@@ -21,7 +21,7 @@ export async function createLead(formData: FormData) {
     redirect('/leads?error=' + encodeURIComponent(parsed.error.issues[0].message))
   }
 
-  const supabase = await createClient() as any
+  const supabase = await createClient()
   const { error } = await supabase.from('leads').insert({
     contact_name: parsed.data.contact_name,
     contact_email: parsed.data.contact_email || null,

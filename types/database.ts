@@ -10,11 +10,13 @@ export interface Database {
         Row: { id: string; email: string; name: string; role: UserRole; created_at: string }
         Insert: { id: string; email: string; name: string; role?: UserRole }
         Update: { name?: string; role?: UserRole }
+        Relationships: []
       }
       clients: {
         Row: { id: string; name: string; status: ClientStatus; owner_user_id: string | null; created_at: string }
         Insert: { name: string; status?: ClientStatus; owner_user_id?: string | null }
         Update: { name?: string; status?: ClientStatus; owner_user_id?: string | null }
+        Relationships: []
       }
       leads: {
         Row: {
@@ -50,6 +52,7 @@ export interface Database {
           notes: string | null
           updated_at: string
         }>
+        Relationships: []
       }
       activities: {
         Row: {
@@ -69,7 +72,10 @@ export interface Database {
           body?: string | null
         }
         Update: never
+        Relationships: []
       }
     }
+    Views: Record<string, never>
+    Functions: Record<string, never>
   }
 }

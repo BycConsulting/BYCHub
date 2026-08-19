@@ -9,10 +9,10 @@ export default async function LeadsPage({
 }) {
   const { error } = await searchParams
   const supabase = await createClient()
-  const { data: leads } = (await supabase
+  const { data: leads } = await supabase
     .from('leads')
     .select('id, contact_name, contact_company, stage, source, created_at')
-    .order('created_at', { ascending: false })) as any
+    .order('created_at', { ascending: false })
 
   return (
     <div className="space-y-8">
@@ -43,7 +43,7 @@ export default async function LeadsPage({
             </tr>
           </thead>
           <tbody>
-            {(leads ?? []).map((lead: any) => (
+            {(leads ?? []).map((lead) => (
               <tr key={lead.id} className="border-b">
                 <td className="py-2">
                   <Link href={`/leads/${lead.id}`} className="text-blue-600 hover:underline">
