@@ -51,11 +51,31 @@ alter table public.activities enable row level security;
 create policy "users_select_authenticated" on public.users
   for select using (auth.role() = 'authenticated');
 
-create policy "clients_all_authenticated" on public.clients
-  for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+-- CRM tables: employee membership, NOT merely "has a session".
+--
+-- These policies deliberately do NOT use `auth.role() = 'authenticated'`. That
+-- predicate is true for ANY Supabase Auth session, not just employees. The anon
+-- key is public (it ships in the browser bundle) and Supabase projects accept
+-- email signup by default, so a stranger can self-register straight against the
+-- Auth REST API — never touching this Next.js app or its requireUser/requireAdmin
+-- checks — and then read and write every row through
+-- https://<project>.supabase.co/rest/v1/... using the anon key plus their own
+-- session. Verified exploitable against the live project before this change.
+--
+-- Requiring a matching public.users row closes that hole: rows in public.users
+-- are only ever created by an admin's invite action through the service-role key
+-- (see the comment above), so "has a profile row" means "is a real employee".
+create policy "clients_all_employees" on public.clients
+  for all to authenticated
+  using (exists (select 1 from public.users u where u.id = (select auth.uid())))
+  with check (exists (select 1 from public.users u where u.id = (select auth.uid())));
 
-create policy "leads_all_authenticated" on public.leads
-  for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+create policy "leads_all_employees" on public.leads
+  for all to authenticated
+  using (exists (select 1 from public.users u where u.id = (select auth.uid())))
+  with check (exists (select 1 from public.users u where u.id = (select auth.uid())));
 
-create policy "activities_all_authenticated" on public.activities
-  for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+create policy "activities_all_employees" on public.activities
+  for all to authenticated
+  using (exists (select 1 from public.users u where u.id = (select auth.uid())))
+  with check (exists (select 1 from public.users u where u.id = (select auth.uid())));
