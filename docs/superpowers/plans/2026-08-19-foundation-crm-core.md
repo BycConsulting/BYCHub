@@ -520,7 +520,7 @@ export default async function LoginPage({
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
       <form action={login} className="w-full max-w-sm space-y-4 rounded-lg border bg-white p-6 shadow-sm">
-        <h1 className="text-xl font-semibold">BYC Platform</h1>
+        <h1 className="text-xl font-semibold">BYC Hub</h1>
         {error && <p className="rounded bg-red-50 p-2 text-sm text-red-600">{error}</p>}
         <div>
           <label className="block text-sm font-medium" htmlFor="email">
@@ -587,7 +587,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div className="min-h-screen bg-gray-50">
       <nav className="flex items-center justify-between border-b bg-white px-6 py-3">
         <div className="flex items-center gap-4">
-          <span className="font-semibold">BYC Platform</span>
+          <span className="font-semibold">BYC Hub</span>
           <Link href="/leads" className="text-sm text-gray-600 hover:text-black">
             Leads
           </Link>
