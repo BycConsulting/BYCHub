@@ -4,10 +4,13 @@ import { addActivity } from '../../leads/actions'
 
 export default async function ClientDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>
+  searchParams: Promise<{ error?: string }>
 }) {
   const { id } = await params
+  const { error } = await searchParams
   const supabase = await createClient()
 
   const { data: client } = await supabase.from('clients').select('id, name, status').eq('id', id).single()
@@ -22,6 +25,8 @@ export default async function ClientDetailPage({
 
   return (
     <div className="space-y-8">
+      {error && <p className="rounded bg-red-50 p-2 text-sm text-red-600">{error}</p>}
+
       <div>
         <h1 className="text-lg font-semibold">{client.name}</h1>
         <p className="text-sm text-gray-600">Status: {client.status}</p>

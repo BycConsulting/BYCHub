@@ -23,6 +23,16 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
     .eq('id', user.id)
     .single()
 
+  if (!profile) {
+    // Valid Auth session but no employee profile (orphaned invite, bad seed).
+    // Returning null alone would make requireUser() bounce to /login, where
+    // middleware sees the still-valid session and sends them back — an
+    // unbreakable loop in which the layout (and its sign-out button) never
+    // renders. Dropping the session turns that loop into a clean stop.
+    await supabase.auth.signOut()
+    return null
+  }
+
   return profile
 }
 

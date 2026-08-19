@@ -71,7 +71,17 @@ export async function updateLeadStage(formData: FormData) {
   })
 
   if (stage === 'won') {
-    await convertLeadToClient(leadId, supabase)
+    // The stage change and its activity entry stand either way, but a failed
+    // conversion must not look like a success — surface it.
+    const conversionError = await convertLeadToClient(leadId, supabase)
+    if (conversionError) {
+      revalidatePath(`/leads/${leadId}`)
+      revalidatePath('/leads')
+      redirect(
+        `/leads/${leadId}?error=` +
+          encodeURIComponent(`Stage saved, but creating the client record failed: ${conversionError}`)
+      )
+    }
   }
 
   revalidatePath(`/leads/${leadId}`)
@@ -79,16 +89,22 @@ export async function updateLeadStage(formData: FormData) {
   redirect(`/leads/${leadId}`)
 }
 
-async function convertLeadToClient(leadId: string, supabase: Awaited<ReturnType<typeof createClient>>) {
-  const { data: lead } = await supabase
+/** Returns an error message if the conversion failed, or null on success/no-op. */
+async function convertLeadToClient(
+  leadId: string,
+  supabase: Awaited<ReturnType<typeof createClient>>
+): Promise<string | null> {
+  const { data: lead, error: leadError } = await supabase
     .from('leads')
     .select('id, client_id, contact_company, contact_name, assigned_user_id')
     .eq('id', leadId)
     .single()
 
-  if (!lead || lead.client_id) return
+  if (leadError) return leadError.message
+  if (!lead) return 'Lead not found'
+  if (lead.client_id) return null
 
-  const { data: client } = await supabase
+  const { data: client, error: insertError } = await supabase
     .from('clients')
     .insert({
       name: lead.contact_company || lead.contact_name,
@@ -98,9 +114,17 @@ async function convertLeadToClient(leadId: string, supabase: Awaited<ReturnType<
     .select('id')
     .single()
 
-  if (client) {
-    await supabase.from('leads').update({ client_id: client.id }).eq('id', leadId)
-  }
+  if (insertError) return insertError.message
+  if (!client) return 'Client record was not created'
+
+  const { error: linkError } = await supabase
+    .from('leads')
+    .update({ client_id: client.id })
+    .eq('id', leadId)
+
+  if (linkError) return `Client created but linking it to the lead failed: ${linkError.message}`
+
+  return null
 }
 
 export async function addActivity(formData: FormData) {

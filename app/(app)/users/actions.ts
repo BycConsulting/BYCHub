@@ -1,8 +1,10 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { requireAdmin } from '@/lib/access'
+import { INVITE_RESULT_COOKIE } from './invite-result'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { inviteUserSchema } from '@/lib/validation'
 
@@ -47,6 +49,27 @@ export async function inviteUser(formData: FormData) {
     redirect('/users?error=' + encodeURIComponent(profileError.message))
   }
 
+  // The temp password must never travel in the URL — query strings land in
+  // browser history, server access logs and Referer headers. Hand it over in a
+  // short-lived httpOnly cookie instead; /users reads it once and clears it.
+  const cookieStore = await cookies()
+  cookieStore.set(INVITE_RESULT_COOKIE, JSON.stringify({ email: parsed.data.email, tempPassword }), {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    path: '/users',
+    maxAge: 60,
+  })
+
   revalidatePath('/users')
-  redirect('/users?tempPassword=' + encodeURIComponent(tempPassword) + '&for=' + encodeURIComponent(parsed.data.email))
+  redirect('/users')
+}
+
+// Clears the one-time invite cookie. A Server Component cannot delete a cookie
+// mid-render, so the banner renders with this action wired to its dismiss form.
+export async function clearInviteResult() {
+  await requireAdmin()
+  const cookieStore = await cookies()
+  cookieStore.delete({ name: INVITE_RESULT_COOKIE, path: '/users' })
+  revalidatePath('/users')
 }

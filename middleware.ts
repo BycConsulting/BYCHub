@@ -29,16 +29,23 @@ export async function middleware(request: NextRequest) {
 
   const isLoginPage = request.nextUrl.pathname === '/login'
 
+  // getUser() may have rotated the session cookies via setAll above. A fresh
+  // NextResponse.redirect() carries none of them, so copy them across or the
+  // refreshed tokens are dropped and the user is bounced back to /login.
   if (!user && !isLoginPage) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
-    return NextResponse.redirect(url)
+    const redirectResponse = NextResponse.redirect(url)
+    response.cookies.getAll().forEach((cookie) => redirectResponse.cookies.set(cookie))
+    return redirectResponse
   }
 
   if (user && isLoginPage) {
     const url = request.nextUrl.clone()
     url.pathname = '/leads'
-    return NextResponse.redirect(url)
+    const redirectResponse = NextResponse.redirect(url)
+    response.cookies.getAll().forEach((cookie) => redirectResponse.cookies.set(cookie))
+    return redirectResponse
   }
 
   return response
