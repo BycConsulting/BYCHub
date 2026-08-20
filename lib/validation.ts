@@ -33,3 +33,9 @@ export const inviteUserSchema = z.object({
   name: z.string().trim().min(1, 'Name is required'),
   role: z.enum(['admin', 'employee']),
 })
+
+export const chatProviders = ['claude', 'chatgpt'] as const
+
+export const createConversationSchema = z.object({
+  provider: z.enum(chatProviders),
+})

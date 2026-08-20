@@ -2,6 +2,8 @@ export type UserRole = 'admin' | 'employee'
 export type ClientStatus = 'prospect' | 'active' | 'paused' | 'lost'
 export type LeadStage = 'new' | 'contacted' | 'qualified' | 'proposal' | 'won' | 'lost'
 export type ActivityType = 'note' | 'call' | 'email' | 'stage_change'
+export type ChatProvider = 'claude' | 'chatgpt'
+export type ChatMessageRole = 'user' | 'assistant'
 
 export interface Database {
   public: {
@@ -70,6 +72,44 @@ export interface Database {
           user_id: string
           type: ActivityType
           body?: string | null
+        }
+        Update: never
+        Relationships: []
+      }
+      chat_conversations: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          provider: ChatProvider
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          user_id: string
+          title?: string
+          provider: ChatProvider
+        }
+        Update: {
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          id: string
+          conversation_id: string
+          user_id: string
+          role: ChatMessageRole
+          content: string
+          created_at: string
+        }
+        Insert: {
+          conversation_id: string
+          user_id: string
+          role: ChatMessageRole
+          content: string
         }
         Update: never
         Relationships: []
