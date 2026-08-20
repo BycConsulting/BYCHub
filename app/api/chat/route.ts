@@ -67,8 +67,16 @@ export async function POST(req: Request) {
 
   return result.toUIMessageStreamResponse({
     originalMessages: messages,
+    onError: (error) => {
+      console.error('[chat] provider error', error)
+      return error instanceof Error ? error.message : 'Something went wrong talking to the provider.'
+    },
     onEnd: async ({ responseMessage }) => {
       const assistantText = textFromParts(responseMessage.parts)
+
+      if (!assistantText.trim()) {
+        return
+      }
 
       await supabase.from('chat_messages').insert({
         conversation_id: conversationId,
