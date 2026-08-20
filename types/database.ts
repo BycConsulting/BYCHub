@@ -13,6 +13,8 @@ export type LeaveRequestStatus = 'pending' | 'approved' | 'rejected' | 'cancelle
 export type JobOpeningStatus = 'open' | 'closed'
 export type CandidateStage = 'applied' | 'screening' | 'interview' | 'offer' | 'hired' | 'rejected'
 export type FinanceTransactionType = 'income' | 'expense'
+export type ChatProvider = 'claude' | 'chatgpt'
+export type ChatMessageRole = 'user' | 'assistant'
 
 export interface Database {
   public: {
@@ -525,6 +527,44 @@ export interface Database {
           note?: string | null
           receipt_path?: string | null
           created_by?: string | null
+        }
+        Update: never
+        Relationships: []
+      }
+      chat_conversations: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          provider: ChatProvider
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          user_id: string
+          title?: string
+          provider: ChatProvider
+        }
+        Update: {
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          id: string
+          conversation_id: string
+          user_id: string
+          role: ChatMessageRole
+          content: string
+          created_at: string
+        }
+        Insert: {
+          conversation_id: string
+          user_id: string
+          role: ChatMessageRole
+          content: string
         }
         Update: never
         Relationships: []
