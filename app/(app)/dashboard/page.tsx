@@ -15,10 +15,13 @@ export default async function DashboardPage() {
   const supabase = await createClient()
 
   const [leadsRes, clientsRes, activitiesRes, usersRes] = await Promise.all([
-    supabase.from('leads').select('id, stage, source, created_at'),
-    supabase.from('clients').select('status'),
-    supabase.from('activities').select('lead_id, type, body, user_id, created_at'),
-    supabase.from('users').select('id, name'),
+    supabase.from('leads').select('id, stage, source, created_at', { count: 'exact' }),
+    supabase.from('clients').select('status', { count: 'exact' }),
+    supabase
+      .from('activities')
+      .select('lead_id, type, body, user_id, created_at', { count: 'exact' })
+      .order('created_at', { ascending: true }),
+    supabase.from('users').select('id, name', { count: 'exact' }),
   ])
 
   const queryError = leadsRes.error || clientsRes.error || activitiesRes.error || usersRes.error
@@ -35,6 +38,12 @@ export default async function DashboardPage() {
   const activities = activitiesRes.data ?? []
   const users = usersRes.data ?? []
 
+  const isTruncated =
+    (leadsRes.count ?? leads.length) > leads.length ||
+    (clientsRes.count ?? clients.length) > clients.length ||
+    (activitiesRes.count ?? activities.length) > activities.length ||
+    (usersRes.count ?? users.length) > users.length
+
   const byStage = countLeadsByStage(leads)
   const bySource = countLeadsBySource(leads)
   const winRate = computeWinRate(leads)
@@ -49,6 +58,12 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-8">
       <h1 className="text-lg font-semibold">Dashboard</h1>
+
+      {isTruncated && (
+        <div className="rounded bg-yellow-50 p-3 text-sm text-yellow-800">
+          Showing partial data — some rows were not loaded. Numbers below may be understated.
+        </div>
+      )}
 
       <div className="grid grid-cols-3 gap-4">
         <div className="rounded border p-4">
@@ -127,8 +142,8 @@ export default async function DashboardPage() {
           <p className="mt-2 text-sm text-gray-500">No activity yet.</p>
         ) : (
           <div className="mt-3 space-y-2">
-            {byUser.map(({ name, count }) => (
-              <div key={name} className="flex items-center gap-2">
+            {byUser.map(({ userId, name, count }) => (
+              <div key={userId} className="flex items-center gap-2">
                 <div className="w-24 truncate text-sm">{name}</div>
                 <div className="h-4 flex-1 rounded bg-gray-100">
                   <div

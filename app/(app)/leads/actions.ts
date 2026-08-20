@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { requireUser } from '@/lib/access'
 import { createLeadSchema, updateStageSchema, addActivitySchema } from '@/lib/validation'
+import { stageChangeBody } from '@/lib/metrics'
 
 export async function createLead(formData: FormData) {
   const user = await requireUser()
@@ -67,7 +68,7 @@ export async function updateLeadStage(formData: FormData) {
     lead_id: leadId,
     user_id: user.id,
     type: 'stage_change',
-    body: `Stage changed to ${stage}`,
+    body: stageChangeBody(stage),
   })
 
   if (stage === 'won') {

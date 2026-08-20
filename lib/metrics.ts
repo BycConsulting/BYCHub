@@ -1,4 +1,4 @@
-import type { LeadStage, ClientStatus } from '@/types/database'
+import type { LeadStage, ClientStatus, ActivityType } from '@/types/database'
 
 export interface LeadRow {
   id: string
@@ -13,7 +13,7 @@ export interface ClientRow {
 
 export interface ActivityRow {
   lead_id: string | null
-  type: string
+  type: ActivityType
   body: string | null
   user_id: string
   created_at: string
@@ -22,6 +22,10 @@ export interface ActivityRow {
 export interface UserRow {
   id: string
   name: string
+}
+
+export function stageChangeBody(stage: LeadStage): string {
+  return `Stage changed to ${stage}`
 }
 
 export const leadStageOrder: readonly LeadStage[] = [
@@ -89,7 +93,7 @@ export function computeAvgTimeToWonDays(leads: LeadRow[], activities: ActivityRo
       (activity) =>
         activity.lead_id === lead.id &&
         activity.type === 'stage_change' &&
-        activity.body === 'Stage changed to won'
+        activity.body === stageChangeBody('won')
     )
     if (!wonActivity) continue
 
@@ -106,7 +110,7 @@ export function computeAvgTimeToWonDays(leads: LeadRow[], activities: ActivityRo
 export function countActivitiesByUser(
   activities: ActivityRow[],
   users: UserRow[]
-): { name: string; count: number }[] {
+): { userId: string; name: string; count: number }[] {
   const counts = new Map<string, number>()
   for (const activity of activities) {
     counts.set(activity.user_id, (counts.get(activity.user_id) ?? 0) + 1)
@@ -115,6 +119,6 @@ export function countActivitiesByUser(
   const nameById = new Map(users.map((user) => [user.id, user.name]))
 
   return Array.from(counts.entries())
-    .map(([userId, count]) => ({ name: nameById.get(userId) ?? 'Unknown', count }))
+    .map(([userId, count]) => ({ userId, name: nameById.get(userId) ?? 'Unknown', count }))
     .sort((a, b) => b.count - a.count)
 }
