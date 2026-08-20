@@ -101,15 +101,23 @@ export async function deactivateUser(formData: FormData) {
   const supabase = await createClient()
   const admin = createAdminSupabaseClient()
 
-  const { count: leadsCount } = await supabase
+  const { count: leadsCount, error: leadsCountError } = await supabase
     .from('leads')
     .select('id', { count: 'exact', head: true })
     .eq('assigned_user_id', userId)
 
-  const { count: clientsCount } = await supabase
+  if (leadsCountError) {
+    redirect('/users?error=' + encodeURIComponent(leadsCountError.message))
+  }
+
+  const { count: clientsCount, error: clientsCountError } = await supabase
     .from('clients')
     .select('id', { count: 'exact', head: true })
     .eq('owner_user_id', userId)
+
+  if (clientsCountError) {
+    redirect('/users?error=' + encodeURIComponent(clientsCountError.message))
+  }
 
   const ownedCount = (leadsCount ?? 0) + (clientsCount ?? 0)
 
@@ -130,8 +138,23 @@ export async function deactivateUser(formData: FormData) {
       redirect('/users?error=' + encodeURIComponent('Reassignment target must be an active employee'))
     }
 
-    await supabase.from('leads').update({ assigned_user_id: reassignToUserId }).eq('assigned_user_id', userId)
-    await supabase.from('clients').update({ owner_user_id: reassignToUserId }).eq('owner_user_id', userId)
+    const { error: reassignLeadsError } = await supabase
+      .from('leads')
+      .update({ assigned_user_id: reassignToUserId })
+      .eq('assigned_user_id', userId)
+
+    if (reassignLeadsError) {
+      redirect('/users?error=' + encodeURIComponent(reassignLeadsError.message))
+    }
+
+    const { error: reassignClientsError } = await supabase
+      .from('clients')
+      .update({ owner_user_id: reassignToUserId })
+      .eq('owner_user_id', userId)
+
+    if (reassignClientsError) {
+      redirect('/users?error=' + encodeURIComponent(reassignClientsError.message))
+    }
   }
 
   const { error } = await admin.from('users').update({ is_active: false }).eq('id', userId)
