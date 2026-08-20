@@ -33,3 +33,12 @@ export const inviteUserSchema = z.object({
   name: z.string().trim().min(1, 'Name is required'),
   role: z.enum(['admin', 'employee']),
 })
+
+export const deactivateUserSchema = z.object({
+  userId: z.string().uuid(),
+  reassignToUserId: z.string().uuid().optional(),
+})
+
+export const userIdSchema = z.object({
+  userId: z.string().uuid(),
+})

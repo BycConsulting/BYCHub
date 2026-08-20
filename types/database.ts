@@ -7,9 +7,16 @@ export interface Database {
   public: {
     Tables: {
       users: {
-        Row: { id: string; email: string; name: string; role: UserRole; created_at: string }
-        Insert: { id: string; email: string; name: string; role?: UserRole }
-        Update: { name?: string; role?: UserRole }
+        Row: {
+          id: string
+          email: string
+          name: string
+          role: UserRole
+          is_active: boolean
+          created_at: string
+        }
+        Insert: { id: string; email: string; name: string; role?: UserRole; is_active?: boolean }
+        Update: { name?: string; role?: UserRole; is_active?: boolean }
         Relationships: []
       }
       clients: {
