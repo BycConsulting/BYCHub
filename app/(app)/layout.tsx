@@ -10,6 +10,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <nav className="flex items-center justify-between border-b bg-white px-6 py-3">
         <div className="flex items-center gap-4">
           <span className="font-semibold">BYC Hub</span>
+          <Link href="/dashboard" className="text-sm text-gray-600 hover:text-black">
+            Dashboard
+          </Link>
           <Link href="/leads" className="text-sm text-gray-600 hover:text-black">
             Leads
           </Link>
