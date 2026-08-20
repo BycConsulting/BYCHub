@@ -20,9 +20,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             Clients
           </Link>
           {user.role === 'admin' && (
-            <Link href="/users" className="text-sm text-gray-600 hover:text-black">
-              Users
-            </Link>
+            <>
+              <Link href="/users" className="text-sm text-gray-600 hover:text-black">
+                Users
+              </Link>
+              <Link href="/settings" className="text-sm text-gray-600 hover:text-black">
+                Settings
+              </Link>
+            </>
           )}
         </div>
         <div className="flex items-center gap-3 text-sm text-gray-600">
