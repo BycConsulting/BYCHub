@@ -61,7 +61,7 @@ export default async function DashboardPage() {
 
       {isTruncated && (
         <div className="rounded bg-yellow-50 p-3 text-sm text-yellow-800">
-          Showing partial data — some rows were not loaded. Numbers below may be understated.
+          Showing partial data — some rows were not loaded. Numbers below may be incomplete or inaccurate.
         </div>
       )}
 
