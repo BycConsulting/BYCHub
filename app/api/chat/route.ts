@@ -19,20 +19,14 @@ export async function POST(req: Request) {
   const { messages, provider, conversationId } = body
 
   if (!messages || !provider || !conversationId || !chatProviders.includes(provider)) {
-    return new Response(JSON.stringify({ error: 'Malformed request' }), { status: 400 })
+    return new Response('Malformed request', { status: 400 })
   }
 
   if (provider === 'claude' && !process.env.ANTHROPIC_API_KEY) {
-    return new Response(
-      JSON.stringify({ error: "Claude isn't configured — ask an admin to add ANTHROPIC_API_KEY." }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    )
+    return new Response("Claude isn't configured — ask an admin to add ANTHROPIC_API_KEY.", { status: 500 })
   }
   if (provider === 'chatgpt' && !process.env.OPENAI_API_KEY) {
-    return new Response(
-      JSON.stringify({ error: "ChatGPT isn't configured — ask an admin to add OPENAI_API_KEY." }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    )
+    return new Response("ChatGPT isn't configured — ask an admin to add OPENAI_API_KEY.", { status: 500 })
   }
 
   const supabase = await createClient()
@@ -41,7 +35,7 @@ export async function POST(req: Request) {
   } = await supabase.auth.getUser()
 
   if (!user) {
-    return new Response(JSON.stringify({ error: 'Not authenticated' }), { status: 401 })
+    return new Response('Not authenticated', { status: 401 })
   }
 
   const { data: conversation, error: conversationError } = await supabase
@@ -51,7 +45,7 @@ export async function POST(req: Request) {
     .single()
 
   if (conversationError || !conversation) {
-    return new Response(JSON.stringify({ error: 'Conversation not found' }), { status: 404 })
+    return new Response('Conversation not found', { status: 404 })
   }
 
   const model = provider === 'claude' ? anthropic('claude-sonnet-5') : openai('gpt-5.4')
