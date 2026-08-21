@@ -67,6 +67,14 @@ export async function inviteUser(formData: FormData) {
     redirect('/users?error=' + encodeURIComponent(profileError.message))
   }
 
+  const { error: employeeProfileError } = await admin.from('employee_profiles').insert({
+    user_id: created.user.id,
+  })
+
+  if (employeeProfileError) {
+    redirect('/users?error=' + encodeURIComponent(employeeProfileError.message))
+  }
+
   // The temp password must never travel in the URL — query strings land in
   // browser history, server access logs and Referer headers. Hand it over in a
   // short-lived httpOnly cookie instead; /users reads it once and clears it.
