@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { addActivity } from '../../leads/actions'
+import { requireModule } from '@/lib/access'
 
 export default async function ClientDetailPage({
   params,
@@ -9,6 +10,7 @@ export default async function ClientDetailPage({
   params: Promise<{ id: string }>
   searchParams: Promise<{ error?: string }>
 }) {
+  await requireModule('clients')
   const { id } = await params
   const { error } = await searchParams
   const supabase = await createClient()

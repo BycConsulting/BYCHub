@@ -1,7 +1,9 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { requireModule } from '@/lib/access'
 
 export default async function ClientsPage() {
+  await requireModule('clients')
   const supabase = await createClient()
   const { data: clients } = await supabase
     .from('clients')
