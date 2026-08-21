@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { requireModule } from '@/lib/access'
+import { requireAdminRole } from '@/lib/access'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { configurableRoles, moduleKeys, updateModuleAccessSchema } from '@/lib/validation'
 import type { ConfigurableRole, Module } from '@/types/database'
@@ -16,7 +16,7 @@ function isModule(value: string): value is Module {
 }
 
 export async function updateModuleAccess(formData: FormData) {
-  await requireModule('settings')
+  await requireAdminRole()
 
   const parsed = updateModuleAccessSchema.safeParse({
     enabled: formData.getAll('enabled'),

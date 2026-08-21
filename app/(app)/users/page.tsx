@@ -64,7 +64,7 @@ export default async function UsersPage({
           <select name="role" className="rounded border px-3 py-2">
             <option value="employee">Employee</option>
             <option value="hr">HR</option>
-            <option value="admin">Admin</option>
+            {currentUser.role === 'admin' && <option value="admin">Admin</option>}
           </select>
           <button type="submit" className="col-span-3 rounded bg-black py-2 text-white">
             Create user

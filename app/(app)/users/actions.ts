@@ -31,7 +31,7 @@ async function setInviteResultCookie(email: string, tempPassword: string, action
 }
 
 export async function inviteUser(formData: FormData) {
-  await requireModule('hr')
+  const currentUser = await requireModule('hr')
 
   const parsed = inviteUserSchema.safeParse({
     email: formData.get('email'),
@@ -41,6 +41,10 @@ export async function inviteUser(formData: FormData) {
 
   if (!parsed.success) {
     redirect('/users?error=' + encodeURIComponent(parsed.error.issues[0].message))
+  }
+
+  if (parsed.data.role === 'admin' && currentUser.role !== 'admin') {
+    redirect('/users?error=' + encodeURIComponent('Only an admin can create another admin'))
   }
 
   const tempPassword = generateTempPassword()
@@ -112,8 +116,15 @@ export async function deactivateUser(formData: FormData) {
     redirect('/users?error=' + encodeURIComponent('You cannot deactivate your own account'))
   }
 
-  const supabase = await createClient()
   const admin = createAdminSupabaseClient()
+
+  const { data: target } = await admin.from('users').select('role').eq('id', userId).single()
+
+  if (target?.role === 'admin' && currentUser.role !== 'admin') {
+    redirect('/users?error=' + encodeURIComponent('Only an admin can deactivate an admin'))
+  }
+
+  const supabase = await createClient()
 
   const { count: leadsCount, error: leadsCountError } = await supabase
     .from('leads')
@@ -233,7 +244,7 @@ export async function reactivateUser(formData: FormData) {
 }
 
 export async function resetUserPassword(formData: FormData) {
-  await requireModule('hr')
+  const currentUser = await requireModule('hr')
 
   const parsed = userIdSchema.safeParse({ userId: formData.get('userId') })
 
@@ -242,10 +253,14 @@ export async function resetUserPassword(formData: FormData) {
   }
 
   const admin = createAdminSupabaseClient()
-  const { data: profile } = await admin.from('users').select('email').eq('id', parsed.data.userId).single()
+  const { data: profile } = await admin.from('users').select('email, role').eq('id', parsed.data.userId).single()
 
   if (!profile) {
     redirect('/users?error=' + encodeURIComponent('User not found'))
+  }
+
+  if (profile.role === 'admin' && currentUser.role !== 'admin') {
+    redirect('/users?error=' + encodeURIComponent('Only an admin can reset an admin\'s password'))
   }
 
   const tempPassword = generateTempPassword()

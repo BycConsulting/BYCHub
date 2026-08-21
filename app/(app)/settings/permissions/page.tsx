@@ -1,4 +1,4 @@
-import { requireModule } from '@/lib/access'
+import { requireAdminRole } from '@/lib/access'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { configurableRoles, moduleKeys } from '@/lib/validation'
 import { updateModuleAccess } from './actions'
@@ -8,7 +8,7 @@ export default async function PermissionsPage({
 }: {
   searchParams: Promise<{ error?: string }>
 }) {
-  await requireModule('settings')
+  await requireAdminRole()
   const { error } = await searchParams
 
   const admin = createAdminSupabaseClient()
