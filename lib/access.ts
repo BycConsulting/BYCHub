@@ -44,12 +44,6 @@ export async function requireUser(): Promise<CurrentUser> {
   return user
 }
 
-export async function requireAdmin(): Promise<CurrentUser> {
-  const user = await requireUser()
-  if (user.role !== 'admin') redirect('/leads')
-  return user
-}
-
 const MODULE_ORDER: Module[] = ['dashboard', 'leads', 'clients', 'hr', 'settings']
 
 const MODULE_PATHS: Record<Module, string> = {

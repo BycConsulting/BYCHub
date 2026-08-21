@@ -1,39 +1,43 @@
 import Link from 'next/link'
-import { requireUser } from '@/lib/access'
+import { requireUser, getEnabledModules } from '@/lib/access'
 import { logout } from '@/app/login/actions'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await requireUser()
+  const enabledModules = await getEnabledModules(user.role)
 
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="flex items-center justify-between border-b bg-white px-6 py-3">
         <div className="flex items-center gap-4">
           <span className="font-semibold">BYC Hub</span>
-          <Link href="/dashboard" className="text-sm text-gray-600 hover:text-black">
-            Dashboard
-          </Link>
-          <Link href="/leads" className="text-sm text-gray-600 hover:text-black">
-            Leads
-          </Link>
-          <Link href="/clients" className="text-sm text-gray-600 hover:text-black">
-            Clients
-          </Link>
+          {enabledModules.includes('dashboard') && (
+            <Link href="/dashboard" className="text-sm text-gray-600 hover:text-black">
+              Dashboard
+            </Link>
+          )}
+          {enabledModules.includes('leads') && (
+            <Link href="/leads" className="text-sm text-gray-600 hover:text-black">
+              Leads
+            </Link>
+          )}
+          {enabledModules.includes('clients') && (
+            <Link href="/clients" className="text-sm text-gray-600 hover:text-black">
+              Clients
+            </Link>
+          )}
           <Link href="/profile" className="text-sm text-gray-600 hover:text-black">
             Profile
           </Link>
-          {user.role === 'admin' && (
-            <>
-              <Link href="/users" className="text-sm text-gray-600 hover:text-black">
-                Users
-              </Link>
-              <Link href="/settings" className="text-sm text-gray-600 hover:text-black">
-                Settings
-              </Link>
-              <Link href="/users/requests" className="text-sm text-gray-600 hover:text-black">
-                Requests
-              </Link>
-            </>
+          {enabledModules.includes('hr') && (
+            <Link href="/users" className="text-sm text-gray-600 hover:text-black">
+              HR
+            </Link>
+          )}
+          {enabledModules.includes('settings') && (
+            <Link href="/settings" className="text-sm text-gray-600 hover:text-black">
+              Settings
+            </Link>
           )}
         </div>
         <div className="flex items-center gap-3 text-sm text-gray-600">
