@@ -34,4 +34,13 @@ if (profileError) {
   process.exit(1)
 }
 
+const { error: employeeProfileError } = await admin.from('employee_profiles').insert({
+  user_id: created.user.id,
+})
+
+if (employeeProfileError) {
+  console.error('Failed to create employee profile row:', employeeProfileError.message)
+  process.exit(1)
+}
+
 console.log(`Admin user created: ${email}`)

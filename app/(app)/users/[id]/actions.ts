@@ -29,7 +29,7 @@ export async function updateEmployeeProfile(formData: FormData) {
   const { userId, ...fields } = parsed.data
   const admin = createAdminSupabaseClient()
 
-  const { error } = await admin
+  const { data: updated, error } = await admin
     .from('employee_profiles')
     .update({
       phone: fields.phone || null,
@@ -44,9 +44,16 @@ export async function updateEmployeeProfile(formData: FormData) {
       updated_at: new Date().toISOString(),
     })
     .eq('user_id', userId)
+    .select('user_id')
+    .single()
 
-  if (error) {
-    redirect(`/users/${userId}?error=` + encodeURIComponent(error.message))
+  // A well-formed but nonexistent user id matches zero rows, which without
+  // `.single()` returns no error at all and redirects as if it had worked.
+  // `.single()` surfaces it as PGRST116; its message is unreadable, so
+  // translate that one and pass every other error through as-is.
+  if (!updated) {
+    const message = !error || error.code === 'PGRST116' ? 'Employee profile not found' : error.message
+    redirect(`/users/${userId}?error=` + encodeURIComponent(message))
   }
 
   revalidatePath(`/users/${userId}`)

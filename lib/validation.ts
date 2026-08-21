@@ -58,7 +58,12 @@ export const submitProfileChangesSchema = z.object({
   address: z.string().trim().max(200).optional().or(z.literal('')),
   emergencyContactName: z.string().trim().max(200).optional().or(z.literal('')),
   emergencyContactPhone: z.string().trim().max(200).optional().or(z.literal('')),
-  dateOfBirth: z.string().trim().optional().or(z.literal('')),
+  dateOfBirth: z
+    .string()
+    .trim()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Enter a valid date')
+    .optional()
+    .or(z.literal('')),
 })
 
 export const reviewProfileRequestSchema = z.object({
@@ -71,9 +76,19 @@ export const updateEmployeeProfileSchema = z.object({
   address: z.string().trim().max(200).optional().or(z.literal('')),
   emergencyContactName: z.string().trim().max(200).optional().or(z.literal('')),
   emergencyContactPhone: z.string().trim().max(200).optional().or(z.literal('')),
-  dateOfBirth: z.string().trim().optional().or(z.literal('')),
+  dateOfBirth: z
+    .string()
+    .trim()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Enter a valid date')
+    .optional()
+    .or(z.literal('')),
   designation: z.string().trim().max(200).optional().or(z.literal('')),
   department: z.string().trim().max(200).optional().or(z.literal('')),
-  employmentStartDate: z.string().trim().optional().or(z.literal('')),
+  employmentStartDate: z
+    .string()
+    .trim()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Enter a valid date')
+    .optional()
+    .or(z.literal('')),
   employmentType: z.enum(employmentTypes).optional().or(z.literal('')),
 })

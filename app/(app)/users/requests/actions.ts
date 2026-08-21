@@ -5,9 +5,12 @@ import { redirect } from 'next/navigation'
 import { requireAdmin } from '@/lib/access'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { reviewProfileRequestSchema } from '@/lib/validation'
-import type { EmployeeProfileField } from '@/types/database'
+import type { Database, EmployeeProfileField } from '@/types/database'
 
-function buildProfileUpdate(field: EmployeeProfileField, value: string): Record<string, string> {
+function buildProfileUpdate(
+  field: EmployeeProfileField,
+  value: string
+): Database['public']['Tables']['employee_profiles']['Update'] {
   switch (field) {
     case 'phone':
       return { phone: value }
@@ -43,16 +46,24 @@ export async function approveProfileRequest(formData: FormData) {
     redirect('/users/requests?error=' + encodeURIComponent('Request not found or already resolved'))
   }
 
-  const { error: profileError } = await admin
+  const { data: updatedProfile, error: profileError } = await admin
     .from('employee_profiles')
     .update({
       ...buildProfileUpdate(request.field, request.proposed_value),
       updated_at: new Date().toISOString(),
     })
     .eq('user_id', request.user_id)
+    .select('user_id')
+    .single()
 
-  if (profileError) {
-    redirect('/users/requests?error=' + encodeURIComponent(profileError.message))
+  // A well-formed but nonexistent user id matches zero rows, which without
+  // `.single()` returns no error at all — falling through and marking the
+  // request approved even though the value was never applied, and the
+  // request can never be re-approved because it's no longer pending.
+  if (!updatedProfile) {
+    const message =
+      !profileError || profileError.code === 'PGRST116' ? 'Employee profile not found' : profileError.message
+    redirect('/users/requests?error=' + encodeURIComponent(message))
   }
 
   const { error: requestError } = await admin
