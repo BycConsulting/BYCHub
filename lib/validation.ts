@@ -42,3 +42,38 @@ export const deactivateUserSchema = z.object({
 export const userIdSchema = z.object({
   userId: z.string().uuid(),
 })
+
+export const employeeProfileFields = [
+  'phone',
+  'address',
+  'emergency_contact_name',
+  'emergency_contact_phone',
+  'date_of_birth',
+] as const
+
+export const employmentTypes = ['full_time', 'part_time', 'contract'] as const
+
+export const submitProfileChangesSchema = z.object({
+  phone: z.string().trim().max(200).optional().or(z.literal('')),
+  address: z.string().trim().max(200).optional().or(z.literal('')),
+  emergencyContactName: z.string().trim().max(200).optional().or(z.literal('')),
+  emergencyContactPhone: z.string().trim().max(200).optional().or(z.literal('')),
+  dateOfBirth: z.string().trim().optional().or(z.literal('')),
+})
+
+export const reviewProfileRequestSchema = z.object({
+  requestId: z.string().uuid(),
+})
+
+export const updateEmployeeProfileSchema = z.object({
+  userId: z.string().uuid(),
+  phone: z.string().trim().max(200).optional().or(z.literal('')),
+  address: z.string().trim().max(200).optional().or(z.literal('')),
+  emergencyContactName: z.string().trim().max(200).optional().or(z.literal('')),
+  emergencyContactPhone: z.string().trim().max(200).optional().or(z.literal('')),
+  dateOfBirth: z.string().trim().optional().or(z.literal('')),
+  designation: z.string().trim().max(200).optional().or(z.literal('')),
+  department: z.string().trim().max(200).optional().or(z.literal('')),
+  employmentStartDate: z.string().trim().optional().or(z.literal('')),
+  employmentType: z.enum(employmentTypes).optional().or(z.literal('')),
+})

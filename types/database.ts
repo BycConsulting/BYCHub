@@ -2,6 +2,14 @@ export type UserRole = 'admin' | 'employee'
 export type ClientStatus = 'prospect' | 'active' | 'paused' | 'lost'
 export type LeadStage = 'new' | 'contacted' | 'qualified' | 'proposal' | 'won' | 'lost'
 export type ActivityType = 'note' | 'call' | 'email' | 'stage_change'
+export type EmploymentType = 'full_time' | 'part_time' | 'contract'
+export type EmployeeProfileField =
+  | 'phone'
+  | 'address'
+  | 'emergency_contact_name'
+  | 'emergency_contact_phone'
+  | 'date_of_birth'
+export type ProfileRequestStatus = 'pending' | 'approved' | 'rejected'
 
 export interface Database {
   public: {
@@ -79,6 +87,70 @@ export interface Database {
           body?: string | null
         }
         Update: never
+        Relationships: []
+      }
+      employee_profiles: {
+        Row: {
+          user_id: string
+          phone: string | null
+          address: string | null
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          date_of_birth: string | null
+          designation: string | null
+          department: string | null
+          employment_start_date: string | null
+          employment_type: EmploymentType | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          user_id: string
+          phone?: string | null
+          address?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          date_of_birth?: string | null
+          designation?: string | null
+          department?: string | null
+          employment_start_date?: string | null
+          employment_type?: EmploymentType | null
+        }
+        Update: Partial<{
+          phone: string | null
+          address: string | null
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          date_of_birth: string | null
+          designation: string | null
+          department: string | null
+          employment_start_date: string | null
+          employment_type: EmploymentType | null
+          updated_at: string
+        }>
+        Relationships: []
+      }
+      employee_profile_requests: {
+        Row: {
+          id: string
+          user_id: string
+          field: EmployeeProfileField
+          proposed_value: string
+          status: ProfileRequestStatus
+          reviewed_by: string | null
+          reviewed_at: string | null
+          created_at: string
+        }
+        Insert: {
+          user_id: string
+          field: EmployeeProfileField
+          proposed_value: string
+        }
+        Update: Partial<{
+          status: ProfileRequestStatus
+          reviewed_by: string | null
+          reviewed_at: string | null
+        }>
         Relationships: []
       }
     }
