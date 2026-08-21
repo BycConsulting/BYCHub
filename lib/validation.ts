@@ -31,7 +31,7 @@ export const addActivitySchema = z
 export const inviteUserSchema = z.object({
   email: z.string().trim().email('Invalid email'),
   name: z.string().trim().min(1, 'Name is required'),
-  role: z.enum(['admin', 'employee']),
+  role: z.enum(['admin', 'hr', 'employee']),
 })
 
 export const deactivateUserSchema = z.object({
@@ -43,32 +43,7 @@ export const userIdSchema = z.object({
   userId: z.string().uuid(),
 })
 
-export const employeeProfileFields = [
-  'phone',
-  'address',
-  'emergency_contact_name',
-  'emergency_contact_phone',
-  'date_of_birth',
-] as const
-
 export const employmentTypes = ['full_time', 'part_time', 'contract'] as const
-
-export const submitProfileChangesSchema = z.object({
-  phone: z.string().trim().max(200).optional().or(z.literal('')),
-  address: z.string().trim().max(200).optional().or(z.literal('')),
-  emergencyContactName: z.string().trim().max(200).optional().or(z.literal('')),
-  emergencyContactPhone: z.string().trim().max(200).optional().or(z.literal('')),
-  dateOfBirth: z
-    .string()
-    .trim()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Enter a valid date')
-    .optional()
-    .or(z.literal('')),
-})
-
-export const reviewProfileRequestSchema = z.object({
-  requestId: z.string().uuid(),
-})
 
 export const updateEmployeeProfileSchema = z.object({
   userId: z.string().uuid(),
@@ -91,4 +66,11 @@ export const updateEmployeeProfileSchema = z.object({
     .optional()
     .or(z.literal('')),
   employmentType: z.enum(employmentTypes).optional().or(z.literal('')),
+})
+
+export const configurableRoles = ['hr', 'employee'] as const
+export const moduleKeys = ['dashboard', 'leads', 'clients', 'hr', 'settings'] as const
+
+export const updateModuleAccessSchema = z.object({
+  enabled: z.array(z.string()),
 })
