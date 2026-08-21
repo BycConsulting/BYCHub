@@ -4,7 +4,7 @@ import { randomBytes } from 'node:crypto'
 import { revalidatePath } from 'next/cache'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { requireAdmin } from '@/lib/access'
+import { requireModule } from '@/lib/access'
 import { INVITE_RESULT_COOKIE } from './invite-result'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
@@ -31,7 +31,7 @@ async function setInviteResultCookie(email: string, tempPassword: string, action
 }
 
 export async function inviteUser(formData: FormData) {
-  await requireAdmin()
+  await requireModule('hr')
 
   const parsed = inviteUserSchema.safeParse({
     email: formData.get('email'),
@@ -88,14 +88,14 @@ export async function inviteUser(formData: FormData) {
 // delete a cookie mid-render, so the banner renders with this action wired to
 // its dismiss form.
 export async function clearInviteResult() {
-  await requireAdmin()
+  await requireModule('hr')
   const cookieStore = await cookies()
   cookieStore.delete({ name: INVITE_RESULT_COOKIE, path: '/users' })
   revalidatePath('/users')
 }
 
 export async function deactivateUser(formData: FormData) {
-  const currentUser = await requireAdmin()
+  const currentUser = await requireModule('hr')
 
   const parsed = deactivateUserSchema.safeParse({
     userId: formData.get('userId'),
@@ -193,7 +193,7 @@ export async function deactivateUser(formData: FormData) {
 }
 
 export async function reactivateUser(formData: FormData) {
-  await requireAdmin()
+  await requireModule('hr')
 
   const parsed = userIdSchema.safeParse({ userId: formData.get('userId') })
 
@@ -233,7 +233,7 @@ export async function reactivateUser(formData: FormData) {
 }
 
 export async function resetUserPassword(formData: FormData) {
-  await requireAdmin()
+  await requireModule('hr')
 
   const parsed = userIdSchema.safeParse({ userId: formData.get('userId') })
 

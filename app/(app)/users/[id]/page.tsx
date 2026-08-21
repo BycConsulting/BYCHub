@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { requireAdmin } from '@/lib/access'
+import { requireModule } from '@/lib/access'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { updateEmployeeProfile } from './actions'
 
@@ -10,7 +10,7 @@ export default async function EmployeeDetailPage({
   params: Promise<{ id: string }>
   searchParams: Promise<{ error?: string }>
 }) {
-  await requireAdmin()
+  await requireModule('hr')
   const { id } = await params
   const { error } = await searchParams
 
