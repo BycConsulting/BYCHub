@@ -1,5 +1,6 @@
 'use server'
 
+import { randomBytes } from 'node:crypto'
 import { revalidatePath } from 'next/cache'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
@@ -9,9 +10,14 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { deactivateUserSchema, inviteUserSchema, userIdSchema } from '@/lib/validation'
 
+// Math.random() is not cryptographically secure, and this is load-bearing for
+// the account-recovery path (reset password), not just first-time invite.
 function generateTempPassword(): string {
-  return Math.random().toString(36).slice(2, 10) + 'A1!'
+  return randomBytes(12).toString('base64url') + 'A1!'
 }
+
+// 100 years — effectively permanent, and reversible via reactivateUser.
+const PERMANENT_BAN_DURATION = '876000h'
 
 async function setInviteResultCookie(email: string, tempPassword: string, action: 'invited' | 'reset') {
   const cookieStore = await cookies()
@@ -163,6 +169,17 @@ export async function deactivateUser(formData: FormData) {
     redirect('/users?error=' + encodeURIComponent(error.message))
   }
 
+  // Flipping is_active locks the employee out of this app and (via
+  // 0005_rls_active_employees.sql) out of the REST API too. Their password still
+  // authenticates at the Auth layer though, so revoke the credential itself.
+  const { error: banError } = await admin.auth.admin.updateUserById(userId, {
+    ban_duration: PERMANENT_BAN_DURATION,
+  })
+
+  if (banError) {
+    redirect('/users?error=' + encodeURIComponent(banError.message))
+  }
+
   revalidatePath('/users')
   redirect('/users')
 }
@@ -177,10 +194,30 @@ export async function reactivateUser(formData: FormData) {
   }
 
   const admin = createAdminSupabaseClient()
-  const { error } = await admin.from('users').update({ is_active: true }).eq('id', parsed.data.userId)
+  const { data: updated, error } = await admin
+    .from('users')
+    .update({ is_active: true })
+    .eq('id', parsed.data.userId)
+    .select('id')
+    .single()
 
-  if (error) {
-    redirect('/users?error=' + encodeURIComponent(error.message))
+  // A well-formed but nonexistent user id matches zero rows, which without
+  // `.single()` returns no error at all and redirects as if it had worked.
+  // `.single()` surfaces it as PGRST116; its message is unreadable, so
+  // translate that one and pass every other error through as-is.
+  if (!updated) {
+    const message = !error || error.code === 'PGRST116' ? 'User not found' : error.message
+    redirect('/users?error=' + encodeURIComponent(message))
+  }
+
+  // deactivateUser bans the Auth user so their password stops working at the
+  // Auth layer; restoring the profile has to lift that ban too.
+  const { error: unbanError } = await admin.auth.admin.updateUserById(parsed.data.userId, {
+    ban_duration: 'none',
+  })
+
+  if (unbanError) {
+    redirect('/users?error=' + encodeURIComponent(unbanError.message))
   }
 
   revalidatePath('/users')
