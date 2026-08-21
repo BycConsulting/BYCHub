@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import type { UserRole } from '@/types/database'
+import { createAdminSupabaseClient } from '@/lib/supabase/admin'
+import type { Module, UserRole } from '@/types/database'
 
 export interface CurrentUser {
   id: string
@@ -47,4 +48,34 @@ export async function requireAdmin(): Promise<CurrentUser> {
   const user = await requireUser()
   if (user.role !== 'admin') redirect('/leads')
   return user
+}
+
+const MODULE_ORDER: Module[] = ['dashboard', 'leads', 'clients', 'hr', 'settings']
+
+const MODULE_PATHS: Record<Module, string> = {
+  dashboard: '/dashboard',
+  leads: '/leads',
+  clients: '/clients',
+  hr: '/users',
+  settings: '/settings',
+}
+
+export async function getEnabledModules(role: UserRole): Promise<Module[]> {
+  if (role === 'admin') return [...MODULE_ORDER]
+
+  const admin = createAdminSupabaseClient()
+  const { data } = await admin.from('role_module_access').select('module').eq('role', role).eq('enabled', true)
+
+  const enabledSet = new Set((data ?? []).map((row) => row.module))
+  return MODULE_ORDER.filter((moduleKey) => enabledSet.has(moduleKey))
+}
+
+export async function requireModule(moduleKey: Module): Promise<CurrentUser> {
+  const user = await requireUser()
+  if (user.role === 'admin') return user
+
+  const enabled = await getEnabledModules(user.role)
+  if (enabled.includes(moduleKey)) return user
+
+  redirect(enabled.length > 0 ? MODULE_PATHS[enabled[0]] : '/profile')
 }
