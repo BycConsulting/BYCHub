@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { cookies } from 'next/headers'
 import { requireAdmin } from '@/lib/access'
 import { createClient } from '@/lib/supabase/server'
@@ -90,7 +91,11 @@ export default async function UsersPage({
 
               return (
                 <tr key={u.id} className="border-b align-top">
-                  <td className="py-2">{u.name}</td>
+                  <td className="py-2">
+                    <Link href={`/users/${u.id}`} className="text-blue-600 hover:underline">
+                      {u.name}
+                    </Link>
+                  </td>
                   <td>{u.email}</td>
                   <td>{u.role}</td>
                   <td>{u.is_active ? 'Active' : 'Deactivated'}</td>
