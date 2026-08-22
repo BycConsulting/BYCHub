@@ -75,6 +75,12 @@ export const updateModuleAccessSchema = z.object({
   enabled: z.array(z.string()),
 })
 
+const leaveDayCount = z
+  .string()
+  .trim()
+  .min(1, 'Leave day counts are required')
+  .pipe(z.coerce.number<string>().int().min(0).max(365))
+
 export const updateHrConfigSchema = z
   .object({
     workingMonday: z.boolean(),
@@ -83,11 +89,11 @@ export const updateHrConfigSchema = z
     workingThursday: z.boolean(),
     workingFriday: z.boolean(),
     workingSaturday: z.boolean(),
-    casualLeaveDays: z.coerce.number().int().min(0).max(365),
-    sickLeaveDays: z.coerce.number().int().min(0).max(365),
-    earnedLeaveDays: z.coerce.number().int().min(0).max(365),
-    maternityLeaveDays: z.coerce.number().int().min(0).max(365),
-    paternityLeaveDays: z.coerce.number().int().min(0).max(365),
+    casualLeaveDays: leaveDayCount,
+    sickLeaveDays: leaveDayCount,
+    earnedLeaveDays: leaveDayCount,
+    maternityLeaveDays: leaveDayCount,
+    paternityLeaveDays: leaveDayCount,
   })
   .refine(
     (data) =>
