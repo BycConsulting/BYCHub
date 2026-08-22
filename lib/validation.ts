@@ -74,3 +74,28 @@ export const moduleKeys = ['dashboard', 'leads', 'clients', 'hr', 'settings'] as
 export const updateModuleAccessSchema = z.object({
   enabled: z.array(z.string()),
 })
+
+export const updateHrConfigSchema = z
+  .object({
+    workingMonday: z.boolean(),
+    workingTuesday: z.boolean(),
+    workingWednesday: z.boolean(),
+    workingThursday: z.boolean(),
+    workingFriday: z.boolean(),
+    workingSaturday: z.boolean(),
+    casualLeaveDays: z.coerce.number().int().min(0).max(365),
+    sickLeaveDays: z.coerce.number().int().min(0).max(365),
+    earnedLeaveDays: z.coerce.number().int().min(0).max(365),
+    maternityLeaveDays: z.coerce.number().int().min(0).max(365),
+    paternityLeaveDays: z.coerce.number().int().min(0).max(365),
+  })
+  .refine(
+    (data) =>
+      data.workingMonday ||
+      data.workingTuesday ||
+      data.workingWednesday ||
+      data.workingThursday ||
+      data.workingFriday ||
+      data.workingSaturday,
+    { message: 'At least one weekday must be a working day' }
+  )
