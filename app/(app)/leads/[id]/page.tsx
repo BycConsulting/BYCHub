@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { leadStages } from '@/lib/validation'
 import { updateLeadStage, addActivity } from '../actions'
+import { requireModule } from '@/lib/access'
 
 export default async function LeadDetailPage({
   params,
@@ -10,6 +11,7 @@ export default async function LeadDetailPage({
   params: Promise<{ id: string }>
   searchParams: Promise<{ error?: string }>
 }) {
+  await requireModule('leads')
   const { id } = await params
   const { error } = await searchParams
   const supabase = await createClient()

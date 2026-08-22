@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { cookies } from 'next/headers'
-import { requireAdmin } from '@/lib/access'
+import { requireModule } from '@/lib/access'
 import { createClient } from '@/lib/supabase/server'
 import { clearInviteResult, deactivateUser, inviteUser, reactivateUser, resetUserPassword } from './actions'
 import { INVITE_RESULT_COOKIE, parseInviteResult } from './invite-result'
@@ -10,7 +10,7 @@ export default async function UsersPage({
 }: {
   searchParams: Promise<{ error?: string }>
 }) {
-  const currentUser = await requireAdmin()
+  const currentUser = await requireModule('hr')
   const { error } = await searchParams
 
   // The temp password arrives in a short-lived httpOnly cookie, never the URL.
@@ -63,7 +63,8 @@ export default async function UsersPage({
           <input name="email" type="email" placeholder="Email" required className="rounded border px-3 py-2" />
           <select name="role" className="rounded border px-3 py-2">
             <option value="employee">Employee</option>
-            <option value="admin">Admin</option>
+            <option value="hr">HR</option>
+            {currentUser.role === 'admin' && <option value="admin">Admin</option>}
           </select>
           <button type="submit" className="col-span-3 rounded bg-black py-2 text-white">
             Create user

@@ -1,12 +1,14 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { createLead } from './actions'
+import { requireModule } from '@/lib/access'
 
 export default async function LeadsPage({
   searchParams,
 }: {
   searchParams: Promise<{ error?: string }>
 }) {
+  await requireModule('leads')
   const { error } = await searchParams
   const supabase = await createClient()
   const { data: leads } = await supabase

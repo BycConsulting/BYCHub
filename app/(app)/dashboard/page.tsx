@@ -8,10 +8,12 @@ import {
   computeAvgTimeToWonDays,
   countActivitiesByUser,
 } from '@/lib/metrics'
+import { requireModule } from '@/lib/access'
 
 const clientStatusOrder = ['prospect', 'active', 'paused', 'lost'] as const
 
 export default async function DashboardPage() {
+  await requireModule('dashboard')
   const supabase = await createClient()
 
   const [leadsRes, clientsRes, activitiesRes, usersRes] = await Promise.all([

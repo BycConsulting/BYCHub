@@ -1,6 +1,9 @@
+import { cache } from 'react'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import type { UserRole } from '@/types/database'
+import { createAdminSupabaseClient } from '@/lib/supabase/admin'
+import { moduleKeys } from '@/lib/validation'
+import type { Module, UserRole } from '@/types/database'
 
 export interface CurrentUser {
   id: string
@@ -9,7 +12,7 @@ export interface CurrentUser {
   role: UserRole
 }
 
-export async function getCurrentUser(): Promise<CurrentUser | null> {
+export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   const supabase = await createClient()
   const {
     data: { user },
@@ -35,7 +38,7 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
   }
 
   return { id: profile.id, email: profile.email, name: profile.name, role: profile.role }
-}
+})
 
 export async function requireUser(): Promise<CurrentUser> {
   const user = await getCurrentUser()
@@ -43,8 +46,42 @@ export async function requireUser(): Promise<CurrentUser> {
   return user
 }
 
-export async function requireAdmin(): Promise<CurrentUser> {
+export async function requireAdminRole(): Promise<CurrentUser> {
   const user = await requireUser()
-  if (user.role !== 'admin') redirect('/leads')
+  if (user.role !== 'admin') redirect('/profile')
   return user
+}
+
+const MODULE_ORDER: Module[] = [...moduleKeys]
+
+const MODULE_PATHS: Record<Module, string> = {
+  dashboard: '/dashboard',
+  leads: '/leads',
+  clients: '/clients',
+  hr: '/users',
+  settings: '/settings',
+}
+
+export const getEnabledModules = cache(async (role: UserRole): Promise<Module[]> => {
+  if (role === 'admin') return [...MODULE_ORDER]
+
+  const admin = createAdminSupabaseClient()
+  const { data, error } = await admin.from('role_module_access').select('module').eq('role', role).eq('enabled', true)
+
+  if (error) {
+    console.error(`getEnabledModules: failed to query role_module_access for role "${role}":`, error.message)
+  }
+
+  const enabledSet = new Set((data ?? []).map((row) => row.module))
+  return MODULE_ORDER.filter((moduleKey) => enabledSet.has(moduleKey))
+})
+
+export async function requireModule(moduleKey: Module): Promise<CurrentUser> {
+  const user = await requireUser()
+  if (user.role === 'admin') return user
+
+  const enabled = await getEnabledModules(user.role)
+  if (enabled.includes(moduleKey)) return user
+
+  redirect(enabled.length > 0 ? MODULE_PATHS[enabled[0]] : '/profile')
 }

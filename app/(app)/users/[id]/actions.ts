@@ -2,12 +2,12 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { requireAdmin } from '@/lib/access'
+import { requireModule } from '@/lib/access'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { updateEmployeeProfileSchema } from '@/lib/validation'
 
 export async function updateEmployeeProfile(formData: FormData) {
-  await requireAdmin()
+  await requireModule('hr')
 
   const parsed = updateEmployeeProfileSchema.safeParse({
     userId: formData.get('userId'),

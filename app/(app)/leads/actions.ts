@@ -3,12 +3,12 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { requireUser } from '@/lib/access'
+import { requireModule } from '@/lib/access'
 import { createLeadSchema, updateStageSchema, addActivitySchema } from '@/lib/validation'
 import { stageChangeBody } from '@/lib/metrics'
 
 export async function createLead(formData: FormData) {
-  const user = await requireUser()
+  const user = await requireModule('leads')
 
   const parsed = createLeadSchema.safeParse({
     contact_name: formData.get('contact_name'),
@@ -41,7 +41,7 @@ export async function createLead(formData: FormData) {
 }
 
 export async function updateLeadStage(formData: FormData) {
-  const user = await requireUser()
+  const user = await requireModule('leads')
 
   const parsed = updateStageSchema.safeParse({
     leadId: formData.get('leadId'),
@@ -129,10 +129,10 @@ async function convertLeadToClient(
 }
 
 export async function addActivity(formData: FormData) {
-  const user = await requireUser()
-
   const rawLeadId = formData.get('leadId')
   const rawClientId = formData.get('clientId')
+
+  const user = await requireModule(rawLeadId ? 'leads' : 'clients')
 
   const parsed = addActivitySchema.safeParse({
     leadId: rawLeadId ? String(rawLeadId) : undefined,

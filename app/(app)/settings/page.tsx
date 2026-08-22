@@ -1,7 +1,8 @@
-import { requireAdmin } from '@/lib/access'
+import Link from 'next/link'
+import { requireModule } from '@/lib/access'
 
 export default async function SettingsPage() {
-  await requireAdmin()
+  const currentUser = await requireModule('settings')
 
   const providers = [
     { name: 'Claude', configured: Boolean(process.env.ANTHROPIC_API_KEY) },
@@ -11,6 +12,11 @@ export default async function SettingsPage() {
   return (
     <div className="space-y-4">
       <h1 className="text-lg font-semibold">Settings</h1>
+      {currentUser.role === 'admin' && (
+        <Link href="/settings/permissions" className="text-sm text-blue-600 hover:underline">
+          Edit role permissions
+        </Link>
+      )}
       <div>
         <h2 className="text-sm font-medium text-gray-500">AI provider API keys</h2>
         <ul className="mt-2 space-y-2">

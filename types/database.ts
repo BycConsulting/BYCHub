@@ -1,15 +1,10 @@
-export type UserRole = 'admin' | 'employee'
+export type UserRole = 'admin' | 'hr' | 'employee'
 export type ClientStatus = 'prospect' | 'active' | 'paused' | 'lost'
 export type LeadStage = 'new' | 'contacted' | 'qualified' | 'proposal' | 'won' | 'lost'
 export type ActivityType = 'note' | 'call' | 'email' | 'stage_change'
 export type EmploymentType = 'full_time' | 'part_time' | 'contract'
-export type EmployeeProfileField =
-  | 'phone'
-  | 'address'
-  | 'emergency_contact_name'
-  | 'emergency_contact_phone'
-  | 'date_of_birth'
-export type ProfileRequestStatus = 'pending' | 'approved' | 'rejected'
+export type Module = 'dashboard' | 'leads' | 'clients' | 'hr' | 'settings'
+export type ConfigurableRole = 'hr' | 'employee'
 
 export interface Database {
   public: {
@@ -130,26 +125,19 @@ export interface Database {
         }>
         Relationships: []
       }
-      employee_profile_requests: {
+      role_module_access: {
         Row: {
-          id: string
-          user_id: string
-          field: EmployeeProfileField
-          proposed_value: string
-          status: ProfileRequestStatus
-          reviewed_by: string | null
-          reviewed_at: string | null
-          created_at: string
+          role: ConfigurableRole
+          module: Module
+          enabled: boolean
         }
         Insert: {
-          user_id: string
-          field: EmployeeProfileField
-          proposed_value: string
+          role: ConfigurableRole
+          module: Module
+          enabled?: boolean
         }
         Update: Partial<{
-          status: ProfileRequestStatus
-          reviewed_by: string | null
-          reviewed_at: string | null
+          enabled: boolean
         }>
         Relationships: []
       }
