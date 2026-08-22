@@ -141,6 +141,57 @@ export interface Database {
         }>
         Relationships: []
       }
+      hr_config: {
+        Row: {
+          id: boolean
+          working_monday: boolean
+          working_tuesday: boolean
+          working_wednesday: boolean
+          working_thursday: boolean
+          working_friday: boolean
+          working_saturday: boolean
+          working_sunday: boolean
+          casual_leave_days: number
+          sick_leave_days: number
+          earned_leave_days: number
+          maternity_leave_days: number
+          paternity_leave_days: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          id?: boolean
+          working_monday?: boolean
+          working_tuesday?: boolean
+          working_wednesday?: boolean
+          working_thursday?: boolean
+          working_friday?: boolean
+          working_saturday?: boolean
+          working_sunday?: boolean
+          casual_leave_days?: number
+          sick_leave_days?: number
+          earned_leave_days?: number
+          maternity_leave_days?: number
+          paternity_leave_days?: number
+          updated_by?: string | null
+        }
+        Update: Partial<{
+          working_monday: boolean
+          working_tuesday: boolean
+          working_wednesday: boolean
+          working_thursday: boolean
+          working_friday: boolean
+          working_saturday: boolean
+          casual_leave_days: number
+          sick_leave_days: number
+          earned_leave_days: number
+          maternity_leave_days: number
+          paternity_leave_days: number
+          updated_at: string
+          updated_by: string | null
+        }>
+        Relationships: []
+      }
     }
     Views: Record<string, never>
     Functions: Record<string, never>

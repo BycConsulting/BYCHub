@@ -42,7 +42,10 @@ export default async function UsersPage({
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-lg font-semibold">Invite user</h1>
+        <Link href="/users/config" className="text-sm text-blue-600 hover:underline">
+          HR configuration
+        </Link>
+        <h1 className="mt-2 text-lg font-semibold">Invite user</h1>
         {error && <p className="mt-2 rounded bg-red-50 p-2 text-sm text-red-600">{error}</p>}
         {inviteResult && (
           <div className="mt-2 rounded bg-green-50 p-2 text-sm text-green-700">
