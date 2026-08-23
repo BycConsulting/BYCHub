@@ -105,3 +105,25 @@ export const updateHrConfigSchema = z
       data.workingSaturday,
     { message: 'At least one weekday must be a working day' }
   )
+
+export const leaveRequestTypes = ['casual', 'sick', 'earned', 'maternity', 'paternity', 'wfh'] as const
+
+export const submitLeaveRequestSchema = z
+  .object({
+    type: z.enum(leaveRequestTypes),
+    startDate: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/, 'Enter a valid date'),
+    endDate: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/, 'Enter a valid date'),
+    reason: z.string().trim().min(1, 'Reason is required').max(1000),
+  })
+  .refine((data) => data.endDate >= data.startDate, {
+    message: 'End date must be on or after start date',
+    path: ['endDate'],
+  })
+  .refine((data) => data.startDate.slice(0, 4) === data.endDate.slice(0, 4), {
+    message: 'A request cannot span two different years',
+    path: ['endDate'],
+  })
+
+export const leaveRequestIdSchema = z.object({
+  requestId: z.string().uuid(),
+})

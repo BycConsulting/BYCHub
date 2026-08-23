@@ -29,6 +29,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <Link href="/profile" className="text-sm text-gray-600 hover:text-black">
             Profile
           </Link>
+          <Link href="/leave" className="text-sm text-gray-600 hover:text-black">
+            Leave
+          </Link>
           {enabledModules.includes('hr') && (
             <Link href="/users" className="text-sm text-gray-600 hover:text-black">
               HR
