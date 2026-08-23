@@ -5,6 +5,8 @@ export type ActivityType = 'note' | 'call' | 'email' | 'stage_change'
 export type EmploymentType = 'full_time' | 'part_time' | 'contract'
 export type Module = 'dashboard' | 'leads' | 'clients' | 'hr' | 'settings'
 export type ConfigurableRole = 'hr' | 'employee'
+export type LeaveRequestType = 'casual' | 'sick' | 'earned' | 'maternity' | 'paternity' | 'wfh'
+export type LeaveRequestStatus = 'pending' | 'approved' | 'rejected' | 'cancelled'
 
 export interface Database {
   public: {
@@ -189,6 +191,33 @@ export interface Database {
           paternity_leave_days: number
           updated_at: string
           updated_by: string | null
+        }>
+        Relationships: []
+      }
+      leave_requests: {
+        Row: {
+          id: string
+          user_id: string
+          type: LeaveRequestType
+          start_date: string
+          end_date: string
+          reason: string
+          status: LeaveRequestStatus
+          reviewed_by: string | null
+          reviewed_at: string | null
+          created_at: string
+        }
+        Insert: {
+          user_id: string
+          type: LeaveRequestType
+          start_date: string
+          end_date: string
+          reason: string
+        }
+        Update: Partial<{
+          status: LeaveRequestStatus
+          reviewed_by: string | null
+          reviewed_at: string | null
         }>
         Relationships: []
       }
