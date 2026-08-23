@@ -20,6 +20,7 @@ export async function updateEmployeeProfile(formData: FormData) {
     department: formData.get('department'),
     employmentStartDate: formData.get('employmentStartDate'),
     employmentType: formData.get('employmentType'),
+    managerId: formData.get('managerId'),
   })
 
   if (!parsed.success) {
@@ -41,6 +42,7 @@ export async function updateEmployeeProfile(formData: FormData) {
       department: fields.department || null,
       employment_start_date: fields.employmentStartDate || null,
       employment_type: fields.employmentType || null,
+      manager_id: fields.managerId || null,
       updated_at: new Date().toISOString(),
     })
     .eq('user_id', userId)
