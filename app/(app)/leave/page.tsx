@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { allocationForType, computeBalance, dayCount, LEAVE_TYPE_LABELS } from '@/lib/leave'
 import { submitLeaveRequest, cancelLeaveRequest } from './actions'
+import { approveTeamRequest, rejectTeamRequest } from './team-actions'
+import { ConfirmSubmitButton } from '@/app/(app)/confirm-submit-button'
 import type { LeaveRequestType } from '@/types/database'
 
 const BALANCE_TYPES: LeaveRequestType[] = ['casual', 'sick', 'earned', 'maternity', 'paternity']
@@ -35,6 +37,46 @@ export default async function LeavePage({
   }
 
   const currentYear = new Date().getFullYear()
+
+  const { data: myReports } = await admin.from('employee_profiles').select('user_id').eq('manager_id', currentUser.id)
+  const reportIds = (myReports ?? []).map((report) => report.user_id)
+
+  let teamPending: {
+    id: string
+    user_id: string
+    type: LeaveRequestType
+    start_date: string
+    end_date: string
+    reason: string
+    created_at: string
+  }[] = []
+  let teamNameById = new Map<string, string>()
+  let teamApprovedByUserAndType = new Map<string, { start_date: string; end_date: string }[]>()
+
+  if (reportIds.length > 0) {
+    const { data: pending } = await admin
+      .from('leave_requests')
+      .select('id, user_id, type, start_date, end_date, reason, created_at')
+      .in('user_id', reportIds)
+      .eq('status', 'pending')
+      .order('created_at', { ascending: true })
+    teamPending = pending ?? []
+
+    const { data: reportUsers } = await admin.from('users').select('id, name').in('id', reportIds)
+    teamNameById = new Map((reportUsers ?? []).map((user) => [user.id, user.name]))
+
+    const { data: teamApproved } = await admin
+      .from('leave_requests')
+      .select('user_id, type, start_date, end_date')
+      .in('user_id', reportIds)
+      .eq('status', 'approved')
+    for (const request of teamApproved ?? []) {
+      const key = `${request.user_id}:${request.type}`
+      const list = teamApprovedByUserAndType.get(key) ?? []
+      list.push({ start_date: request.start_date, end_date: request.end_date })
+      teamApprovedByUserAndType.set(key, list)
+    }
+  }
 
   return (
     <div className="space-y-8">
@@ -117,6 +159,65 @@ export default async function LeavePage({
           <p className="mt-2 text-sm text-gray-500">No requests yet.</p>
         )}
       </div>
+
+      {reportIds.length > 0 && (
+        <div>
+          <h2 className="text-lg font-semibold">My team&apos;s requests</h2>
+          {teamPending.length === 0 ? (
+            <p className="mt-2 text-sm text-gray-500">No pending requests from your team.</p>
+          ) : (
+            <ul className="mt-3 space-y-3">
+              {teamPending.map((request) => {
+                const allocation = config ? allocationForType(config, request.type) : null
+                const balanceText =
+                  configError && request.type !== 'wfh'
+                    ? 'balance unavailable'
+                    : allocation !== null
+                      ? `current balance: ${computeBalance(
+                          allocation,
+                          teamApprovedByUserAndType.get(`${request.user_id}:${request.type}`) ?? [],
+                          currentYear
+                        )}`
+                      : null
+
+                return (
+                  <li key={request.id} className="rounded border p-4">
+                    <p className="text-sm font-medium">
+                      {teamNameById.get(request.user_id) ?? 'Unknown'} — {LEAVE_TYPE_LABELS[request.type]}
+                    </p>
+                    <p className="mt-1 text-sm text-gray-600">
+                      {request.start_date} to {request.end_date} ({dayCount(request.start_date, request.end_date)}{' '}
+                      day{dayCount(request.start_date, request.end_date) === 1 ? '' : 's'})
+                      {balanceText && <> — {balanceText}</>}
+                    </p>
+                    <p className="text-sm text-gray-600">{request.reason}</p>
+                    <div className="mt-2 flex gap-3">
+                      <form action={approveTeamRequest}>
+                        <input type="hidden" name="requestId" value={request.id} />
+                        <ConfirmSubmitButton
+                          confirmMessage="Approve this request? This cannot be undone."
+                          className="text-green-700 underline"
+                        >
+                          Approve
+                        </ConfirmSubmitButton>
+                      </form>
+                      <form action={rejectTeamRequest}>
+                        <input type="hidden" name="requestId" value={request.id} />
+                        <ConfirmSubmitButton
+                          confirmMessage="Reject this request? This cannot be undone."
+                          className="text-red-600 underline"
+                        >
+                          Reject
+                        </ConfirmSubmitButton>
+                      </form>
+                    </div>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+        </div>
+      )}
     </div>
   )
 }

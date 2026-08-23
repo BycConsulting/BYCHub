@@ -2,7 +2,7 @@ import { requireModule } from '@/lib/access'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { allocationForType, computeBalance, dayCount, LEAVE_TYPE_LABELS } from '@/lib/leave'
 import { approveLeaveRequest, rejectLeaveRequest } from './actions'
-import { ConfirmSubmitButton } from './confirm-submit-button'
+import { ConfirmSubmitButton } from '@/app/(app)/confirm-submit-button'
 
 export default async function LeaveRequestsPage({
   searchParams,
