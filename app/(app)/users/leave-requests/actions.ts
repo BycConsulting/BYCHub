@@ -19,12 +19,16 @@ async function reviewRequest(formData: FormData, status: 'approved' | 'rejected'
 
   const { data: request } = await admin
     .from('leave_requests')
-    .select('id, status')
+    .select('id, user_id, status')
     .eq('id', parsed.data.requestId)
     .single()
 
   if (!request || request.status !== 'pending') {
     redirect('/users/leave-requests?error=' + encodeURIComponent('Request not found or already resolved'))
+  }
+
+  if (request.user_id === currentUser.id) {
+    redirect('/users/leave-requests?error=' + encodeURIComponent('You cannot review your own request'))
   }
 
   // Re-check `status = 'pending'` in the update's own filter (not just the

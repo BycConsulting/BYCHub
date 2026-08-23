@@ -24,11 +24,15 @@ export async function submitLeaveRequest(formData: FormData) {
 
   const supabase = await createClient()
 
-  const { data: existing } = await supabase
+  const { data: existing, error: existingError } = await supabase
     .from('leave_requests')
     .select('start_date, end_date')
     .eq('user_id', currentUser.id)
     .in('status', ['pending', 'approved'])
+
+  if (existingError) {
+    redirect('/leave?error=' + encodeURIComponent('Could not verify your existing requests, please retry'))
+  }
 
   const overlaps = (existing ?? []).some((request) =>
     rangesOverlap(parsed.data.startDate, parsed.data.endDate, request.start_date, request.end_date)
@@ -84,6 +88,7 @@ export async function cancelLeaveRequest(formData: FormData) {
     .from('leave_requests')
     .update({ status: 'cancelled' })
     .eq('id', parsed.data.requestId)
+    .eq('user_id', currentUser.id)
     .eq('status', 'pending')
     .select('id')
     .single()

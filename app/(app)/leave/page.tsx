@@ -18,13 +18,13 @@ export default async function LeavePage({
   const supabase = await createClient()
   const admin = createAdminSupabaseClient()
 
-  const { data: myRequests } = await supabase
+  const { data: myRequests, error: requestsError } = await supabase
     .from('leave_requests')
     .select('id, type, start_date, end_date, reason, status, created_at')
     .eq('user_id', currentUser.id)
     .order('created_at', { ascending: false })
 
-  const { data: config } = await admin.from('hr_config').select('*').eq('id', true).single()
+  const { data: config, error: configError } = await admin.from('hr_config').select('*').eq('id', true).single()
 
   const approvedByType = new Map<LeaveRequestType, { start_date: string; end_date: string }[]>()
   for (const request of myRequests ?? []) {
@@ -42,22 +42,26 @@ export default async function LeavePage({
         <h1 className="text-lg font-semibold">Leave & WFH</h1>
         {error && <p className="mt-2 rounded bg-red-50 p-2 text-sm text-red-600">{error}</p>}
 
-        {config && (
-          <div className="mt-3">
-            <h2 className="text-sm font-medium text-gray-500">My balance ({currentYear})</h2>
-            <div className="mt-2 grid grid-cols-5 gap-3">
-              {BALANCE_TYPES.map((type) => {
-                const allocation = allocationForType(config, type)
-                const balance = computeBalance(allocation ?? 0, approvedByType.get(type) ?? [], currentYear)
-                return (
-                  <div key={type} className="rounded border p-3 text-sm">
-                    <div className="text-gray-500">{LEAVE_TYPE_LABELS[type]}</div>
-                    <div className="text-lg font-semibold">{balance}</div>
-                  </div>
-                )
-              })}
+        {configError ? (
+          <p className="mt-3 rounded bg-red-50 p-2 text-sm text-red-600">Could not load leave balances</p>
+        ) : (
+          config && (
+            <div className="mt-3">
+              <h2 className="text-sm font-medium text-gray-500">My balance ({currentYear})</h2>
+              <div className="mt-2 grid grid-cols-5 gap-3">
+                {BALANCE_TYPES.map((type) => {
+                  const allocation = allocationForType(config, type)
+                  const balance = computeBalance(allocation ?? 0, approvedByType.get(type) ?? [], currentYear)
+                  return (
+                    <div key={type} className="rounded border p-3 text-sm">
+                      <div className="text-gray-500">{LEAVE_TYPE_LABELS[type]}</div>
+                      <div className="text-lg font-semibold">{balance}</div>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
-          </div>
+          )
         )}
 
         <form action={submitLeaveRequest} className="mt-4 grid grid-cols-2 gap-3">
@@ -85,7 +89,9 @@ export default async function LeavePage({
 
       <div>
         <h2 className="text-lg font-semibold">My requests</h2>
-        {myRequests && myRequests.length > 0 ? (
+        {requestsError ? (
+          <p className="mt-2 rounded bg-red-50 p-2 text-sm text-red-600">Could not load your requests</p>
+        ) : myRequests && myRequests.length > 0 ? (
           <ul className="mt-3 space-y-2">
             {myRequests.map((request) => (
               <li key={request.id} className="rounded border p-3 text-sm">
