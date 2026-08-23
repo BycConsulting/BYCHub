@@ -1,3 +1,4 @@
+import type { PostgrestError } from '@supabase/supabase-js'
 import { requireUser } from '@/lib/access'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
@@ -38,7 +39,10 @@ export default async function LeavePage({
 
   const currentYear = new Date().getFullYear()
 
-  const { data: myReports } = await admin.from('employee_profiles').select('user_id').eq('manager_id', currentUser.id)
+  const { data: myReports, error: reportsError } = await admin
+    .from('employee_profiles')
+    .select('user_id')
+    .eq('manager_id', currentUser.id)
   const reportIds = (myReports ?? []).map((report) => report.user_id)
 
   let teamPending: {
@@ -51,25 +55,29 @@ export default async function LeavePage({
     created_at: string
   }[] = []
   let teamNameById = new Map<string, string>()
-  let teamApprovedByUserAndType = new Map<string, { start_date: string; end_date: string }[]>()
+  const teamApprovedByUserAndType = new Map<string, { start_date: string; end_date: string }[]>()
+  let teamPendingError: PostgrestError | null = null
+  let teamApprovedError: PostgrestError | null = null
 
   if (reportIds.length > 0) {
-    const { data: pending } = await admin
+    const { data: pending, error: pendingErr } = await admin
       .from('leave_requests')
       .select('id, user_id, type, start_date, end_date, reason, created_at')
       .in('user_id', reportIds)
       .eq('status', 'pending')
       .order('created_at', { ascending: true })
     teamPending = pending ?? []
+    teamPendingError = pendingErr
 
     const { data: reportUsers } = await admin.from('users').select('id, name').in('id', reportIds)
     teamNameById = new Map((reportUsers ?? []).map((user) => [user.id, user.name]))
 
-    const { data: teamApproved } = await admin
+    const { data: teamApproved, error: approvedErr } = await admin
       .from('leave_requests')
       .select('user_id, type, start_date, end_date')
       .in('user_id', reportIds)
       .eq('status', 'approved')
+    teamApprovedError = approvedErr
     for (const request of teamApproved ?? []) {
       const key = `${request.user_id}:${request.type}`
       const list = teamApprovedByUserAndType.get(key) ?? []
@@ -160,17 +168,21 @@ export default async function LeavePage({
         )}
       </div>
 
-      {reportIds.length > 0 && (
+      {(reportsError || reportIds.length > 0) && (
         <div>
           <h2 className="text-lg font-semibold">My team&apos;s requests</h2>
-          {teamPending.length === 0 ? (
+          {reportsError ? (
+            <p className="mt-2 rounded bg-red-50 p-2 text-sm text-red-600">Could not load your team</p>
+          ) : teamPendingError ? (
+            <p className="mt-2 rounded bg-red-50 p-2 text-sm text-red-600">Could not load your team&apos;s requests</p>
+          ) : teamPending.length === 0 ? (
             <p className="mt-2 text-sm text-gray-500">No pending requests from your team.</p>
           ) : (
             <ul className="mt-3 space-y-3">
               {teamPending.map((request) => {
                 const allocation = config ? allocationForType(config, request.type) : null
                 const balanceText =
-                  configError && request.type !== 'wfh'
+                  (configError || teamApprovedError) && request.type !== 'wfh'
                     ? 'balance unavailable'
                     : allocation !== null
                       ? `current balance: ${computeBalance(

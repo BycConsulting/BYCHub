@@ -30,6 +30,22 @@ export async function updateEmployeeProfile(formData: FormData) {
   const { userId, ...fields } = parsed.data
   const admin = createAdminSupabaseClient()
 
+  // Defense-in-depth alongside the manager dropdown's UI handling: a stale
+  // form submitted after someone else deactivates the candidate manager
+  // must not silently succeed in assigning a deactivated manager.
+  if (fields.managerId) {
+    const { data: manager } = await admin
+      .from('users')
+      .select('id')
+      .eq('id', fields.managerId)
+      .eq('is_active', true)
+      .single()
+
+    if (!manager) {
+      redirect(`/users/${userId}?error=` + encodeURIComponent('Selected manager is not an active user'))
+    }
+  }
+
   const { data: updated, error } = await admin
     .from('employee_profiles')
     .update({

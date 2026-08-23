@@ -188,6 +188,21 @@ export async function deactivateUser(formData: FormData) {
     redirect('/users?error=' + encodeURIComponent(error.message))
   }
 
+  // Deactivating a manager must not strand their reports' pending leave
+  // requests: /leave and /users/leave-requests both route on manager_id, so
+  // leaving it pointed at a deactivated manager would make those requests
+  // invisible to that manager (who can no longer act on them) and to HR's
+  // queue (which excludes anyone with a manager assigned) alike. Clear it so
+  // the reports fall back to HR's queue.
+  const { error: clearManagerError } = await admin
+    .from('employee_profiles')
+    .update({ manager_id: null })
+    .eq('manager_id', userId)
+
+  if (clearManagerError) {
+    redirect('/users?error=' + encodeURIComponent(clearManagerError.message))
+  }
+
   // Flipping is_active locks the employee out of this app and (via
   // 0005_rls_active_employees.sql) out of the REST API too. Their password still
   // authenticates at the Auth layer though, so revoke the credential itself.

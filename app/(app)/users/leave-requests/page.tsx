@@ -27,13 +27,20 @@ export default async function LeaveRequestsPage({
   // Requests from employees who have an assigned manager route to that
   // manager exclusively (see /leave's "My team's requests" section) — HR's
   // queue only shows requests from employees with no manager assigned.
-  const { data: managerLookup } =
+  const { data: managerLookup, error: managerLookupError } =
     pendingUserIds.length > 0
       ? await admin.from('employee_profiles').select('user_id, manager_id').in('user_id', pendingUserIds)
-      : { data: [] }
+      : { data: [], error: null }
   const managerIdByUser = new Map((managerLookup ?? []).map((profile) => [profile.user_id, profile.manager_id]))
 
-  const pending = allPending.filter((request) => !managerIdByUser.get(request.user_id))
+  // Fail closed: if this lookup errors we cannot tell which pending requests
+  // are manager-routed, so we must not let the filter no-op open and risk
+  // re-showing manager-routed requests in HR's queue (breaking the "never
+  // visible to both HR and manager at once" invariant) — render the error
+  // banner below and treat the queue as unavailable instead.
+  const pending = managerLookupError
+    ? []
+    : allPending.filter((request) => !managerIdByUser.get(request.user_id))
   const userIds = [...new Set(pending.map((request) => request.user_id))]
 
   const { data: users } =
@@ -61,7 +68,7 @@ export default async function LeaveRequestsPage({
     <div className="space-y-4">
       <h1 className="text-lg font-semibold">Pending leave & WFH requests</h1>
       {error && <p className="rounded bg-red-50 p-2 text-sm text-red-600">{error}</p>}
-      {pendingError ? (
+      {pendingError || managerLookupError ? (
         <p className="rounded bg-red-50 p-2 text-sm text-red-600">Could not load pending requests</p>
       ) : pending.length === 0 ? (
         <p className="text-sm text-gray-500">No pending requests.</p>
