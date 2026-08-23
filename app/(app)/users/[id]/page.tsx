@@ -23,10 +23,35 @@ export default async function EmployeeDetailPage({
   const { data: profile } = await admin
     .from('employee_profiles')
     .select(
-      'phone, address, emergency_contact_name, emergency_contact_phone, date_of_birth, designation, department, employment_start_date, employment_type'
+      'phone, address, emergency_contact_name, emergency_contact_phone, date_of_birth, designation, department, employment_start_date, employment_type, manager_id'
     )
     .eq('user_id', id)
     .single()
+
+  const { data: activeUsers } = await admin
+    .from('users')
+    .select('id, name, is_active')
+    .eq('is_active', true)
+    .neq('id', id)
+    .order('name')
+
+  // The employee's currently assigned manager must always appear as an
+  // option, even if they've since been deactivated — otherwise the select
+  // silently shows "No manager" and an unrelated form save would silently
+  // null out the relationship. Label them as deactivated so HR sees the
+  // true state instead. (The write path has its own defense-in-depth check
+  // in updateEmployeeProfile.)
+  let managerOptions = activeUsers ?? []
+  if (profile?.manager_id && !managerOptions.some((user) => user.id === profile.manager_id)) {
+    const { data: assignedManager } = await admin
+      .from('users')
+      .select('id, name, is_active')
+      .eq('id', profile.manager_id)
+      .single()
+    if (assignedManager) {
+      managerOptions = [...managerOptions, assignedManager]
+    }
+  }
 
   return (
     <div className="space-y-4">
@@ -68,6 +93,19 @@ export default async function EmployeeDetailPage({
             <option value="full_time">Full time</option>
             <option value="part_time">Part time</option>
             <option value="contract">Contract</option>
+          </select>
+          <select
+            name="managerId"
+            defaultValue={profile?.manager_id ?? ''}
+            className="w-full rounded border px-3 py-2"
+          >
+            <option value="">No manager</option>
+            {managerOptions.map((user) => (
+              <option key={user.id} value={user.id}>
+                {user.name}
+                {!user.is_active ? ' (deactivated)' : ''}
+              </option>
+            ))}
           </select>
         </div>
 

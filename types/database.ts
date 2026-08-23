@@ -98,6 +98,7 @@ export interface Database {
           department: string | null
           employment_start_date: string | null
           employment_type: EmploymentType | null
+          manager_id: string | null
           created_at: string
           updated_at: string
         }
@@ -112,6 +113,7 @@ export interface Database {
           department?: string | null
           employment_start_date?: string | null
           employment_type?: EmploymentType | null
+          manager_id?: string | null
         }
         Update: Partial<{
           phone: string | null
@@ -123,6 +125,7 @@ export interface Database {
           department: string | null
           employment_start_date: string | null
           employment_type: EmploymentType | null
+          manager_id: string | null
           updated_at: string
         }>
         Relationships: []
