@@ -42,9 +42,14 @@ export default async function UsersPage({
   return (
     <div className="space-y-8">
       <div>
-        <Link href="/users/config" className="text-sm text-blue-600 hover:underline">
-          HR configuration
-        </Link>
+        <div className="flex gap-4">
+          <Link href="/users/config" className="text-sm text-blue-600 hover:underline">
+            HR configuration
+          </Link>
+          <Link href="/users/leave-requests" className="text-sm text-blue-600 hover:underline">
+            Leave requests
+          </Link>
+        </div>
         <h1 className="mt-2 text-lg font-semibold">Invite user</h1>
         {error && <p className="mt-2 rounded bg-red-50 p-2 text-sm text-red-600">{error}</p>}
         {inviteResult && (
