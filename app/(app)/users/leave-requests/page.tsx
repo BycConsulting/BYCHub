@@ -21,7 +21,19 @@ export default async function LeaveRequestsPage({
     .neq('user_id', currentUser.id)
     .order('created_at', { ascending: true })
 
-  const pending = pendingRequests ?? []
+  const allPending = pendingRequests ?? []
+  const pendingUserIds = [...new Set(allPending.map((request) => request.user_id))]
+
+  // Requests from employees who have an assigned manager route to that
+  // manager exclusively (see /leave's "My team's requests" section) — HR's
+  // queue only shows requests from employees with no manager assigned.
+  const { data: managerLookup } =
+    pendingUserIds.length > 0
+      ? await admin.from('employee_profiles').select('user_id, manager_id').in('user_id', pendingUserIds)
+      : { data: [] }
+  const managerIdByUser = new Map((managerLookup ?? []).map((profile) => [profile.user_id, profile.manager_id]))
+
+  const pending = allPending.filter((request) => !managerIdByUser.get(request.user_id))
   const userIds = [...new Set(pending.map((request) => request.user_id))]
 
   const { data: users } =
