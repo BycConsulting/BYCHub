@@ -45,28 +45,34 @@ export const userIdSchema = z.object({
 
 export const employmentTypes = ['full_time', 'part_time', 'contract'] as const
 
-export const updateEmployeeProfileSchema = z.object({
-  userId: z.string().uuid(),
-  phone: z.string().trim().max(200).optional().or(z.literal('')),
-  address: z.string().trim().max(200).optional().or(z.literal('')),
-  emergencyContactName: z.string().trim().max(200).optional().or(z.literal('')),
-  emergencyContactPhone: z.string().trim().max(200).optional().or(z.literal('')),
-  dateOfBirth: z
-    .string()
-    .trim()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Enter a valid date')
-    .optional()
-    .or(z.literal('')),
-  designation: z.string().trim().max(200).optional().or(z.literal('')),
-  department: z.string().trim().max(200).optional().or(z.literal('')),
-  employmentStartDate: z
-    .string()
-    .trim()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Enter a valid date')
-    .optional()
-    .or(z.literal('')),
-  employmentType: z.enum(employmentTypes).optional().or(z.literal('')),
-})
+export const updateEmployeeProfileSchema = z
+  .object({
+    userId: z.string().uuid(),
+    phone: z.string().trim().max(200).optional().or(z.literal('')),
+    address: z.string().trim().max(200).optional().or(z.literal('')),
+    emergencyContactName: z.string().trim().max(200).optional().or(z.literal('')),
+    emergencyContactPhone: z.string().trim().max(200).optional().or(z.literal('')),
+    dateOfBirth: z
+      .string()
+      .trim()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, 'Enter a valid date')
+      .optional()
+      .or(z.literal('')),
+    designation: z.string().trim().max(200).optional().or(z.literal('')),
+    department: z.string().trim().max(200).optional().or(z.literal('')),
+    employmentStartDate: z
+      .string()
+      .trim()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, 'Enter a valid date')
+      .optional()
+      .or(z.literal('')),
+    employmentType: z.enum(employmentTypes).optional().or(z.literal('')),
+    managerId: z.string().uuid().optional().or(z.literal('')),
+  })
+  .refine((data) => !data.managerId || data.managerId !== data.userId, {
+    message: 'An employee cannot be their own manager',
+    path: ['managerId'],
+  })
 
 export const configurableRoles = ['hr', 'employee'] as const
 export const moduleKeys = ['dashboard', 'leads', 'clients', 'hr', 'settings'] as const
