@@ -1,5 +1,7 @@
+import type { PostgrestError } from '@supabase/supabase-js'
 import { requireUser } from '@/lib/access'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { hoursWorked, todayDate } from '@/lib/attendance'
 import { checkIn, checkOut } from './actions'
 
@@ -22,6 +24,35 @@ export default async function AttendancePage({
 
   const today = todayDate()
   const todayRecord = (myRecords ?? []).find((record) => record.date === today)
+
+  const admin = createAdminSupabaseClient()
+
+  const { data: myReports, error: reportsError } = await admin
+    .from('employee_profiles')
+    .select('user_id')
+    .eq('manager_id', currentUser.id)
+  const reportIds = (myReports ?? []).map((report) => report.user_id)
+
+  let teamToday: {
+    user_id: string
+    checked_in_at: string | null
+    checked_out_at: string | null
+  }[] = []
+  let teamNameById = new Map<string, string>()
+  let teamRecordsError: PostgrestError | null = null
+
+  if (reportIds.length > 0) {
+    const { data: records, error: recordsErr } = await admin
+      .from('attendance_records')
+      .select('user_id, checked_in_at, checked_out_at')
+      .in('user_id', reportIds)
+      .eq('date', today)
+    teamToday = records ?? []
+    teamRecordsError = recordsErr
+
+    const { data: reportUsers } = await admin.from('users').select('id, name').in('id', reportIds)
+    teamNameById = new Map((reportUsers ?? []).map((user) => [user.id, user.name]))
+  }
 
   return (
     <div className="space-y-8">
@@ -70,6 +101,35 @@ export default async function AttendancePage({
           <p className="mt-2 text-sm text-gray-500">No attendance records yet.</p>
         )}
       </div>
+
+      {(reportsError || reportIds.length > 0) && (
+        <div>
+          <h2 className="text-lg font-semibold">My team&apos;s attendance</h2>
+          {reportsError ? (
+            <p className="mt-2 rounded bg-red-50 p-2 text-sm text-red-600">Could not load your team</p>
+          ) : teamRecordsError ? (
+            <p className="mt-2 rounded bg-red-50 p-2 text-sm text-red-600">Could not load your team&apos;s attendance</p>
+          ) : (
+            <ul className="mt-3 space-y-2">
+              {reportIds.map((reportId) => {
+                const record = teamToday.find((r) => r.user_id === reportId)
+                const status = !record?.checked_in_at
+                  ? 'not checked in today'
+                  : !record.checked_out_at
+                    ? `checked in at ${new Date(record.checked_in_at).toLocaleTimeString()}`
+                    : `${new Date(record.checked_in_at).toLocaleTimeString()} to ${new Date(
+                        record.checked_out_at
+                      ).toLocaleTimeString()}`
+                return (
+                  <li key={reportId} className="rounded border p-3 text-sm">
+                    <span className="font-medium">{teamNameById.get(reportId) ?? 'Unknown'}</span> — {status}
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+        </div>
+      )}
     </div>
   )
 }
