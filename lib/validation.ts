@@ -100,6 +100,7 @@ export const updateHrConfigSchema = z
     earnedLeaveDays: leaveDayCount,
     maternityLeaveDays: leaveDayCount,
     paternityLeaveDays: leaveDayCount,
+    officeIpAllowlist: z.string().trim().max(2000),
   })
   .refine(
     (data) =>
@@ -132,4 +133,20 @@ export const submitLeaveRequestSchema = z
 
 export const leaveRequestIdSchema = z.object({
   requestId: z.string().uuid(),
+})
+
+export const correctAttendanceSchema = z.object({
+  recordId: z.string().uuid(),
+  checkedInAt: z
+    .string()
+    .trim()
+    .regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/, 'Enter a valid date and time')
+    .optional()
+    .or(z.literal('')),
+  checkedOutAt: z
+    .string()
+    .trim()
+    .regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/, 'Enter a valid date and time')
+    .optional()
+    .or(z.literal('')),
 })
