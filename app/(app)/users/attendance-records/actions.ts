@@ -40,7 +40,7 @@ export async function correctAttendanceRecord(formData: FormData) {
     ? new Date(parsed.data.checkedOutAt).toISOString()
     : record.checked_out_at
 
-  if (checkedInAt && checkedOutAt && checkedOutAt < checkedInAt) {
+  if (checkedInAt && checkedOutAt && new Date(checkedOutAt).getTime() < new Date(checkedInAt).getTime()) {
     redirect('/users/attendance-records?error=' + encodeURIComponent('Checkout must be after check-in'))
   }
 
