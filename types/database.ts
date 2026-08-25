@@ -156,6 +156,7 @@ export interface Database {
           working_friday: boolean
           working_saturday: boolean
           working_sunday: boolean
+          office_ip_allowlist: string
           casual_leave_days: number
           sick_leave_days: number
           earned_leave_days: number
@@ -173,6 +174,7 @@ export interface Database {
           working_friday?: boolean
           working_saturday?: boolean
           working_sunday?: boolean
+          office_ip_allowlist?: string
           casual_leave_days?: number
           sick_leave_days?: number
           earned_leave_days?: number
@@ -187,6 +189,7 @@ export interface Database {
           working_thursday: boolean
           working_friday: boolean
           working_saturday: boolean
+          office_ip_allowlist: string
           casual_leave_days: number
           sick_leave_days: number
           earned_leave_days: number
@@ -221,6 +224,31 @@ export interface Database {
           status: LeaveRequestStatus
           reviewed_by: string | null
           reviewed_at: string | null
+        }>
+        Relationships: []
+      }
+      attendance_records: {
+        Row: {
+          id: string
+          user_id: string
+          date: string
+          checked_in_at: string | null
+          checked_in_ip: string | null
+          checked_out_at: string | null
+          checked_out_ip: string | null
+          created_at: string
+        }
+        Insert: {
+          user_id: string
+          date: string
+          checked_in_at?: string | null
+          checked_in_ip?: string | null
+        }
+        Update: Partial<{
+          checked_in_at: string | null
+          checked_in_ip: string | null
+          checked_out_at: string | null
+          checked_out_ip: string | null
         }>
         Relationships: []
       }

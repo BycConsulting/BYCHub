@@ -21,6 +21,7 @@ export async function updateHrConfig(formData: FormData) {
     earnedLeaveDays: formData.get('earnedLeaveDays'),
     maternityLeaveDays: formData.get('maternityLeaveDays'),
     paternityLeaveDays: formData.get('paternityLeaveDays'),
+    officeIpAllowlist: formData.get('officeIpAllowlist'),
   })
 
   if (!parsed.success) {
@@ -42,6 +43,7 @@ export async function updateHrConfig(formData: FormData) {
       earned_leave_days: parsed.data.earnedLeaveDays,
       maternity_leave_days: parsed.data.maternityLeaveDays,
       paternity_leave_days: parsed.data.paternityLeaveDays,
+      office_ip_allowlist: parsed.data.officeIpAllowlist,
       updated_at: new Date().toISOString(),
       updated_by: currentUser.id,
     })

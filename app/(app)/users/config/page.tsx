@@ -116,6 +116,20 @@ export default async function HrConfigPage({
             </div>
           </div>
 
+          <div>
+            <h2 className="text-sm font-medium text-gray-500">Office network (attendance check-in)</h2>
+            <p className="mt-1 text-xs text-gray-500">
+              Comma-separated IPv4 addresses or CIDR ranges (e.g. 203.0.113.5, 198.51.100.0/24). Employees can
+              only check in/out from these networks unless they have an approved WFH request for today.
+            </p>
+            <textarea
+              name="officeIpAllowlist"
+              rows={2}
+              defaultValue={config?.office_ip_allowlist ?? ''}
+              className="mt-2 w-full rounded border px-3 py-2 text-sm"
+            />
+          </div>
+
           <button type="submit" className="rounded bg-black px-3 py-2 text-white">
             Save
           </button>
