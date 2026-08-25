@@ -49,6 +49,9 @@ export default async function UsersPage({
           <Link href="/users/leave-requests" className="text-sm text-blue-600 hover:underline">
             Leave requests
           </Link>
+          <Link href="/users/attendance-records" className="text-sm text-blue-600 hover:underline">
+            Attendance records
+          </Link>
         </div>
         <h1 className="mt-2 text-lg font-semibold">Invite user</h1>
         {error && <p className="mt-2 rounded bg-red-50 p-2 text-sm text-red-600">{error}</p>}

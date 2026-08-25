@@ -1,5 +1,6 @@
 import { requireModule } from '@/lib/access'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
+import { utcIsoToIstWallClock } from '@/lib/attendance'
 import { correctAttendanceRecord } from './actions'
 
 export default async function AttendanceRecordsPage({
@@ -24,8 +25,8 @@ export default async function AttendanceRecordsPage({
 
   const sortedRecords = [...(records ?? [])].sort((a, b) => {
     if (a.date !== b.date) return a.date < b.date ? 1 : -1
-    const aOpen = a.checked_in_at && !a.checked_out_at
-    const bOpen = b.checked_in_at && !b.checked_out_at
+    const aOpen = Boolean(a.checked_in_at && !a.checked_out_at)
+    const bOpen = Boolean(b.checked_in_at && !b.checked_out_at)
     return aOpen === bOpen ? 0 : aOpen ? -1 : 1
   })
 
@@ -59,7 +60,7 @@ export default async function AttendanceRecordsPage({
                   <input
                     type="datetime-local"
                     name="checkedInAt"
-                    defaultValue={record.checked_in_at ? record.checked_in_at.slice(0, 16) : ''}
+                    defaultValue={record.checked_in_at ? utcIsoToIstWallClock(record.checked_in_at) : ''}
                     className="mt-1 block rounded border px-2 py-1"
                   />
                 </label>
@@ -68,7 +69,7 @@ export default async function AttendanceRecordsPage({
                   <input
                     type="datetime-local"
                     name="checkedOutAt"
-                    defaultValue={record.checked_out_at ? record.checked_out_at.slice(0, 16) : ''}
+                    defaultValue={record.checked_out_at ? utcIsoToIstWallClock(record.checked_out_at) : ''}
                     className="mt-1 block rounded border px-2 py-1"
                   />
                 </label>

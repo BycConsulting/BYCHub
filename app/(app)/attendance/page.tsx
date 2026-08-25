@@ -2,7 +2,7 @@ import type { PostgrestError } from '@supabase/supabase-js'
 import { requireUser } from '@/lib/access'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
-import { hoursWorked, todayDate } from '@/lib/attendance'
+import { formatIstTime, hoursWorked, todayDate } from '@/lib/attendance'
 import { checkIn, checkOut } from './actions'
 
 export default async function AttendancePage({
@@ -90,8 +90,8 @@ export default async function AttendancePage({
               return (
                 <li key={record.id} className="rounded border p-3 text-sm">
                   <span className="font-medium">{record.date}</span> —{' '}
-                  {record.checked_in_at ? new Date(record.checked_in_at).toLocaleTimeString() : '—'} to{' '}
-                  {record.checked_out_at ? new Date(record.checked_out_at).toLocaleTimeString() : 'not checked out'}
+                  {record.checked_in_at ? formatIstTime(record.checked_in_at) : '—'} to{' '}
+                  {record.checked_out_at ? formatIstTime(record.checked_out_at) : 'not checked out'}
                   {hours !== null && <> ({hours}h)</>}
                 </li>
               )
@@ -116,10 +116,8 @@ export default async function AttendancePage({
                 const status = !record?.checked_in_at
                   ? 'not checked in today'
                   : !record.checked_out_at
-                    ? `checked in at ${new Date(record.checked_in_at).toLocaleTimeString()}`
-                    : `${new Date(record.checked_in_at).toLocaleTimeString()} to ${new Date(
-                        record.checked_out_at
-                      ).toLocaleTimeString()}`
+                    ? `checked in at ${formatIstTime(record.checked_in_at)}`
+                    : `${formatIstTime(record.checked_in_at)} to ${formatIstTime(record.checked_out_at)}`
                 return (
                   <li key={reportId} className="rounded border p-3 text-sm">
                     <span className="font-medium">{teamNameById.get(reportId) ?? 'Unknown'}</span> — {status}

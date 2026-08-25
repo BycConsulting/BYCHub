@@ -31,24 +31,11 @@ create policy "attendance_records_select_own" on public.attendance_records
     )
   );
 
--- Check-in inserts the day's row directly via the regular client (no
--- service-role needed for check-in itself). `with check` pins user_id to
--- the caller and requires a fresh, not-yet-checked-out shape (checked_out_at
--- and checked_out_ip both null), so a row can't be inserted via REST already
--- showing a checkout — same anti-forgery shape as leave_requests' insert-own
--- policy in migration 0009.
-drop policy if exists "attendance_records_insert_own" on public.attendance_records;
-create policy "attendance_records_insert_own" on public.attendance_records
-  for insert to authenticated
-  with check (
-    (select auth.uid()) = user_id
-    and checked_out_at is null
-    and checked_out_ip is null
-    and exists (
-      select 1 from public.users u
-      where u.id = (select auth.uid()) and u.is_active
-    )
-  );
+-- No INSERT policy either (in addition to no UPDATE policy) — the IP
+-- allowlist and WFH-bypass gate can only be enforced in application code,
+-- not expressed as an RLS check, so check-in must go through the
+-- service-role client via the checkIn() Server Action, with an explicit
+-- ownership check in code, same as check-out.
 
 -- No UPDATE policy for `authenticated` — check-out and every HR manual
 -- correction go through the service-role client via Server Actions, each

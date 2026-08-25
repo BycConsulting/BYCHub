@@ -1,8 +1,23 @@
-/** The first IP in an X-Forwarded-For header value, or null if absent/empty. */
+/**
+ * The LAST IP in an X-Forwarded-For header value, or null if absent/empty.
+ * Proxies APPEND to X-Forwarded-For, so the last entry is the one added by
+ * the proxy nearest this server — the earliest entries are client-supplied
+ * and trivially spoofable, so they must not be trusted.
+ */
 export function parseClientIp(forwardedFor: string | null): string | null {
   if (!forwardedFor) return null
-  const first = forwardedFor.split(',')[0]?.trim()
-  return first && first.length > 0 ? first : null
+  const parts = forwardedFor.split(',').map((part) => part.trim()).filter((part) => part.length > 0)
+  return parts.length > 0 ? parts[parts.length - 1] : null
+}
+
+/** Whether `ip` is a syntactically valid IPv4 address (not IPv6 or garbage). */
+export function isIpv4Address(ip: string): boolean {
+  const parts = ip.split('.')
+  if (parts.length !== 4) return false
+  return parts.every((part) => {
+    const n = Number(part)
+    return Number.isInteger(n) && n >= 0 && n <= 255 && String(n) === part
+  })
 }
 
 /**
@@ -55,11 +70,45 @@ export function hoursWorked(checkedInAt: string, checkedOutAt: string | null): n
   return Math.round((ms / 3600000) * 100) / 100
 }
 
-/** Today's date as YYYY-MM-DD in the server's local time zone. */
+// India Standard Time is a fixed UTC+5:30 offset with no daylight saving
+// observed, so a constant offset is safe here — no timezone library needed.
+const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000
+
+/** Today's date as YYYY-MM-DD in India Standard Time (the company's timezone). */
 export function todayDate(): string {
-  const now = new Date()
-  const year = now.getFullYear()
-  const month = String(now.getMonth() + 1).padStart(2, '0')
-  const day = String(now.getDate()).padStart(2, '0')
+  const ist = new Date(Date.now() + IST_OFFSET_MS)
+  const year = ist.getUTCFullYear()
+  const month = String(ist.getUTCMonth() + 1).padStart(2, '0')
+  const day = String(ist.getUTCDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
+}
+
+/**
+ * Converts a stored UTC ISO timestamp to an IST "YYYY-MM-DDTHH:mm" wall-clock
+ * string, for pre-filling a <input type="datetime-local"> or for display.
+ */
+export function utcIsoToIstWallClock(isoUtc: string): string {
+  const ist = new Date(new Date(isoUtc).getTime() + IST_OFFSET_MS)
+  return ist.toISOString().slice(0, 16)
+}
+
+/**
+ * Converts an IST "YYYY-MM-DDTHH:mm" wall-clock string (as submitted by a
+ * <input type="datetime-local">, interpreted as IST) back to a UTC ISO
+ * timestamp for storage.
+ */
+export function istWallClockToUtcIso(wallClock: string): string {
+  const asUtc = new Date(wallClock + ':00Z')
+  return new Date(asUtc.getTime() - IST_OFFSET_MS).toISOString()
+}
+
+/** Formats a stored UTC ISO timestamp as a human-readable IST time, e.g. "9:30 AM". */
+export function formatIstTime(isoUtc: string): string {
+  const wallClock = utcIsoToIstWallClock(isoUtc)
+  const [, timePart] = wallClock.split('T')
+  const [hourStr, minuteStr] = timePart.split(':')
+  const hour24 = Number(hourStr)
+  const period = hour24 >= 12 ? 'PM' : 'AM'
+  const hour12 = hour24 % 12 === 0 ? 12 : hour24 % 12
+  return `${hour12}:${minuteStr} ${period}`
 }

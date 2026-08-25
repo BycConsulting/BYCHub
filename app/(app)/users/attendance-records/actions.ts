@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { requireModule } from '@/lib/access'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { correctAttendanceSchema } from '@/lib/validation'
+import { istWallClockToUtcIso } from '@/lib/attendance'
 
 export async function correctAttendanceRecord(formData: FormData) {
   await requireModule('hr')
@@ -35,9 +36,9 @@ export async function correctAttendanceRecord(formData: FormData) {
     redirect('/users/attendance-records?error=' + encodeURIComponent('Record not found'))
   }
 
-  const checkedInAt = parsed.data.checkedInAt ? new Date(parsed.data.checkedInAt).toISOString() : record.checked_in_at
+  const checkedInAt = parsed.data.checkedInAt ? istWallClockToUtcIso(parsed.data.checkedInAt) : record.checked_in_at
   const checkedOutAt = parsed.data.checkedOutAt
-    ? new Date(parsed.data.checkedOutAt).toISOString()
+    ? istWallClockToUtcIso(parsed.data.checkedOutAt)
     : record.checked_out_at
 
   if (checkedInAt && checkedOutAt && new Date(checkedOutAt).getTime() < new Date(checkedInAt).getTime()) {
