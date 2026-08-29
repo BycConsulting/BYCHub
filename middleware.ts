@@ -52,5 +52,9 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  // /hrm/* is proxied (next.config.ts rewrites) to the separate BYC HRM
+  // deployment, which runs its own auth middleware -- excluded here so this
+  // app's session gate doesn't intercept it first and redirect to the wrong
+  // login page.
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|hrm).*)'],
 }

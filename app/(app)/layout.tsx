@@ -40,6 +40,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               HR
             </Link>
           )}
+          {/* Cross-zone: BYC HRM is a separate deployment proxied under
+              /hrm (next.config.ts rewrites) -- plain <a>, not next/link,
+              since client-side prefetch/navigation can't span zones. */}
+          <a href="/hrm" className="text-sm text-gray-600 hover:text-black">
+            HR Portal
+          </a>
           {enabledModules.includes('settings') && (
             <Link href="/settings" className="text-sm text-gray-600 hover:text-black">
               Settings
