@@ -75,7 +75,7 @@ export const updateEmployeeProfileSchema = z
   })
 
 export const configurableRoles = ['hr', 'employee'] as const
-export const moduleKeys = ['dashboard', 'leads', 'clients', 'hr', 'settings'] as const
+export const moduleKeys = ['dashboard', 'leads', 'clients', 'hr', 'settings', 'directory'] as const
 
 export const updateModuleAccessSchema = z.object({
   enabled: z.array(z.string()),
