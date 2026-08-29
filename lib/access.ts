@@ -61,6 +61,7 @@ const MODULE_PATHS: Record<Module, string> = {
   hr: '/users',
   settings: '/settings',
   directory: '/hrm/directory',
+  leave_attendance: '/hrm/leave',
 }
 
 export const getEnabledModules = cache(async (role: UserRole): Promise<Module[]> => {
