@@ -88,24 +88,28 @@ export default async function LeavePage({
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-lg font-semibold">Leave & WFH</h1>
-        {error && <p className="mt-2 rounded bg-red-50 p-2 text-sm text-red-600">{error}</p>}
+      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <h1 className="text-lg font-semibold text-slate-800">Leave & WFH</h1>
+        {error && (
+          <p className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+        )}
 
         {configError ? (
-          <p className="mt-3 rounded bg-red-50 p-2 text-sm text-red-600">Could not load leave balances</p>
+          <p className="mt-3 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">
+            Could not load leave balances
+          </p>
         ) : (
           config && (
             <div className="mt-3">
-              <h2 className="text-sm font-medium text-gray-500">My balance ({currentYear})</h2>
+              <h2 className="text-sm font-medium text-slate-500">My balance ({currentYear})</h2>
               <div className="mt-2 grid grid-cols-5 gap-3">
                 {BALANCE_TYPES.map((type) => {
                   const allocation = allocationForType(config, type)
                   const balance = computeBalance(allocation ?? 0, approvedByType.get(type) ?? [], currentYear)
                   return (
-                    <div key={type} className="rounded border p-3 text-sm">
-                      <div className="text-gray-500">{LEAVE_TYPE_LABELS[type]}</div>
-                      <div className="text-lg font-semibold">{balance}</div>
+                    <div key={type} className="rounded-lg border border-slate-200 p-3 text-sm">
+                      <div className="text-slate-500">{LEAVE_TYPE_LABELS[type]}</div>
+                      <div className="text-lg font-semibold text-slate-800">{balance}</div>
                     </div>
                   )
                 })}
@@ -115,7 +119,10 @@ export default async function LeavePage({
         )}
 
         <form action={submitLeaveRequest} className="mt-4 grid grid-cols-2 gap-3">
-          <select name="type" className="rounded border px-3 py-2">
+          <select
+            name="type"
+            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+          >
             {Object.entries(LEAVE_TYPE_LABELS).map(([value, label]) => (
               <option key={value} value={value}>
                 {label}
@@ -123,35 +130,50 @@ export default async function LeavePage({
             ))}
           </select>
           <div />
-          <input type="date" name="startDate" required className="rounded border px-3 py-2" />
-          <input type="date" name="endDate" required className="rounded border px-3 py-2" />
+          <input
+            type="date"
+            name="startDate"
+            required
+            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+          />
+          <input
+            type="date"
+            name="endDate"
+            required
+            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+          />
           <textarea
             name="reason"
             placeholder="Reason"
             required
-            className="col-span-2 rounded border px-3 py-2"
+            className="col-span-2 rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
           />
-          <button type="submit" className="col-span-2 rounded bg-black py-2 text-white">
+          <button
+            type="submit"
+            className="col-span-2 rounded-lg bg-slate-800 py-2 text-sm font-medium text-white hover:bg-slate-700"
+          >
             Submit request
           </button>
         </form>
       </div>
 
-      <div>
-        <h2 className="text-lg font-semibold">My requests</h2>
+      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <h2 className="text-lg font-semibold text-slate-800">My requests</h2>
         {requestsError ? (
-          <p className="mt-2 rounded bg-red-50 p-2 text-sm text-red-600">Could not load your requests</p>
+          <p className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">
+            Could not load your requests
+          </p>
         ) : myRequests && myRequests.length > 0 ? (
           <ul className="mt-3 space-y-2">
             {myRequests.map((request) => (
-              <li key={request.id} className="rounded border p-3 text-sm">
-                <div>
+              <li key={request.id} className="rounded-lg border border-slate-100 p-3 text-sm">
+                <div className="text-slate-700">
                   {LEAVE_TYPE_LABELS[request.type]}: {request.start_date} to {request.end_date} (
                   {dayCount(request.start_date, request.end_date)} day
                   {dayCount(request.start_date, request.end_date) === 1 ? '' : 's'}) —{' '}
-                  <strong>{request.status}</strong>
+                  <strong className="text-slate-800">{request.status}</strong>
                 </div>
-                <div className="text-gray-500">{request.reason}</div>
+                <div className="text-slate-500">{request.reason}</div>
                 {request.status === 'pending' && (
                   <form action={cancelLeaveRequest} className="mt-1">
                     <input type="hidden" name="requestId" value={request.id} />
@@ -164,19 +186,23 @@ export default async function LeavePage({
             ))}
           </ul>
         ) : (
-          <p className="mt-2 text-sm text-gray-500">No requests yet.</p>
+          <p className="mt-2 text-sm text-slate-500">No requests yet.</p>
         )}
       </div>
 
       {(reportsError || reportIds.length > 0) && (
-        <div>
-          <h2 className="text-lg font-semibold">My team&apos;s requests</h2>
+        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          <h2 className="text-lg font-semibold text-slate-800">My team&apos;s requests</h2>
           {reportsError ? (
-            <p className="mt-2 rounded bg-red-50 p-2 text-sm text-red-600">Could not load your team</p>
+            <p className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">
+              Could not load your team
+            </p>
           ) : teamPendingError ? (
-            <p className="mt-2 rounded bg-red-50 p-2 text-sm text-red-600">Could not load your team&apos;s requests</p>
+            <p className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">
+              Could not load your team&apos;s requests
+            </p>
           ) : teamPending.length === 0 ? (
-            <p className="mt-2 text-sm text-gray-500">No pending requests from your team.</p>
+            <p className="mt-2 text-sm text-slate-500">No pending requests from your team.</p>
           ) : (
             <ul className="mt-3 space-y-3">
               {teamPending.map((request) => {
@@ -193,16 +219,16 @@ export default async function LeavePage({
                       : null
 
                 return (
-                  <li key={request.id} className="rounded border p-4">
-                    <p className="text-sm font-medium">
+                  <li key={request.id} className="rounded-lg border border-slate-100 p-4">
+                    <p className="text-sm font-medium text-slate-800">
                       {teamNameById.get(request.user_id) ?? 'Unknown'} — {LEAVE_TYPE_LABELS[request.type]}
                     </p>
-                    <p className="mt-1 text-sm text-gray-600">
+                    <p className="mt-1 text-sm text-slate-600">
                       {request.start_date} to {request.end_date} ({dayCount(request.start_date, request.end_date)}{' '}
                       day{dayCount(request.start_date, request.end_date) === 1 ? '' : 's'})
                       {balanceText && <> — {balanceText}</>}
                     </p>
-                    <p className="text-sm text-gray-600">{request.reason}</p>
+                    <p className="text-sm text-slate-600">{request.reason}</p>
                     <div className="mt-2 flex gap-3">
                       <form action={approveTeamRequest}>
                         <input type="hidden" name="requestId" value={request.id} />

@@ -29,7 +29,7 @@ export default async function DashboardPage() {
   const queryError = leadsRes.error || clientsRes.error || activitiesRes.error || usersRes.error
   if (queryError) {
     return (
-      <div className="rounded bg-red-50 p-4 text-sm text-red-600">
+      <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
         Failed to load dashboard data: {queryError.message}
       </div>
     )
@@ -59,67 +59,67 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-lg font-semibold">Dashboard</h1>
+      <h1 className="text-xl font-semibold text-slate-800">Dashboard</h1>
 
       {isTruncated && (
-        <div className="rounded bg-yellow-50 p-3 text-sm text-yellow-800">
+        <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-800">
           Showing partial data — some rows were not loaded. Numbers below may be incomplete or inaccurate.
         </div>
       )}
 
       <div className="grid grid-cols-3 gap-4">
-        <div className="rounded border p-4">
-          <div className="text-sm text-gray-500">Total leads</div>
-          <div className="text-2xl font-semibold">{leads.length}</div>
+        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="text-sm text-slate-500">Total leads</div>
+          <div className="text-2xl font-semibold text-slate-800">{leads.length}</div>
         </div>
-        <div className="rounded border p-4">
-          <div className="text-sm text-gray-500">Win rate</div>
-          <div className="text-2xl font-semibold">
+        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="text-sm text-slate-500">Win rate</div>
+          <div className="text-2xl font-semibold text-slate-800">
             {winRate === null ? '—' : `${winRate.toFixed(0)}%`}
           </div>
         </div>
-        <div className="rounded border p-4">
-          <div className="text-sm text-gray-500">Avg time to won</div>
-          <div className="text-2xl font-semibold">
+        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="text-sm text-slate-500">Avg time to won</div>
+          <div className="text-2xl font-semibold text-slate-800">
             {avgDays === null ? '—' : `${avgDays.toFixed(1)}d`}
           </div>
         </div>
       </div>
 
-      <div>
-        <h2 className="text-lg font-semibold">Leads by stage</h2>
+      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <h2 className="text-lg font-semibold text-slate-800">Leads by stage</h2>
         <div className="mt-3 space-y-2">
           {leadStageOrder.map((stage) => (
             <div key={stage} className="flex items-center gap-2">
-              <div className="w-24 text-sm capitalize">{stage}</div>
-              <div className="h-4 flex-1 rounded bg-gray-100">
+              <div className="w-24 text-sm capitalize text-slate-600">{stage}</div>
+              <div className="h-4 flex-1 rounded bg-slate-100">
                 <div
-                  className="h-4 rounded bg-black"
+                  className="h-4 rounded bg-slate-800"
                   style={{ width: `${(byStage[stage] / maxStageCount) * 100}%` }}
                 />
               </div>
-              <div className="w-8 text-right text-sm">{byStage[stage]}</div>
+              <div className="w-8 text-right text-sm text-slate-600">{byStage[stage]}</div>
             </div>
           ))}
         </div>
       </div>
 
-      <div>
-        <h2 className="text-lg font-semibold">Leads by source</h2>
+      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <h2 className="text-lg font-semibold text-slate-800">Leads by source</h2>
         {bySource.length === 0 ? (
-          <p className="mt-2 text-sm text-gray-500">No data yet.</p>
+          <p className="mt-2 text-sm text-slate-500">No data yet.</p>
         ) : (
           <div className="mt-3 space-y-2">
             {bySource.map(({ source, count }) => (
               <div key={source} className="flex items-center gap-2">
-                <div className="w-24 truncate text-sm">{source}</div>
-                <div className="h-4 flex-1 rounded bg-gray-100">
+                <div className="w-24 truncate text-sm text-slate-600">{source}</div>
+                <div className="h-4 flex-1 rounded bg-slate-100">
                   <div
-                    className="h-4 rounded bg-black"
+                    className="h-4 rounded bg-slate-800"
                     style={{ width: `${(count / maxSourceCount) * 100}%` }}
                   />
                 </div>
-                <div className="w-8 text-right text-sm">{count}</div>
+                <div className="w-8 text-right text-sm text-slate-600">{count}</div>
               </div>
             ))}
           </div>
@@ -127,33 +127,33 @@ export default async function DashboardPage() {
       </div>
 
       <div>
-        <h2 className="text-lg font-semibold">Clients by status</h2>
+        <h2 className="text-lg font-semibold text-slate-800">Clients by status</h2>
         <div className="mt-3 grid grid-cols-4 gap-4">
           {clientStatusOrder.map((status) => (
-            <div key={status} className="rounded border p-4">
-              <div className="text-sm capitalize text-gray-500">{status}</div>
-              <div className="text-xl font-semibold">{byStatus[status]}</div>
+            <div key={status} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <div className="text-sm capitalize text-slate-500">{status}</div>
+              <div className="text-xl font-semibold text-slate-800">{byStatus[status]}</div>
             </div>
           ))}
         </div>
       </div>
 
-      <div>
-        <h2 className="text-lg font-semibold">Activity by teammate</h2>
+      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <h2 className="text-lg font-semibold text-slate-800">Activity by teammate</h2>
         {byUser.length === 0 ? (
-          <p className="mt-2 text-sm text-gray-500">No activity yet.</p>
+          <p className="mt-2 text-sm text-slate-500">No activity yet.</p>
         ) : (
           <div className="mt-3 space-y-2">
             {byUser.map(({ userId, name, count }) => (
               <div key={userId} className="flex items-center gap-2">
-                <div className="w-24 truncate text-sm">{name}</div>
-                <div className="h-4 flex-1 rounded bg-gray-100">
+                <div className="w-24 truncate text-sm text-slate-600">{name}</div>
+                <div className="h-4 flex-1 rounded bg-slate-100">
                   <div
-                    className="h-4 rounded bg-black"
+                    className="h-4 rounded bg-slate-800"
                     style={{ width: `${(count / maxUserCount) * 100}%` }}
                   />
                 </div>
-                <div className="w-8 text-right text-sm">{count}</div>
+                <div className="w-8 text-right text-sm text-slate-600">{count}</div>
               </div>
             ))}
           </div>

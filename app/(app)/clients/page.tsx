@@ -11,28 +11,30 @@ export default async function ClientsPage() {
     .order('created_at', { ascending: false })
 
   return (
-    <div>
-      <h1 className="text-lg font-semibold">Clients</h1>
-      <table className="mt-3 w-full text-left text-sm">
-        <thead>
-          <tr className="border-b text-gray-500">
-            <th className="py-2">Name</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {(clients ?? []).map((client) => (
-            <tr key={client.id} className="border-b">
-              <td className="py-2">
-                <Link href={`/clients/${client.id}`} className="text-blue-600 hover:underline">
-                  {client.name}
-                </Link>
-              </td>
-              <td>{client.status}</td>
+    <div className="space-y-4">
+      <h1 className="text-xl font-semibold text-slate-800">Clients</h1>
+      <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
+        <table className="w-full text-left text-sm">
+          <thead>
+            <tr className="border-b border-slate-200 text-slate-500">
+              <th className="px-4 py-2">Name</th>
+              <th>Status</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {(clients ?? []).map((client) => (
+              <tr key={client.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
+                <td className="px-4 py-2">
+                  <Link href={`/clients/${client.id}`} className="font-medium text-slate-800 hover:underline">
+                    {client.name}
+                  </Link>
+                </td>
+                <td className="text-slate-600">{client.status}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }

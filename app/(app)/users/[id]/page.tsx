@@ -54,40 +54,47 @@ export default async function EmployeeDetailPage({
   }
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-lg font-semibold">{user.name}</h1>
-      <p className="text-sm text-gray-500">
-        {user.email} · {user.role} · {user.is_active ? 'Active' : 'Deactivated'}
-      </p>
-      {error && <p className="rounded bg-red-50 p-2 text-sm text-red-600">{error}</p>}
+    <div className="max-w-3xl space-y-4">
+      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <h1 className="text-lg font-semibold text-slate-800">{user.name}</h1>
+        <p className="text-sm text-slate-500">
+          {user.email} · {user.role} · {user.is_active ? 'Active' : 'Deactivated'}
+        </p>
+      </div>
+      {error && (
+        <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+      )}
 
-      <form action={updateEmployeeProfile} className="grid grid-cols-2 gap-6">
+      <form
+        action={updateEmployeeProfile}
+        className="grid grid-cols-2 gap-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+      >
         <input type="hidden" name="userId" value={user.id} />
 
         <div className="space-y-2">
-          <h2 className="text-sm font-medium text-gray-500">Job info</h2>
+          <h2 className="text-sm font-medium text-slate-500">Job info</h2>
           <input
             name="designation"
             placeholder="Designation"
             defaultValue={profile?.designation ?? ''}
-            className="w-full rounded border px-3 py-2"
+            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
           />
           <input
             name="department"
             placeholder="Department"
             defaultValue={profile?.department ?? ''}
-            className="w-full rounded border px-3 py-2"
+            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
           />
           <input
             name="employmentStartDate"
             type="date"
             defaultValue={profile?.employment_start_date ?? ''}
-            className="w-full rounded border px-3 py-2"
+            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
           />
           <select
             name="employmentType"
             defaultValue={profile?.employment_type ?? ''}
-            className="w-full rounded border px-3 py-2"
+            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
           >
             <option value="">Select type</option>
             <option value="full_time">Full time</option>
@@ -97,7 +104,7 @@ export default async function EmployeeDetailPage({
           <select
             name="managerId"
             defaultValue={profile?.manager_id ?? ''}
-            className="w-full rounded border px-3 py-2"
+            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
           >
             <option value="">No manager</option>
             {managerOptions.map((user) => (
@@ -110,40 +117,43 @@ export default async function EmployeeDetailPage({
         </div>
 
         <div className="space-y-2">
-          <h2 className="text-sm font-medium text-gray-500">Personal info</h2>
+          <h2 className="text-sm font-medium text-slate-500">Personal info</h2>
           <input
             name="phone"
             placeholder="Phone"
             defaultValue={profile?.phone ?? ''}
-            className="w-full rounded border px-3 py-2"
+            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
           />
           <input
             name="address"
             placeholder="Address"
             defaultValue={profile?.address ?? ''}
-            className="w-full rounded border px-3 py-2"
+            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
           />
           <input
             name="emergencyContactName"
             placeholder="Emergency contact name"
             defaultValue={profile?.emergency_contact_name ?? ''}
-            className="w-full rounded border px-3 py-2"
+            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
           />
           <input
             name="emergencyContactPhone"
             placeholder="Emergency contact phone"
             defaultValue={profile?.emergency_contact_phone ?? ''}
-            className="w-full rounded border px-3 py-2"
+            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
           />
           <input
             name="dateOfBirth"
             type="date"
             defaultValue={profile?.date_of_birth ?? ''}
-            className="w-full rounded border px-3 py-2"
+            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
           />
         </div>
 
-        <button type="submit" className="col-span-2 rounded bg-black py-2 text-white">
+        <button
+          type="submit"
+          className="col-span-2 rounded-lg bg-slate-800 py-2 text-sm font-medium text-white hover:bg-slate-700"
+        >
           Save
         </button>
       </form>
