@@ -46,18 +46,6 @@ export default async function UsersPage({
           <Link href="/users/config" className="text-sm text-slate-600 hover:text-slate-900 hover:underline">
             HR configuration
           </Link>
-          <Link
-            href="/users/leave-requests"
-            className="text-sm text-slate-600 hover:text-slate-900 hover:underline"
-          >
-            Leave requests
-          </Link>
-          <Link
-            href="/users/attendance-records"
-            className="text-sm text-slate-600 hover:text-slate-900 hover:underline"
-          >
-            Attendance records
-          </Link>
         </div>
         <h1 className="mt-2 text-lg font-semibold text-slate-800">Invite user</h1>
         {error && (
