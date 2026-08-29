@@ -56,40 +56,50 @@ export default async function AttendancePage({
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-lg font-semibold">Attendance</h1>
-        {error && <p className="mt-2 rounded bg-red-50 p-2 text-sm text-red-600">{error}</p>}
+      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <h1 className="text-lg font-semibold text-slate-800">Attendance</h1>
+        {error && (
+          <p className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+        )}
 
         <div className="mt-4">
           {!todayRecord?.checked_in_at ? (
             <form action={checkIn}>
-              <button type="submit" className="rounded bg-black px-4 py-2 text-white">
+              <button
+                type="submit"
+                className="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700"
+              >
                 Check In
               </button>
             </form>
           ) : !todayRecord.checked_out_at ? (
             <form action={checkOut}>
-              <button type="submit" className="rounded bg-black px-4 py-2 text-white">
+              <button
+                type="submit"
+                className="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700"
+              >
                 Check Out
               </button>
             </form>
           ) : (
-            <p className="text-sm text-gray-500">Checked out for today.</p>
+            <p className="text-sm text-slate-500">Checked out for today.</p>
           )}
         </div>
       </div>
 
-      <div>
-        <h2 className="text-lg font-semibold">My history</h2>
+      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <h2 className="text-lg font-semibold text-slate-800">My history</h2>
         {recordsError ? (
-          <p className="mt-2 rounded bg-red-50 p-2 text-sm text-red-600">Could not load your attendance history</p>
+          <p className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">
+            Could not load your attendance history
+          </p>
         ) : myRecords && myRecords.length > 0 ? (
           <ul className="mt-3 space-y-2">
             {myRecords.map((record) => {
               const hours = record.checked_in_at ? hoursWorked(record.checked_in_at, record.checked_out_at) : null
               return (
-                <li key={record.id} className="rounded border p-3 text-sm">
-                  <span className="font-medium">{record.date}</span> —{' '}
+                <li key={record.id} className="rounded-lg border border-slate-100 p-3 text-sm text-slate-700">
+                  <span className="font-medium text-slate-800">{record.date}</span> —{' '}
                   {record.checked_in_at ? formatIstTime(record.checked_in_at) : '—'} to{' '}
                   {record.checked_out_at ? formatIstTime(record.checked_out_at) : 'not checked out'}
                   {hours !== null && <> ({hours}h)</>}
@@ -98,17 +108,21 @@ export default async function AttendancePage({
             })}
           </ul>
         ) : (
-          <p className="mt-2 text-sm text-gray-500">No attendance records yet.</p>
+          <p className="mt-2 text-sm text-slate-500">No attendance records yet.</p>
         )}
       </div>
 
       {(reportsError || reportIds.length > 0) && (
-        <div>
-          <h2 className="text-lg font-semibold">My team&apos;s attendance</h2>
+        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          <h2 className="text-lg font-semibold text-slate-800">My team&apos;s attendance</h2>
           {reportsError ? (
-            <p className="mt-2 rounded bg-red-50 p-2 text-sm text-red-600">Could not load your team</p>
+            <p className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">
+              Could not load your team
+            </p>
           ) : teamRecordsError ? (
-            <p className="mt-2 rounded bg-red-50 p-2 text-sm text-red-600">Could not load your team&apos;s attendance</p>
+            <p className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">
+              Could not load your team&apos;s attendance
+            </p>
           ) : (
             <ul className="mt-3 space-y-2">
               {reportIds.map((reportId) => {
@@ -119,8 +133,9 @@ export default async function AttendancePage({
                     ? `checked in at ${formatIstTime(record.checked_in_at)}`
                     : `${formatIstTime(record.checked_in_at)} to ${formatIstTime(record.checked_out_at)}`
                 return (
-                  <li key={reportId} className="rounded border p-3 text-sm">
-                    <span className="font-medium">{teamNameById.get(reportId) ?? 'Unknown'}</span> — {status}
+                  <li key={reportId} className="rounded-lg border border-slate-100 p-3 text-sm text-slate-700">
+                    <span className="font-medium text-slate-800">{teamNameById.get(reportId) ?? 'Unknown'}</span> —{' '}
+                    {status}
                   </li>
                 )
               })}

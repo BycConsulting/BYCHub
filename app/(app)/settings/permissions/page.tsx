@@ -17,14 +17,16 @@ export default async function PermissionsPage({
   const enabledSet = new Set((rows ?? []).filter((row) => row.enabled).map((row) => `${row.role}:${row.module}`))
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-lg font-semibold">Role permissions</h1>
-      {error && <p className="rounded bg-red-50 p-2 text-sm text-red-600">{error}</p>}
+    <div className="max-w-2xl space-y-4">
+      <h1 className="text-xl font-semibold text-slate-800">Role permissions</h1>
+      {error && (
+        <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+      )}
 
-      <form action={updateModuleAccess}>
+      <form action={updateModuleAccess} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
         <table className="w-full text-left text-sm">
           <thead>
-            <tr className="border-b text-gray-500">
+            <tr className="border-b border-slate-200 text-slate-500">
               <th className="py-2">Module</th>
               <th>Admin</th>
               {configurableRoles.map((role) => (
@@ -36,8 +38,8 @@ export default async function PermissionsPage({
           </thead>
           <tbody>
             {moduleKeys.map((moduleKey) => (
-              <tr key={moduleKey} className="border-b">
-                <td className="py-2 capitalize">{moduleKey}</td>
+              <tr key={moduleKey} className="border-b border-slate-100 last:border-0">
+                <td className="py-2 capitalize text-slate-700">{moduleKey}</td>
                 <td>
                   <input type="checkbox" checked disabled />
                 </td>
@@ -55,7 +57,10 @@ export default async function PermissionsPage({
             ))}
           </tbody>
         </table>
-        <button type="submit" className="mt-4 rounded bg-black px-3 py-2 text-white">
+        <button
+          type="submit"
+          className="mt-4 rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700"
+        >
           Save
         </button>
       </form>

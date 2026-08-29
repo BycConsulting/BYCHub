@@ -26,34 +26,48 @@ export default async function ClientDetailPage({
     .order('created_at', { ascending: false })
 
   return (
-    <div className="space-y-8">
-      {error && <p className="rounded bg-red-50 p-2 text-sm text-red-600">{error}</p>}
+    <div className="max-w-3xl space-y-6">
+      {error && (
+        <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+      )}
 
-      <div>
-        <h1 className="text-lg font-semibold">{client.name}</h1>
-        <p className="text-sm text-gray-600">Status: {client.status}</p>
+      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <h1 className="text-lg font-semibold text-slate-800">{client.name}</h1>
+        <p className="text-sm text-slate-500">Status: {client.status}</p>
       </div>
 
-      <div>
-        <h2 className="text-lg font-semibold">Activity</h2>
+      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <h2 className="text-lg font-semibold text-slate-800">Activity</h2>
         <form action={addActivity} className="mt-3 space-y-2">
           <input type="hidden" name="clientId" value={client.id} />
-          <select name="type" className="rounded border px-3 py-2">
+          <select
+            name="type"
+            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+          >
             <option value="note">Note</option>
             <option value="call">Call</option>
             <option value="email">Email</option>
           </select>
-          <textarea name="body" placeholder="What happened?" required className="w-full rounded border px-3 py-2" />
-          <button type="submit" className="rounded bg-black px-3 py-2 text-white">
+          <textarea
+            name="body"
+            placeholder="What happened?"
+            required
+            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+          />
+          <button
+            type="submit"
+            className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700"
+          >
             Add activity
           </button>
         </form>
 
         <ul className="mt-4 space-y-2">
           {(activities ?? []).map((activity) => (
-            <li key={activity.id} className="rounded border p-2 text-sm">
-              <span className="font-medium">{activity.type}</span> — {activity.body}
-              <div className="text-xs text-gray-500">{new Date(activity.created_at).toLocaleString()}</div>
+            <li key={activity.id} className="rounded-lg border border-slate-100 p-2 text-sm">
+              <span className="font-medium text-slate-800">{activity.type}</span>{' '}
+              <span className="text-slate-600">— {activity.body}</span>
+              <div className="text-xs text-slate-400">{new Date(activity.created_at).toLocaleString()}</div>
             </li>
           ))}
         </ul>

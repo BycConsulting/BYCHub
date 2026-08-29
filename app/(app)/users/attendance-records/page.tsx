@@ -37,17 +37,21 @@ export default async function AttendanceRecordsPage({
 
   return (
     <div className="space-y-4">
-      <h1 className="text-lg font-semibold">Attendance records</h1>
-      {error && <p className="rounded bg-red-50 p-2 text-sm text-red-600">{error}</p>}
+      <h1 className="text-xl font-semibold text-slate-800">Attendance records</h1>
+      {error && (
+        <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+      )}
       {recordsError ? (
-        <p className="rounded bg-red-50 p-2 text-sm text-red-600">Could not load attendance records</p>
+        <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">
+          Could not load attendance records
+        </p>
       ) : sortedRecords.length === 0 ? (
-        <p className="text-sm text-gray-500">No attendance records in the last 30 days.</p>
+        <p className="text-sm text-slate-500">No attendance records in the last 30 days.</p>
       ) : (
         <ul className="space-y-3">
           {sortedRecords.map((record) => (
-            <li key={record.id} className="rounded border p-4">
-              <p className="text-sm font-medium">
+            <li key={record.id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <p className="text-sm font-medium text-slate-800">
                 {nameById.get(record.user_id) ?? 'Unknown'} — {record.date}
                 {record.checked_in_at && !record.checked_out_at && (
                   <span className="ml-2 text-xs font-normal text-amber-600">missing checkout</span>
@@ -55,25 +59,28 @@ export default async function AttendanceRecordsPage({
               </p>
               <form action={correctAttendanceRecord} className="mt-2 flex flex-wrap items-end gap-3">
                 <input type="hidden" name="recordId" value={record.id} />
-                <label className="text-sm">
+                <label className="text-sm text-slate-700">
                   Checked in
                   <input
                     type="datetime-local"
                     name="checkedInAt"
                     defaultValue={record.checked_in_at ? utcIsoToIstWallClock(record.checked_in_at) : ''}
-                    className="mt-1 block rounded border px-2 py-1"
+                    className="mt-1 block rounded-lg border border-slate-200 px-2 py-1 text-sm focus:border-slate-800 focus:outline-none"
                   />
                 </label>
-                <label className="text-sm">
+                <label className="text-sm text-slate-700">
                   Checked out
                   <input
                     type="datetime-local"
                     name="checkedOutAt"
                     defaultValue={record.checked_out_at ? utcIsoToIstWallClock(record.checked_out_at) : ''}
-                    className="mt-1 block rounded border px-2 py-1"
+                    className="mt-1 block rounded-lg border border-slate-200 px-2 py-1 text-sm focus:border-slate-800 focus:outline-none"
                   />
                 </label>
-                <button type="submit" className="rounded bg-black px-3 py-2 text-sm text-white">
+                <button
+                  type="submit"
+                  className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700"
+                >
                   Save
                 </button>
               </form>

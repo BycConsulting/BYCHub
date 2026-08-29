@@ -66,12 +66,16 @@ export default async function LeaveRequestsPage({
 
   return (
     <div className="space-y-4">
-      <h1 className="text-lg font-semibold">Pending leave & WFH requests</h1>
-      {error && <p className="rounded bg-red-50 p-2 text-sm text-red-600">{error}</p>}
+      <h1 className="text-xl font-semibold text-slate-800">Pending leave & WFH requests</h1>
+      {error && (
+        <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+      )}
       {pendingError || managerLookupError ? (
-        <p className="rounded bg-red-50 p-2 text-sm text-red-600">Could not load pending requests</p>
+        <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">
+          Could not load pending requests
+        </p>
       ) : pending.length === 0 ? (
-        <p className="text-sm text-gray-500">No pending requests.</p>
+        <p className="text-sm text-slate-500">No pending requests.</p>
       ) : (
         <ul className="space-y-3">
           {pending.map((request) => {
@@ -88,16 +92,16 @@ export default async function LeaveRequestsPage({
                   : null
 
             return (
-              <li key={request.id} className="rounded border p-4">
-                <p className="text-sm font-medium">
+              <li key={request.id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                <p className="text-sm font-medium text-slate-800">
                   {nameById.get(request.user_id) ?? 'Unknown'} — {LEAVE_TYPE_LABELS[request.type]}
                 </p>
-                <p className="mt-1 text-sm text-gray-600">
+                <p className="mt-1 text-sm text-slate-600">
                   {request.start_date} to {request.end_date} ({dayCount(request.start_date, request.end_date)} day
                   {dayCount(request.start_date, request.end_date) === 1 ? '' : 's'})
                   {balanceText && <> — {balanceText}</>}
                 </p>
-                <p className="text-sm text-gray-600">{request.reason}</p>
+                <p className="text-sm text-slate-600">{request.reason}</p>
                 <div className="mt-2 flex gap-3">
                   <form action={approveLeaveRequest}>
                     <input type="hidden" name="requestId" value={request.id} />
