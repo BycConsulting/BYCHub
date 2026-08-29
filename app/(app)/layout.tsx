@@ -40,6 +40,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               HR
             </Link>
           )}
+          {enabledModules.includes('directory') && (
+            <Link href="/hrm/directory" className="text-sm text-gray-600 hover:text-black">
+              HR Portal
+            </Link>
+          )}
           {enabledModules.includes('settings') && (
             <Link href="/settings" className="text-sm text-gray-600 hover:text-black">
               Settings

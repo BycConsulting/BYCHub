@@ -60,6 +60,7 @@ const MODULE_PATHS: Record<Module, string> = {
   clients: '/clients',
   hr: '/users',
   settings: '/settings',
+  directory: '/hrm/directory',
 }
 
 export const getEnabledModules = cache(async (role: UserRole): Promise<Module[]> => {
