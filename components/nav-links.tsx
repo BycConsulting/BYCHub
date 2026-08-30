@@ -13,6 +13,7 @@ import {
   ShieldCheck,
   UserPlus,
   UserMinus,
+  Briefcase,
   Settings as SettingsIcon,
 } from 'lucide-react'
 import type { Module } from '@/types/database'
@@ -33,6 +34,7 @@ const NAV_ITEMS: {
   { href: '/users', label: 'HR', icon: ShieldCheck, module: 'hr' },
   { href: '/hrm/onboarding', label: 'Onboarding', icon: UserPlus, module: 'onboarding' },
   { href: '/hrm/offboarding', label: 'Offboarding', icon: UserMinus, module: 'offboarding' },
+  { href: '/hrm/recruitment', label: 'Recruitment', icon: Briefcase, module: 'recruitment' },
   { href: '/settings', label: 'Settings', icon: SettingsIcon, module: 'settings' },
 ]
 

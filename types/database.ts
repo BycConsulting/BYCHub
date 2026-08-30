@@ -3,10 +3,12 @@ export type ClientStatus = 'prospect' | 'active' | 'paused' | 'lost'
 export type LeadStage = 'new' | 'contacted' | 'qualified' | 'proposal' | 'won' | 'lost'
 export type ActivityType = 'note' | 'call' | 'email' | 'stage_change'
 export type EmploymentType = 'full_time' | 'part_time' | 'contract'
-export type Module = 'dashboard' | 'leads' | 'clients' | 'hr' | 'settings' | 'directory' | 'leave_attendance' | 'onboarding' | 'offboarding'
+export type Module = 'dashboard' | 'leads' | 'clients' | 'hr' | 'settings' | 'directory' | 'leave_attendance' | 'onboarding' | 'offboarding' | 'recruitment'
 export type ConfigurableRole = 'hr' | 'employee'
 export type LeaveRequestType = 'casual' | 'sick' | 'earned' | 'maternity' | 'paternity' | 'wfh'
 export type LeaveRequestStatus = 'pending' | 'approved' | 'rejected' | 'cancelled'
+export type JobOpeningStatus = 'open' | 'closed'
+export type CandidateStage = 'applied' | 'screening' | 'interview' | 'offer' | 'hired' | 'rejected'
 
 export interface Database {
   public: {
@@ -350,6 +352,36 @@ export interface Database {
           notes: string
           completed_at: string | null
         }>
+        Relationships: []
+      }
+      job_openings: {
+        Row: {
+          id: string
+          title: string
+          department: string
+          status: JobOpeningStatus
+          created_at: string
+          created_by: string | null
+        }
+        Insert: { title: string; department?: string; created_by?: string | null }
+        Update: Partial<{ title: string; department: string; status: JobOpeningStatus }>
+        Relationships: []
+      }
+      candidates: {
+        Row: {
+          id: string
+          opening_id: string
+          name: string
+          email: string
+          phone: string
+          resume_notes: string
+          stage: CandidateStage
+          notes: string
+          applied_at: string
+          updated_at: string
+        }
+        Insert: { opening_id: string; name: string; email?: string; phone?: string; resume_notes?: string }
+        Update: Partial<{ stage: CandidateStage; notes: string; updated_at: string }>
         Relationships: []
       }
     }
