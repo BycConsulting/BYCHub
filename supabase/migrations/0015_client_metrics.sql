@@ -1,6 +1,6 @@
 -- supabase/migrations/0015_client_metrics.sql
 
-create table public.client_metric_catalog (
+create table if not exists public.client_metric_catalog (
   id uuid primary key default gen_random_uuid(),
   channel text not null,
   metric_key text not null,
@@ -12,9 +12,10 @@ create table public.client_metric_catalog (
 
 alter table public.client_metric_catalog enable row level security;
 
+drop policy if exists "client_metric_catalog_select_authenticated" on public.client_metric_catalog;
 create policy "client_metric_catalog_select_authenticated" on public.client_metric_catalog
   for select to authenticated
-  using (exists (select 1 from public.users u where u.id = (select auth.uid())));
+  using (exists (select 1 from public.users u where u.id = (select auth.uid()) and u.is_active));
 
 insert into public.client_metric_catalog (channel, metric_key, label, unit, sort_order) values
   ('SEO', 'organic_traffic', 'Organic traffic', 'sessions', 1),
@@ -76,7 +77,7 @@ insert into public.client_metric_catalog (channel, metric_key, label, unit, sort
   ('Web/CRO', 'leads', 'Leads', 'leads', 4),
   ('Web/CRO', 'avg_session_duration', 'Average session duration', 'seconds', 5);
 
-create table public.client_metrics (
+create table if not exists public.client_metrics (
   id uuid primary key default gen_random_uuid(),
   client_id uuid not null references public.clients(id),
   period date not null,
@@ -94,7 +95,8 @@ create table public.client_metrics (
 
 alter table public.client_metrics enable row level security;
 
+drop policy if exists "client_metrics_all_employees" on public.client_metrics;
 create policy "client_metrics_all_employees" on public.client_metrics
   for all to authenticated
-  using (exists (select 1 from public.users u where u.id = (select auth.uid())))
-  with check (exists (select 1 from public.users u where u.id = (select auth.uid())));
+  using (exists (select 1 from public.users u where u.id = (select auth.uid()) and u.is_active))
+  with check (exists (select 1 from public.users u where u.id = (select auth.uid()) and u.is_active));

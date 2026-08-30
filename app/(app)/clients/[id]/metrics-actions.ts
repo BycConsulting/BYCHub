@@ -75,6 +75,7 @@ export async function deleteClientMetric(formData: FormData) {
     .from('client_metrics')
     .delete()
     .eq('id', metricId)
+    .eq('client_id', clientId)
     .select('id')
     .single()
 

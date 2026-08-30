@@ -22,7 +22,7 @@ export default async function ClientDetailPage({
   await requireModule('clients')
   const { id } = await params
   const { error, period: periodParam } = await searchParams
-  const period = periodParam && /^\d{4}-\d{2}$/.test(periodParam) ? periodParam : currentMonthValue()
+  const period = periodParam && /^\d{4}-(0[1-9]|1[0-2])$/.test(periodParam) ? periodParam : currentMonthValue()
   const supabase = await createClient()
 
   const { data: client, error: clientError } = await supabase
@@ -45,12 +45,16 @@ export default async function ClientDetailPage({
 
   const catalog = await getMetricCatalog()
 
-  const { data: metrics } = await supabase
+  const { data: metrics, error: metricsError } = await supabase
     .from('client_metrics')
     .select('id, channel, metric_label, value, unit, notes')
     .eq('client_id', id)
     .eq('period', `${period}-01`)
     .order('channel')
+
+  if (metricsError) {
+    throw new Error(metricsError.message)
+  }
 
   return (
     <div className="max-w-3xl space-y-6">

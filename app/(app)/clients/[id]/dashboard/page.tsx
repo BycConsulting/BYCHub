@@ -64,7 +64,7 @@ export default async function ClientMetricsDashboardPage({ params }: { params: P
       {Array.from(byChannel.entries()).map(([channel, metricMap]) => (
         <div key={channel} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
           <h2 className="text-lg font-semibold text-slate-800">{channel}</h2>
-          <div className="mt-3 grid grid-cols-2 gap-4">
+          <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
             {Array.from(metricMap.entries()).map(([label, metric]) => (
               <div key={label} className="rounded-lg border border-slate-100 p-3">
                 <h3 className="text-sm font-medium text-slate-600">
