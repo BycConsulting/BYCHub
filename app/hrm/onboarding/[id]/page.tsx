@@ -31,7 +31,15 @@ export default async function OnboardingDetailPage({
 
   const admin = createAdminSupabaseClient()
 
-  const { data: checklist } = await admin.from('onboarding_checklists').select('*').eq('id', id).single()
+  const { data: checklist, error: checklistError } = await admin
+    .from('onboarding_checklists')
+    .select('*')
+    .eq('id', id)
+    .single()
+
+  if (checklistError && checklistError.code !== 'PGRST116') {
+    throw new Error(`Could not load onboarding checklist: ${checklistError.message}`)
+  }
 
   if (!checklist) notFound()
 

@@ -30,7 +30,15 @@ export default async function OffboardingDetailPage({
 
   const admin = createAdminSupabaseClient()
 
-  const { data: checklist } = await admin.from('offboarding_checklists').select('*').eq('id', id).single()
+  const { data: checklist, error: checklistError } = await admin
+    .from('offboarding_checklists')
+    .select('*')
+    .eq('id', id)
+    .single()
+
+  if (checklistError && checklistError.code !== 'PGRST116') {
+    throw new Error(`Could not load offboarding checklist: ${checklistError.message}`)
+  }
 
   if (!checklist) notFound()
 

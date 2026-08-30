@@ -57,3 +57,9 @@ create table public.offboarding_checklists (
 );
 
 alter table public.offboarding_checklists enable row level security;
+
+create unique index onboarding_checklists_one_open_per_user
+  on public.onboarding_checklists (user_id) where completed_at is null;
+
+create unique index offboarding_checklists_one_open_per_user
+  on public.offboarding_checklists (user_id) where completed_at is null;
