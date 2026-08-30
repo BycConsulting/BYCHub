@@ -26,11 +26,15 @@ export default async function ClientMetricsDashboardPage({ params }: { params: P
 
   if (!client) notFound()
 
-  const { data: metrics } = await supabase
+  const { data: metrics, error: metricsError } = await supabase
     .from('client_metrics')
     .select('channel, metric_label, unit, period, value')
     .eq('client_id', id)
     .order('period', { ascending: true })
+
+  if (metricsError) {
+    throw new Error(metricsError.message)
+  }
 
   const byChannel = new Map<string, Map<string, { unit: string; points: MetricPoint[] }>>()
 
