@@ -14,6 +14,7 @@ import {
   UserPlus,
   UserMinus,
   Briefcase,
+  ListTodo,
   Settings as SettingsIcon,
 } from 'lucide-react'
 import type { Module } from '@/types/database'
@@ -35,6 +36,7 @@ const NAV_ITEMS: {
   { href: '/hrm/onboarding', label: 'Onboarding', icon: UserPlus, module: 'onboarding' },
   { href: '/hrm/offboarding', label: 'Offboarding', icon: UserMinus, module: 'offboarding' },
   { href: '/hrm/recruitment', label: 'Recruitment', icon: Briefcase, module: 'recruitment' },
+  { href: '/hrm/tasks', label: 'Tasks', icon: ListTodo, module: 'tasks' },
   { href: '/settings', label: 'Settings', icon: SettingsIcon, module: 'settings' },
 ]
 
