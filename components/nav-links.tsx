@@ -11,6 +11,8 @@ import {
   CalendarDays,
   Clock,
   ShieldCheck,
+  UserPlus,
+  UserMinus,
   Settings as SettingsIcon,
 } from 'lucide-react'
 import type { Module } from '@/types/database'
@@ -29,6 +31,8 @@ const NAV_ITEMS: {
   { href: '/hrm/leave', label: 'Leave', icon: CalendarDays, module: 'leave_attendance' },
   { href: '/hrm/attendance', label: 'Attendance', icon: Clock, module: 'leave_attendance' },
   { href: '/users', label: 'HR', icon: ShieldCheck, module: 'hr' },
+  { href: '/hrm/onboarding', label: 'Onboarding', icon: UserPlus, module: 'onboarding' },
+  { href: '/hrm/offboarding', label: 'Offboarding', icon: UserMinus, module: 'offboarding' },
   { href: '/settings', label: 'Settings', icon: SettingsIcon, module: 'settings' },
 ]
 
