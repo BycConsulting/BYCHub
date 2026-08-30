@@ -7,12 +7,15 @@ import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { leaveRequestIdSchema } from '@/lib/validation'
 
 async function reviewRequest(formData: FormData, status: 'approved' | 'rejected') {
-  const currentUser = await requireModule('hr')
+  const currentUser = await requireModule('leave_attendance')
+  if (currentUser.role !== 'hr' && currentUser.role !== 'admin') {
+    redirect('/hrm/leave')
+  }
 
   const parsed = leaveRequestIdSchema.safeParse({ requestId: formData.get('requestId') })
 
   if (!parsed.success) {
-    redirect('/users/leave-requests?error=' + encodeURIComponent(parsed.error.issues[0].message))
+    redirect('/hrm/leave/requests?error=' + encodeURIComponent(parsed.error.issues[0].message))
   }
 
   const admin = createAdminSupabaseClient()
@@ -24,17 +27,13 @@ async function reviewRequest(formData: FormData, status: 'approved' | 'rejected'
     .single()
 
   if (!request || request.status !== 'pending') {
-    redirect('/users/leave-requests?error=' + encodeURIComponent('Request not found or already resolved'))
+    redirect('/hrm/leave/requests?error=' + encodeURIComponent('Request not found or already resolved'))
   }
 
   if (request.user_id === currentUser.id) {
-    redirect('/users/leave-requests?error=' + encodeURIComponent('You cannot review your own request'))
+    redirect('/hrm/leave/requests?error=' + encodeURIComponent('You cannot review your own request'))
   }
 
-  // Re-check `status = 'pending'` in the update's own filter (not just the
-  // fetch above), and confirm via `.select().single()` that the update
-  // actually matched a row — same race-safety and silent-no-op guard as
-  // `cancelLeaveRequest` in app/(app)/leave/actions.ts.
   const { data: updated, error } = await admin
     .from('leave_requests')
     .update({ status, reviewed_by: currentUser.id, reviewed_at: new Date().toISOString() })
@@ -45,11 +44,11 @@ async function reviewRequest(formData: FormData, status: 'approved' | 'rejected'
 
   if (!updated) {
     const message = !error || error.code === 'PGRST116' ? 'Request not found or already resolved' : error.message
-    redirect('/users/leave-requests?error=' + encodeURIComponent(message))
+    redirect('/hrm/leave/requests?error=' + encodeURIComponent(message))
   }
 
-  revalidatePath('/users/leave-requests')
-  redirect('/users/leave-requests')
+  revalidatePath('/hrm/leave/requests')
+  redirect('/hrm/leave/requests')
 }
 
 export async function approveLeaveRequest(formData: FormData) {

@@ -189,7 +189,7 @@ export async function deactivateUser(formData: FormData) {
   }
 
   // Deactivating a manager must not strand their reports' pending leave
-  // requests: /leave and /users/leave-requests both route on manager_id, so
+  // requests: /hrm/leave and /hrm/leave/requests both route on manager_id, so
   // leaving it pointed at a deactivated manager would make those requests
   // invisible to that manager (who can no longer act on them) and to HR's
   // queue (which excludes anyone with a manager assigned) alike. Clear it so

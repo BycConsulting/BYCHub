@@ -1,3 +1,5 @@
+import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { requireModule } from '@/lib/access'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { allocationForType, computeBalance, dayCount, LEAVE_TYPE_LABELS } from '@/lib/leave'
@@ -9,7 +11,10 @@ export default async function LeaveRequestsPage({
 }: {
   searchParams: Promise<{ error?: string }>
 }) {
-  const currentUser = await requireModule('hr')
+  const currentUser = await requireModule('leave_attendance')
+  if (currentUser.role !== 'hr' && currentUser.role !== 'admin') {
+    redirect('/hrm/leave')
+  }
   const { error } = await searchParams
 
   const admin = createAdminSupabaseClient()
@@ -25,8 +30,8 @@ export default async function LeaveRequestsPage({
   const pendingUserIds = [...new Set(allPending.map((request) => request.user_id))]
 
   // Requests from employees who have an assigned manager route to that
-  // manager exclusively (see /leave's "My team's requests" section) — HR's
-  // queue only shows requests from employees with no manager assigned.
+  // manager exclusively (see /hrm/leave's "My team's requests" section) —
+  // this queue only shows requests from employees with no manager assigned.
   const { data: managerLookup, error: managerLookupError } =
     pendingUserIds.length > 0
       ? await admin.from('employee_profiles').select('user_id, manager_id').in('user_id', pendingUserIds)
@@ -35,7 +40,7 @@ export default async function LeaveRequestsPage({
 
   // Fail closed: if this lookup errors we cannot tell which pending requests
   // are manager-routed, so we must not let the filter no-op open and risk
-  // re-showing manager-routed requests in HR's queue (breaking the "never
+  // re-showing manager-routed requests in this queue (breaking the "never
   // visible to both HR and manager at once" invariant) — render the error
   // banner below and treat the queue as unavailable instead.
   const pending = managerLookupError
@@ -66,6 +71,9 @@ export default async function LeaveRequestsPage({
 
   return (
     <div className="space-y-4">
+      <Link href="/hrm/leave" className="text-sm text-slate-600 hover:text-slate-900 hover:underline">
+        ← Back to Leave
+      </Link>
       <h1 className="text-xl font-semibold text-slate-800">Pending leave & WFH requests</h1>
       {error && (
         <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>

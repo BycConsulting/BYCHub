@@ -1,5 +1,6 @@
 import type { PostgrestError } from '@supabase/supabase-js'
-import { requireUser } from '@/lib/access'
+import Link from 'next/link'
+import { requireModule } from '@/lib/access'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { allocationForType, computeBalance, dayCount, LEAVE_TYPE_LABELS } from '@/lib/leave'
@@ -15,7 +16,7 @@ export default async function LeavePage({
 }: {
   searchParams: Promise<{ error?: string }>
 }) {
-  const currentUser = await requireUser()
+  const currentUser = await requireModule('leave_attendance')
   const { error } = await searchParams
 
   const supabase = await createClient()
@@ -86,8 +87,26 @@ export default async function LeavePage({
     }
   }
 
+  const canManageHolidays = currentUser.role === 'hr' || currentUser.role === 'admin'
+
   return (
     <div className="space-y-8">
+      <div className="flex gap-4">
+        <Link href="/hrm/leave/calendar" className="text-sm text-slate-600 hover:text-slate-900 hover:underline">
+          Calendar
+        </Link>
+        {canManageHolidays && (
+          <Link href="/hrm/leave/holidays" className="text-sm text-slate-600 hover:text-slate-900 hover:underline">
+            Holidays
+          </Link>
+        )}
+        {canManageHolidays && (
+          <Link href="/hrm/leave/requests" className="text-sm text-slate-600 hover:text-slate-900 hover:underline">
+            Pending requests
+          </Link>
+        )}
+      </div>
+
       <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
         <h1 className="text-lg font-semibold text-slate-800">Leave & WFH</h1>
         {error && (

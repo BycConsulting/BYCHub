@@ -3,7 +3,7 @@ export type ClientStatus = 'prospect' | 'active' | 'paused' | 'lost'
 export type LeadStage = 'new' | 'contacted' | 'qualified' | 'proposal' | 'won' | 'lost'
 export type ActivityType = 'note' | 'call' | 'email' | 'stage_change'
 export type EmploymentType = 'full_time' | 'part_time' | 'contract'
-export type Module = 'dashboard' | 'leads' | 'clients' | 'hr' | 'settings' | 'directory'
+export type Module = 'dashboard' | 'leads' | 'clients' | 'hr' | 'settings' | 'directory' | 'leave_attendance'
 export type ConfigurableRole = 'hr' | 'employee'
 export type LeaveRequestType = 'casual' | 'sick' | 'earned' | 'maternity' | 'paternity' | 'wfh'
 export type LeaveRequestStatus = 'pending' | 'approved' | 'rejected' | 'cancelled'
@@ -99,6 +99,7 @@ export interface Database {
           employment_start_date: string | null
           employment_type: EmploymentType | null
           manager_id: string | null
+          shift_id: string | null
           created_at: string
           updated_at: string
         }
@@ -126,6 +127,7 @@ export interface Database {
           employment_start_date: string | null
           employment_type: EmploymentType | null
           manager_id: string | null
+          shift_id: string | null
           updated_at: string
         }>
         Relationships: []
@@ -249,6 +251,50 @@ export interface Database {
           checked_in_ip: string | null
           checked_out_at: string | null
           checked_out_ip: string | null
+        }>
+        Relationships: []
+      }
+      holidays: {
+        Row: { id: string; date: string; name: string; created_at: string }
+        Insert: { date: string; name: string }
+        Update: Partial<{ date: string; name: string }>
+        Relationships: []
+      }
+      shifts: {
+        Row: {
+          id: string
+          name: string
+          start_time: string
+          end_time: string
+          working_monday: boolean
+          working_tuesday: boolean
+          working_wednesday: boolean
+          working_thursday: boolean
+          working_friday: boolean
+          working_saturday: boolean
+          created_at: string
+        }
+        Insert: {
+          name: string
+          start_time: string
+          end_time: string
+          working_monday?: boolean
+          working_tuesday?: boolean
+          working_wednesday?: boolean
+          working_thursday?: boolean
+          working_friday?: boolean
+          working_saturday?: boolean
+        }
+        Update: Partial<{
+          name: string
+          start_time: string
+          end_time: string
+          working_monday: boolean
+          working_tuesday: boolean
+          working_wednesday: boolean
+          working_thursday: boolean
+          working_friday: boolean
+          working_saturday: boolean
         }>
         Relationships: []
       }

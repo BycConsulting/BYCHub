@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
-import { requireUser } from '@/lib/access'
+import { requireModule } from '@/lib/access'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { isIpAllowed, isIpv4Address, parseClientIp, todayDate } from '@/lib/attendance'
@@ -20,8 +20,6 @@ interface GateResult {
   configUnavailable: boolean
 }
 
-// The IP gate and the WFH bypass are both re-evaluated here on every call —
-// never cached, never trusted from the client — per the design spec.
 async function isGateOpen(userId: string, ip: string | null): Promise<GateResult> {
   const admin = createAdminSupabaseClient()
   const { data: config, error: configError } = await admin.from('hr_config').select('office_ip_allowlist').eq('id', true).single()
@@ -34,9 +32,6 @@ async function isGateOpen(userId: string, ip: string | null): Promise<GateResult
     return { open: true, configUnavailable: false }
   }
 
-  // WFH lookup queries the caller's own leave_requests rows, already
-  // covered by that table's existing SELECT-own policy, so it uses the
-  // regular authenticated client — no service-role needed here.
   const supabase = await createClient()
   const today = todayDate()
   const { data: wfh, error: wfhError } = await supabase
@@ -62,7 +57,7 @@ function gateErrorMessage(gate: GateResult, ip: string | null): string {
 }
 
 export async function checkIn() {
-  const currentUser = await requireUser()
+  const currentUser = await requireModule('leave_attendance')
   const supabase = await createClient()
   const ip = await resolveClientIp()
   const today = todayDate()
@@ -75,12 +70,12 @@ export async function checkIn() {
     .single()
 
   if (existing?.checked_in_at) {
-    redirect('/attendance?error=' + encodeURIComponent('Already checked in today'))
+    redirect('/hrm/attendance?error=' + encodeURIComponent('Already checked in today'))
   }
 
   const gate = await isGateOpen(currentUser.id, ip)
   if (!gate.open) {
-    redirect('/attendance?error=' + encodeURIComponent(gateErrorMessage(gate, ip)))
+    redirect('/hrm/attendance?error=' + encodeURIComponent(gateErrorMessage(gate, ip)))
   }
 
   const admin = createAdminSupabaseClient()
@@ -92,15 +87,15 @@ export async function checkIn() {
   })
 
   if (error) {
-    redirect('/attendance?error=' + encodeURIComponent(error.message))
+    redirect('/hrm/attendance?error=' + encodeURIComponent(error.message))
   }
 
-  revalidatePath('/attendance')
-  redirect('/attendance')
+  revalidatePath('/hrm/attendance')
+  redirect('/hrm/attendance')
 }
 
 export async function checkOut() {
-  const currentUser = await requireUser()
+  const currentUser = await requireModule('leave_attendance')
   const ip = await resolveClientIp()
   const today = todayDate()
   const admin = createAdminSupabaseClient()
@@ -113,19 +108,14 @@ export async function checkOut() {
     .single()
 
   if (!record || !record.checked_in_at || record.checked_out_at) {
-    redirect('/attendance?error=' + encodeURIComponent('Not checked in today, or already checked out'))
+    redirect('/hrm/attendance?error=' + encodeURIComponent('Not checked in today, or already checked out'))
   }
 
   const gate = await isGateOpen(currentUser.id, ip)
   if (!gate.open) {
-    redirect('/attendance?error=' + encodeURIComponent(gateErrorMessage(gate, ip)))
+    redirect('/hrm/attendance?error=' + encodeURIComponent(gateErrorMessage(gate, ip)))
   }
 
-  // Re-check `checked_out_at is null` in the update's own filter (not just
-  // the fetch above), and confirm via `.select().single()` that the update
-  // actually matched a row — same race-safety and silent-no-op guard used
-  // everywhere else in this app (e.g. cancelLeaveRequest in
-  // app/(app)/leave/actions.ts).
   const { data: updated, error } = await admin
     .from('attendance_records')
     .update({ checked_out_at: new Date().toISOString(), checked_out_ip: ip })
@@ -137,9 +127,9 @@ export async function checkOut() {
 
   if (!updated) {
     const message = !error || error.code === 'PGRST116' ? 'Already checked out' : error.message
-    redirect('/attendance?error=' + encodeURIComponent(message))
+    redirect('/hrm/attendance?error=' + encodeURIComponent(message))
   }
 
-  revalidatePath('/attendance')
-  redirect('/attendance')
+  revalidatePath('/hrm/attendance')
+  redirect('/hrm/attendance')
 }

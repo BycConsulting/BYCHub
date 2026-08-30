@@ -26,8 +26,8 @@ const NAV_ITEMS: {
   { href: '/clients', label: 'Clients', icon: Building2, module: 'clients' },
   { href: '/hrm/directory', label: 'Directory', icon: LayoutGrid, module: 'directory' },
   { href: '/profile', label: 'Profile', icon: CircleUserRound, module: null },
-  { href: '/leave', label: 'Leave', icon: CalendarDays, module: null },
-  { href: '/attendance', label: 'Attendance', icon: Clock, module: null },
+  { href: '/hrm/leave', label: 'Leave', icon: CalendarDays, module: 'leave_attendance' },
+  { href: '/hrm/attendance', label: 'Attendance', icon: Clock, module: 'leave_attendance' },
   { href: '/users', label: 'HR', icon: ShieldCheck, module: 'hr' },
   { href: '/settings', label: 'Settings', icon: SettingsIcon, module: 'settings' },
 ]

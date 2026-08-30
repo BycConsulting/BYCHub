@@ -8,7 +8,10 @@ import { correctAttendanceSchema } from '@/lib/validation'
 import { istWallClockToUtcIso } from '@/lib/attendance'
 
 export async function correctAttendanceRecord(formData: FormData) {
-  await requireModule('hr')
+  const currentUser = await requireModule('leave_attendance')
+  if (currentUser.role !== 'hr' && currentUser.role !== 'admin') {
+    redirect('/hrm/attendance')
+  }
 
   const parsed = correctAttendanceSchema.safeParse({
     recordId: formData.get('recordId'),
@@ -17,11 +20,11 @@ export async function correctAttendanceRecord(formData: FormData) {
   })
 
   if (!parsed.success) {
-    redirect('/users/attendance-records?error=' + encodeURIComponent(parsed.error.issues[0].message))
+    redirect('/hrm/attendance/records?error=' + encodeURIComponent(parsed.error.issues[0].message))
   }
 
   if (!parsed.data.checkedInAt && !parsed.data.checkedOutAt) {
-    redirect('/users/attendance-records?error=' + encodeURIComponent('Enter at least one time to save'))
+    redirect('/hrm/attendance/records?error=' + encodeURIComponent('Enter at least one time to save'))
   }
 
   const admin = createAdminSupabaseClient()
@@ -33,7 +36,7 @@ export async function correctAttendanceRecord(formData: FormData) {
     .single()
 
   if (!record) {
-    redirect('/users/attendance-records?error=' + encodeURIComponent('Record not found'))
+    redirect('/hrm/attendance/records?error=' + encodeURIComponent('Record not found'))
   }
 
   const checkedInAt = parsed.data.checkedInAt ? istWallClockToUtcIso(parsed.data.checkedInAt) : record.checked_in_at
@@ -42,11 +45,9 @@ export async function correctAttendanceRecord(formData: FormData) {
     : record.checked_out_at
 
   if (checkedInAt && checkedOutAt && new Date(checkedOutAt).getTime() < new Date(checkedInAt).getTime()) {
-    redirect('/users/attendance-records?error=' + encodeURIComponent('Checkout must be after check-in'))
+    redirect('/hrm/attendance/records?error=' + encodeURIComponent('Checkout must be after check-in'))
   }
 
-  // Row-count-check pattern: confirm the update actually matched a row
-  // rather than silently no-op'ing, same as every other write in this app.
   const { data: updated, error } = await admin
     .from('attendance_records')
     .update({ checked_in_at: checkedInAt, checked_out_at: checkedOutAt })
@@ -56,9 +57,9 @@ export async function correctAttendanceRecord(formData: FormData) {
 
   if (!updated) {
     const message = !error || error.code === 'PGRST116' ? 'Record not found' : error.message
-    redirect('/users/attendance-records?error=' + encodeURIComponent(message))
+    redirect('/hrm/attendance/records?error=' + encodeURIComponent(message))
   }
 
-  revalidatePath('/users/attendance-records')
-  redirect('/users/attendance-records')
+  revalidatePath('/hrm/attendance/records')
+  redirect('/hrm/attendance/records')
 }

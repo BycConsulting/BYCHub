@@ -1,3 +1,5 @@
+import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { requireModule } from '@/lib/access'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { utcIsoToIstWallClock } from '@/lib/attendance'
@@ -8,7 +10,10 @@ export default async function AttendanceRecordsPage({
 }: {
   searchParams: Promise<{ error?: string }>
 }) {
-  await requireModule('hr')
+  const currentUser = await requireModule('leave_attendance')
+  if (currentUser.role !== 'hr' && currentUser.role !== 'admin') {
+    redirect('/hrm/attendance')
+  }
   const { error } = await searchParams
 
   const admin = createAdminSupabaseClient()
@@ -37,6 +42,9 @@ export default async function AttendanceRecordsPage({
 
   return (
     <div className="space-y-4">
+      <Link href="/hrm/attendance" className="text-sm text-slate-600 hover:text-slate-900 hover:underline">
+        ← Back to Attendance
+      </Link>
       <h1 className="text-xl font-semibold text-slate-800">Attendance records</h1>
       {error && (
         <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
