@@ -352,6 +352,47 @@ export interface Database {
         }>
         Relationships: []
       }
+      client_metric_catalog: {
+        Row: { id: string; channel: string; metric_key: string; label: string; unit: string; sort_order: number }
+        Insert: { channel: string; metric_key: string; label: string; unit?: string; sort_order?: number }
+        Update: never
+        Relationships: []
+      }
+      client_metrics: {
+        Row: {
+          id: string
+          client_id: string
+          period: string
+          channel: string
+          metric_key: string
+          metric_label: string
+          value: number
+          unit: string
+          notes: string
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          period: string
+          channel: string
+          metric_key?: string
+          metric_label: string
+          value: number
+          unit?: string
+          notes?: string
+          created_by?: string | null
+          updated_at?: string
+        }
+        Update: Partial<{
+          value: number
+          unit: string
+          notes: string
+          updated_at: string
+        }>
+        Relationships: []
+      }
     }
     Views: Record<string, never>
     Functions: Record<string, never>
