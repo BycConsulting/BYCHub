@@ -64,6 +64,7 @@ const MODULE_PATHS: Record<Module, string> = {
   leave_attendance: '/hrm/leave',
   onboarding: '/hrm/onboarding',
   offboarding: '/hrm/offboarding',
+  recruitment: '/hrm/recruitment',
 }
 
 export const getEnabledModules = cache(async (role: UserRole): Promise<Module[]> => {
