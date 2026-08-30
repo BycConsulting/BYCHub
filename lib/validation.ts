@@ -247,7 +247,7 @@ export const addCandidateSchema = z.object({
 
 export const updateCandidateStageSchema = z.object({
   candidateId: z.string().uuid(),
-  stage: z.enum(candidateStages),
+  stage: z.enum(['applied', 'screening', 'interview', 'offer', 'hired']),
 })
 
 export const rejectCandidateSchema = z.object({
