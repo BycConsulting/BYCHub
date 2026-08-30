@@ -68,13 +68,16 @@ export async function assignShift(formData: FormData) {
   }
 
   const admin = createAdminSupabaseClient()
-  const { error } = await admin
+  const { data: updated, error } = await admin
     .from('employee_profiles')
     .update({ shift_id: parsed.data.shiftId || null })
     .eq('user_id', parsed.data.userId)
+    .select('user_id')
+    .single()
 
-  if (error) {
-    redirect('/hrm/attendance/shifts?error=' + encodeURIComponent(error.message))
+  if (!updated) {
+    const message = !error || error.code === 'PGRST116' ? 'Employee profile not found' : error.message
+    redirect('/hrm/attendance/shifts?error=' + encodeURIComponent(message))
   }
 
   revalidatePath('/hrm/attendance/shifts')

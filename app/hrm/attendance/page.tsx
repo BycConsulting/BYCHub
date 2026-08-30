@@ -26,7 +26,7 @@ export default async function AttendancePage({
   const todayRecord = (myRecords ?? []).find((record) => record.date === today)
 
   const admin = createAdminSupabaseClient()
-  const { data: myReports } = await admin
+  const { data: myReports, error: reportsError } = await admin
     .from('employee_profiles')
     .select('user_id')
     .eq('manager_id', currentUser.id)
@@ -56,9 +56,19 @@ export default async function AttendancePage({
             >
               Shifts
             </Link>
+            <Link
+              href="/hrm/attendance/records"
+              className="text-sm text-slate-600 hover:text-slate-900 hover:underline"
+            >
+              Correct records
+            </Link>
           </>
         )}
       </div>
+
+      {reportsError && (
+        <p className="text-sm text-red-600">Could not check your team — try refreshing.</p>
+      )}
 
       <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
         <h1 className="text-lg font-semibold text-slate-800">Attendance</h1>

@@ -50,10 +50,16 @@ export async function deleteHoliday(formData: FormData) {
   }
 
   const admin = createAdminSupabaseClient()
-  const { error } = await admin.from('holidays').delete().eq('id', parsed.data.holidayId)
+  const { data: deleted, error } = await admin
+    .from('holidays')
+    .delete()
+    .eq('id', parsed.data.holidayId)
+    .select('id')
+    .single()
 
-  if (error) {
-    redirect('/hrm/leave/holidays?error=' + encodeURIComponent(error.message))
+  if (!deleted) {
+    const message = !error || error.code === 'PGRST116' ? 'Holiday not found' : error.message
+    redirect('/hrm/leave/holidays?error=' + encodeURIComponent(message))
   }
 
   revalidatePath('/hrm/leave/holidays')

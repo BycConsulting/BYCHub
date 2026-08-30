@@ -100,6 +100,11 @@ export default async function LeavePage({
             Holidays
           </Link>
         )}
+        {canManageHolidays && (
+          <Link href="/hrm/leave/requests" className="text-sm text-slate-600 hover:text-slate-900 hover:underline">
+            Pending requests
+          </Link>
+        )}
       </div>
 
       <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">

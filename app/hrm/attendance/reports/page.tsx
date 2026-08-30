@@ -35,9 +35,10 @@ export default async function AttendanceReportsPage({
     userIds.length > 0 ? await admin.from('users').select('id, name').in('id', userIds) : { data: [] }
   const nameById = new Map((users ?? []).map((u) => [u.id, u.name]))
 
-  const summary = new Map<string, { name: string; daysPresent: number; totalHours: number }>()
+  const summary = new Map<string, { userId: string; name: string; daysPresent: number; totalHours: number }>()
   for (const record of records ?? []) {
     const entry = summary.get(record.user_id) ?? {
+      userId: record.user_id,
       name: nameById.get(record.user_id) ?? 'Unknown',
       daysPresent: 0,
       totalHours: 0,
@@ -105,7 +106,7 @@ export default async function AttendanceReportsPage({
             </thead>
             <tbody>
               {summaryRows.map((row) => (
-                <tr key={row.name} className="border-b border-slate-100 last:border-0">
+                <tr key={row.userId} className="border-b border-slate-100 last:border-0">
                   <td className="px-4 py-2 text-slate-700">{row.name}</td>
                   <td className="text-slate-600">{row.daysPresent}</td>
                   <td className="text-slate-600">{row.totalHours.toFixed(2)}</td>
