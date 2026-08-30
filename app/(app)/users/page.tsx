@@ -2,7 +2,8 @@ import Link from 'next/link'
 import { cookies } from 'next/headers'
 import { requireModule } from '@/lib/access'
 import { createClient } from '@/lib/supabase/server'
-import { clearInviteResult, deactivateUser, inviteUser, reactivateUser, resetUserPassword } from './actions'
+import { clearInviteResult, deactivateUser, deleteUser, inviteUser, reactivateUser, resetUserPassword } from './actions'
+import { DeleteUserButton } from './delete-user-button'
 import { INVITE_RESULT_COOKIE, parseInviteResult } from './invite-result'
 
 export default async function UsersPage({
@@ -160,12 +161,17 @@ export default async function UsersPage({
                       </>
                     )}
                     {!isSelf && !u.is_active && (
-                      <form action={reactivateUser}>
-                        <input type="hidden" name="userId" value={u.id} />
-                        <button type="submit" className="text-green-700 underline">
-                          Reactivate
-                        </button>
-                      </form>
+                      <>
+                        <form action={reactivateUser}>
+                          <input type="hidden" name="userId" value={u.id} />
+                          <button type="submit" className="text-green-700 underline">
+                            Reactivate
+                          </button>
+                        </form>
+                        {currentUser.role === 'admin' && (
+                          <DeleteUserButton userId={u.id} userEmail={u.email} action={deleteUser} />
+                        )}
+                      </>
                     )}
                   </td>
                 </tr>
