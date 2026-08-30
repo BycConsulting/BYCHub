@@ -75,7 +75,7 @@ export const updateEmployeeProfileSchema = z
   })
 
 export const configurableRoles = ['hr', 'employee'] as const
-export const moduleKeys = ['dashboard', 'leads', 'clients', 'hr', 'settings', 'directory', 'leave_attendance', 'onboarding', 'offboarding', 'recruitment'] as const
+export const moduleKeys = ['dashboard', 'leads', 'clients', 'hr', 'settings', 'directory', 'leave_attendance', 'onboarding', 'offboarding', 'recruitment', 'tasks'] as const
 
 export const updateModuleAccessSchema = z.object({
   enabled: z.array(z.string()),
@@ -273,4 +273,31 @@ export const addClientMetricSchema = z.object({
 export const deleteClientMetricSchema = z.object({
   metricId: z.string().uuid(),
   clientId: z.string().uuid(),
+})
+
+export const taskStatuses = ['todo', 'in_progress', 'done'] as const
+
+export const taskPriorities = ['low', 'medium', 'high', 'urgent'] as const
+
+export const createTaskSchema = z.object({
+  title: z.string().trim().min(1, 'Title is required').max(200),
+  description: z.string().trim().max(2000).optional().or(z.literal('')),
+  priority: z.enum(taskPriorities),
+  assigneeId: z.string().uuid().optional().or(z.literal('')),
+  dueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date').optional().or(z.literal('')),
+})
+
+export const updateTaskStatusSchema = z.object({
+  taskId: z.string().uuid(),
+  status: z.enum(taskStatuses),
+})
+
+export const updateTaskSchema = z.object({
+  taskId: z.string().uuid(),
+  title: z.string().trim().min(1, 'Title is required').max(200),
+  description: z.string().trim().max(2000).optional().or(z.literal('')),
+  status: z.enum(taskStatuses),
+  priority: z.enum(taskPriorities),
+  assigneeId: z.string().uuid().optional().or(z.literal('')),
+  dueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date').optional().or(z.literal('')),
 })

@@ -3,7 +3,10 @@ export type ClientStatus = 'prospect' | 'active' | 'paused' | 'lost'
 export type LeadStage = 'new' | 'contacted' | 'qualified' | 'proposal' | 'won' | 'lost'
 export type ActivityType = 'note' | 'call' | 'email' | 'stage_change'
 export type EmploymentType = 'full_time' | 'part_time' | 'contract'
-export type Module = 'dashboard' | 'leads' | 'clients' | 'hr' | 'settings' | 'directory' | 'leave_attendance' | 'onboarding' | 'offboarding' | 'recruitment'
+export type Module = 'dashboard' | 'leads' | 'clients' | 'hr' | 'settings' | 'directory' | 'leave_attendance' | 'onboarding' | 'offboarding' | 'recruitment' | 'tasks'
+export type TaskStatus = 'todo' | 'in_progress' | 'done'
+export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent'
+export type TaskEventField = 'created' | 'status' | 'assignee' | 'priority'
 export type ConfigurableRole = 'hr' | 'employee'
 export type LeaveRequestType = 'casual' | 'sick' | 'earned' | 'maternity' | 'paternity' | 'wfh'
 export type LeaveRequestStatus = 'pending' | 'approved' | 'rejected' | 'cancelled'
@@ -423,6 +426,59 @@ export interface Database {
           notes: string
           updated_at: string
         }>
+        Relationships: []
+      }
+      tasks: {
+        Row: {
+          id: string
+          title: string
+          description: string
+          status: TaskStatus
+          priority: TaskPriority
+          assignee_id: string | null
+          due_date: string | null
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          title: string
+          description?: string
+          status?: TaskStatus
+          priority?: TaskPriority
+          assignee_id?: string | null
+          due_date?: string | null
+          created_by?: string | null
+        }
+        Update: Partial<{
+          title: string
+          description: string
+          status: TaskStatus
+          priority: TaskPriority
+          assignee_id: string | null
+          due_date: string | null
+          updated_at: string
+        }>
+        Relationships: []
+      }
+      task_events: {
+        Row: {
+          id: string
+          task_id: string
+          field: TaskEventField
+          from_value: string | null
+          to_value: string | null
+          changed_by: string | null
+          created_at: string
+        }
+        Insert: {
+          task_id: string
+          field: TaskEventField
+          from_value?: string | null
+          to_value?: string | null
+          changed_by?: string | null
+        }
+        Update: never
         Relationships: []
       }
     }
