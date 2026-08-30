@@ -3,7 +3,7 @@ export type ClientStatus = 'prospect' | 'active' | 'paused' | 'lost'
 export type LeadStage = 'new' | 'contacted' | 'qualified' | 'proposal' | 'won' | 'lost'
 export type ActivityType = 'note' | 'call' | 'email' | 'stage_change'
 export type EmploymentType = 'full_time' | 'part_time' | 'contract'
-export type Module = 'dashboard' | 'leads' | 'clients' | 'hr' | 'settings' | 'directory' | 'leave_attendance'
+export type Module = 'dashboard' | 'leads' | 'clients' | 'hr' | 'settings' | 'directory' | 'leave_attendance' | 'onboarding' | 'offboarding'
 export type ConfigurableRole = 'hr' | 'employee'
 export type LeaveRequestType = 'casual' | 'sick' | 'earned' | 'maternity' | 'paternity' | 'wfh'
 export type LeaveRequestStatus = 'pending' | 'approved' | 'rejected' | 'cancelled'
@@ -295,6 +295,60 @@ export interface Database {
           working_thursday: boolean
           working_friday: boolean
           working_saturday: boolean
+        }>
+        Relationships: []
+      }
+      onboarding_checklists: {
+        Row: {
+          id: string
+          user_id: string
+          started_at: string
+          started_by: string | null
+          step_offer_letter_signed: boolean
+          step_id_proof_collected: boolean
+          step_equipment_assigned: boolean
+          step_accounts_provisioned: boolean
+          step_orientation_completed: boolean
+          step_documents_filed: boolean
+          notes: string
+          completed_at: string | null
+        }
+        Insert: { user_id: string; started_by?: string | null }
+        Update: Partial<{
+          step_offer_letter_signed: boolean
+          step_id_proof_collected: boolean
+          step_equipment_assigned: boolean
+          step_accounts_provisioned: boolean
+          step_orientation_completed: boolean
+          step_documents_filed: boolean
+          notes: string
+          completed_at: string | null
+        }>
+        Relationships: []
+      }
+      offboarding_checklists: {
+        Row: {
+          id: string
+          user_id: string
+          started_at: string
+          started_by: string | null
+          step_resignation_recorded: boolean
+          step_exit_interview_done: boolean
+          step_assets_returned: boolean
+          step_accounts_deprovisioned: boolean
+          step_final_settlement_done: boolean
+          notes: string
+          completed_at: string | null
+        }
+        Insert: { user_id: string; started_by?: string | null }
+        Update: Partial<{
+          step_resignation_recorded: boolean
+          step_exit_interview_done: boolean
+          step_assets_returned: boolean
+          step_accounts_deprovisioned: boolean
+          step_final_settlement_done: boolean
+          notes: string
+          completed_at: string | null
         }>
         Relationships: []
       }
