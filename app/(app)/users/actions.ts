@@ -4,7 +4,7 @@ import { randomBytes } from 'node:crypto'
 import { revalidatePath } from 'next/cache'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { requireModule } from '@/lib/access'
+import { requireAdminRole, requireModule } from '@/lib/access'
 import { INVITE_RESULT_COOKIE } from './invite-result'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
@@ -286,6 +286,105 @@ export async function resetUserPassword(formData: FormData) {
   }
 
   await setInviteResultCookie(profile.email, tempPassword, 'reset')
+
+  revalidatePath('/users')
+  redirect('/users')
+}
+
+// Every table a user row could be entangled in. A hit on any of these blocks
+// the delete — history must never silently vanish, so an admin has to
+// resolve the reference (reassign, reject, edit) before the account can go.
+const DELETE_REFERENCE_CHECKS: { table: string; column: string; label: string }[] = [
+  { table: 'leads', column: 'assigned_user_id', label: 'lead(s) assigned to them' },
+  { table: 'clients', column: 'owner_user_id', label: 'client(s) owned by them' },
+  { table: 'activities', column: 'user_id', label: 'activity/activities logged by them' },
+  { table: 'leave_requests', column: 'user_id', label: 'leave request(s) filed by them' },
+  { table: 'leave_requests', column: 'reviewed_by', label: 'leave request(s) reviewed by them' },
+  { table: 'attendance_records', column: 'user_id', label: 'attendance record(s)' },
+  { table: 'employee_profile_requests', column: 'user_id', label: 'profile-change request(s) filed by them' },
+  { table: 'employee_profile_requests', column: 'reviewed_by', label: 'profile-change request(s) reviewed by them' },
+  { table: 'onboarding_checklists', column: 'user_id', label: 'onboarding checklist(s)' },
+  { table: 'onboarding_checklists', column: 'started_by', label: 'onboarding checklist(s) started by them' },
+  { table: 'offboarding_checklists', column: 'user_id', label: 'offboarding checklist(s)' },
+  { table: 'offboarding_checklists', column: 'started_by', label: 'offboarding checklist(s) started by them' },
+  { table: 'job_openings', column: 'created_by', label: 'job opening(s) created by them' },
+  { table: 'hr_config', column: 'updated_by', label: 'HR configuration they last updated' },
+  { table: 'employee_profiles', column: 'manager_id', label: 'report(s) who list them as manager' },
+]
+
+export async function deleteUser(formData: FormData) {
+  const currentUser = await requireAdminRole()
+
+  const parsed = userIdSchema.safeParse({ userId: formData.get('userId') })
+
+  if (!parsed.success) {
+    redirect('/users?error=' + encodeURIComponent(parsed.error.issues[0].message))
+  }
+
+  const { userId } = parsed.data
+
+  if (userId === currentUser.id) {
+    redirect('/users?error=' + encodeURIComponent('You cannot delete your own account'))
+  }
+
+  const admin = createAdminSupabaseClient()
+
+  const { data: target, error: targetError } = await admin
+    .from('users')
+    .select('is_active')
+    .eq('id', userId)
+    .single()
+
+  if (targetError && targetError.code !== 'PGRST116') {
+    redirect('/users?error=' + encodeURIComponent(targetError.message))
+  }
+
+  if (!target) {
+    redirect('/users?error=' + encodeURIComponent('User not found'))
+  }
+
+  if (target.is_active) {
+    redirect('/users?error=' + encodeURIComponent('Deactivate this user before deleting them'))
+  }
+
+  const blockers: string[] = []
+
+  for (const check of DELETE_REFERENCE_CHECKS) {
+    const { count, error: countError } = await admin
+      .from(check.table)
+      .select('*', { count: 'exact', head: true })
+      .eq(check.column, userId)
+
+    if (countError) {
+      redirect('/users?error=' + encodeURIComponent(countError.message))
+    }
+
+    if (count && count > 0) {
+      blockers.push(`${count} ${check.label}`)
+    }
+  }
+
+  if (blockers.length > 0) {
+    redirect('/users?error=' + encodeURIComponent(`Cannot delete: referenced by ${blockers.join(', ')}`))
+  }
+
+  const { error: profileDeleteError } = await admin.from('employee_profiles').delete().eq('user_id', userId)
+
+  if (profileDeleteError) {
+    redirect('/users?error=' + encodeURIComponent(profileDeleteError.message))
+  }
+
+  const { error: userDeleteError } = await admin.from('users').delete().eq('id', userId)
+
+  if (userDeleteError) {
+    redirect('/users?error=' + encodeURIComponent(userDeleteError.message))
+  }
+
+  const { error: authDeleteError } = await admin.auth.admin.deleteUser(userId)
+
+  if (authDeleteError) {
+    redirect('/users?error=' + encodeURIComponent(authDeleteError.message))
+  }
 
   revalidatePath('/users')
   redirect('/users')
