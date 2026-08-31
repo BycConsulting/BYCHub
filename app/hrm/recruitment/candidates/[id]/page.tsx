@@ -4,6 +4,11 @@ import { requireModule } from '@/lib/access'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { ConfirmSubmitButton } from '@/app/(app)/confirm-submit-button'
 import { updateCandidateStage, rejectCandidate, updateCandidateNotes } from './actions'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Textarea } from '@/components/ui/textarea'
+import { FormSelect } from '@/components/ui/form-select'
 
 const STAGES = [
   { value: 'applied', label: 'Applied' },
@@ -12,6 +17,12 @@ const STAGES = [
   { value: 'offer', label: 'Offer' },
   { value: 'hired', label: 'Hired' },
 ] as const
+
+function stageBadgeVariant(stage: string): 'default' | 'secondary' | 'destructive' {
+  if (stage === 'rejected') return 'destructive'
+  if (stage === 'hired') return 'default'
+  return 'secondary'
+}
 
 export default async function CandidateDetailPage({
   params,
@@ -60,71 +71,57 @@ export default async function CandidateDetailPage({
         <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
       )}
 
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
-        <h2 className="text-sm font-medium text-slate-500">Stage</h2>
-        <p className="mt-1 text-lg font-semibold text-slate-800 capitalize">{candidate.stage}</p>
-
-        {candidate.stage !== 'rejected' && (
-          <div className="mt-3 flex items-center gap-3">
-            <form action={updateCandidateStage} className="flex items-center gap-2">
-              <input type="hidden" name="candidateId" value={candidate.id} />
-              <select
-                name="stage"
-                defaultValue={candidate.stage}
-                className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-              >
-                {STAGES.map((s) => (
-                  <option key={s.value} value={s.value}>
-                    {s.label}
-                  </option>
-                ))}
-              </select>
-              <button
-                type="submit"
-                className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700 active:scale-[0.98] transition-transform"
-              >
-                Update stage
-              </button>
-            </form>
-            <form action={rejectCandidate}>
-              <input type="hidden" name="candidateId" value={candidate.id} />
-              <ConfirmSubmitButton
-                confirmMessage="Reject this candidate? This cannot be undone."
-                className="text-red-600 underline"
-              >
-                Reject
-              </ConfirmSubmitButton>
-            </form>
+      <Card>
+        <CardContent>
+          <h2 className="text-sm font-medium text-slate-500">Stage</h2>
+          <div className="mt-1">
+            <Badge variant={stageBadgeVariant(candidate.stage)} className="capitalize">
+              {candidate.stage}
+            </Badge>
           </div>
-        )}
-      </div>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
-        <h2 className="text-sm font-medium text-slate-500">Resume / notes</h2>
-        <p className="mt-1 whitespace-pre-wrap text-sm text-slate-700">{candidate.resume_notes || '—'}</p>
-      </div>
+          {candidate.stage !== 'rejected' && (
+            <div className="mt-3 flex items-center gap-3">
+              <form action={updateCandidateStage} className="flex items-center gap-2">
+                <input type="hidden" name="candidateId" value={candidate.id} />
+                <FormSelect name="stage" options={[...STAGES]} defaultValue={candidate.stage} />
+                <Button type="submit">Update stage</Button>
+              </form>
+              <form action={rejectCandidate}>
+                <input type="hidden" name="candidateId" value={candidate.id} />
+                <ConfirmSubmitButton
+                  confirmMessage="Reject this candidate? This cannot be undone."
+                  className={buttonVariants({ variant: 'destructive' })}
+                >
+                  Reject
+                </ConfirmSubmitButton>
+              </form>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
-      <form
-        action={updateCandidateNotes}
-        className="space-y-2 rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]"
-      >
-        <input type="hidden" name="candidateId" value={candidate.id} />
-        <label className="block text-sm text-slate-700">
-          Notes
-          <textarea
-            name="notes"
-            defaultValue={candidate.notes}
-            rows={3}
-            className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-          />
-        </label>
-        <button
-          type="submit"
-          className="rounded-lg bg-slate-800 py-2 text-sm font-medium text-white hover:bg-slate-700 active:scale-[0.98] transition-transform"
-        >
-          Save notes
-        </button>
-      </form>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm font-medium text-slate-500">Resume / notes</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="whitespace-pre-wrap text-sm text-slate-700">{candidate.resume_notes || '—'}</p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent>
+          <form action={updateCandidateNotes} className="space-y-2">
+            <input type="hidden" name="candidateId" value={candidate.id} />
+            <label className="block text-sm text-slate-700">
+              Notes
+              <Textarea name="notes" defaultValue={candidate.notes} rows={3} className="mt-1 w-full" />
+            </label>
+            <Button type="submit">Save notes</Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   )
 }

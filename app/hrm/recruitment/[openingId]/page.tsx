@@ -3,6 +3,10 @@ import Link from 'next/link'
 import { requireModule } from '@/lib/access'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { addCandidate } from './actions'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 const STAGE_LABELS: Record<string, string> = {
   applied: 'Applied',
@@ -59,63 +63,59 @@ export default async function OpeningDetailPage({
         <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
       )}
 
-      <form
-        action={addCandidate}
-        className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]"
-      >
-        <input type="hidden" name="openingId" value={opening.id} />
-        <div className="grid grid-cols-2 gap-3">
-          <input
-            name="name"
-            placeholder="Name"
-            required
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-          />
-          <input
-            name="email"
-            placeholder="Email"
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-          />
-          <input
-            name="phone"
-            placeholder="Phone"
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-          />
-          <input
-            name="resumeNotes"
-            placeholder="Resume link or notes"
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-          />
-        </div>
-        <button
-          type="submit"
-          className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700 active:scale-[0.98] transition-transform"
-        >
-          Add candidate
-        </button>
-      </form>
+      <Card>
+        <CardContent>
+          <form action={addCandidate} className="space-y-3">
+            <input type="hidden" name="openingId" value={opening.id} />
+            <div className="grid grid-cols-2 gap-3">
+              <Input name="name" placeholder="Name" required />
+              <Input name="email" placeholder="Email" />
+              <Input name="phone" placeholder="Phone" />
+              <Input name="resumeNotes" placeholder="Resume link or notes" />
+            </div>
+            <Button type="submit">Add candidate</Button>
+          </form>
+        </CardContent>
+      </Card>
 
-      <div className="rounded-xl border border-slate-200 bg-white shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
+      <Card className="py-0">
+        <CardHeader className="pt-4">
+          <CardTitle className="text-lg">Candidates</CardTitle>
+        </CardHeader>
         {candidatesError ? (
-          <p className="p-4 text-sm text-red-700">Could not load candidates</p>
+          <CardContent className="pb-4">
+            <p className="text-sm text-red-700">Could not load candidates</p>
+          </CardContent>
         ) : candidates && candidates.length > 0 ? (
-          <ul className="divide-y divide-slate-100">
-            {candidates.map((candidate) => (
-              <li key={candidate.id} className="flex items-center justify-between px-4 py-3 text-sm">
-                <Link
-                  href={`/hrm/recruitment/candidates/${candidate.id}`}
-                  className="font-medium text-slate-800 hover:underline"
-                >
-                  {candidate.name}
-                </Link>
-                <span className="text-slate-500">{STAGE_LABELS[candidate.stage]}</span>
-              </li>
-            ))}
-          </ul>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Stage</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {candidates.map((candidate) => (
+                <TableRow key={candidate.id}>
+                  <TableCell>
+                    <Link
+                      href={`/hrm/recruitment/candidates/${candidate.id}`}
+                      className="font-medium text-slate-800 hover:underline"
+                    >
+                      {candidate.name}
+                    </Link>
+                  </TableCell>
+                  <TableCell className="text-slate-500">{STAGE_LABELS[candidate.stage]}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         ) : (
-          <p className="p-4 text-sm text-slate-500">No candidates yet.</p>
+          <CardContent className="pb-4">
+            <p className="text-sm text-slate-500">No candidates yet.</p>
+          </CardContent>
         )}
-      </div>
+      </Card>
     </div>
   )
 }
