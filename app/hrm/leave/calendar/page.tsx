@@ -4,6 +4,7 @@ import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { LEAVE_TYPE_LABELS } from '@/lib/leave'
 import { todayDate } from '@/lib/attendance'
 import type { LeaveRequestType } from '@/types/database'
+import { Card } from '@/components/ui/card'
 
 function shiftMonth(monthParam: string, delta: number): string {
   const [y, m] = monthParam.split('-').map(Number)
@@ -127,7 +128,7 @@ export default async function LeaveCalendarPage({
         </p>
       )}
 
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
+      <Card className="overflow-hidden py-0">
         <div className="grid grid-cols-7 border-b border-slate-200 text-center text-xs font-medium text-slate-500">
           {WEEKDAY_LABELS.map((label) => (
             <div key={label} className="py-2">
@@ -165,7 +166,7 @@ export default async function LeaveCalendarPage({
             })}
           </div>
         ))}
-      </div>
+      </Card>
     </div>
   )
 }

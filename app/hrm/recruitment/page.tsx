@@ -2,6 +2,11 @@ import Link from 'next/link'
 import { requireModule } from '@/lib/access'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { createOpening, toggleOpeningStatus } from './actions'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 export default async function RecruitmentPage({
   searchParams,
@@ -25,70 +30,74 @@ export default async function RecruitmentPage({
         <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
       )}
 
-      <form
-        action={createOpening}
-        className="flex items-end gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]"
-      >
-        <label className="flex-1 text-sm text-slate-700">
-          Title
-          <input
-            name="title"
-            required
-            className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-          />
-        </label>
-        <label className="flex-1 text-sm text-slate-700">
-          Department
-          <input
-            name="department"
-            className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-          />
-        </label>
-        <button
-          type="submit"
-          className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700 active:scale-[0.98] transition-transform"
-        >
-          Create
-        </button>
-      </form>
+      <Card>
+        <CardContent>
+          <form action={createOpening} className="flex items-end gap-3">
+            <label className="flex-1 text-sm text-slate-700">
+              Title
+              <Input name="title" required className="mt-1 w-full" />
+            </label>
+            <label className="flex-1 text-sm text-slate-700">
+              Department
+              <Input name="department" className="mt-1 w-full" />
+            </label>
+            <Button type="submit">Create</Button>
+          </form>
+        </CardContent>
+      </Card>
 
-      <div className="rounded-xl border border-slate-200 bg-white shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
+      <Card className="py-0">
+        <CardHeader className="pt-4">
+          <CardTitle className="text-lg">Job Openings</CardTitle>
+        </CardHeader>
         {openingsError ? (
-          <p className="p-4 text-sm text-red-700">Could not load job openings</p>
+          <CardContent className="pb-4">
+            <p className="text-sm text-red-700">Could not load job openings</p>
+          </CardContent>
         ) : openings && openings.length > 0 ? (
-          <ul className="divide-y divide-slate-100">
-            {openings.map((opening) => (
-              <li key={opening.id} className="flex items-center justify-between px-4 py-3 text-sm">
-                <div>
-                  <Link
-                    href={`/hrm/recruitment/${opening.id}`}
-                    className="font-medium text-slate-800 hover:underline"
-                  >
-                    {opening.title}
-                  </Link>
-                  <span className="ml-2 text-slate-400">{opening.department || '—'}</span>
-                  <span
-                    className={`ml-2 rounded px-1.5 py-0.5 text-xs ${
-                      opening.status === 'open' ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-500'
-                    }`}
-                  >
-                    {opening.status}
-                  </span>
-                </div>
-                <form action={toggleOpeningStatus}>
-                  <input type="hidden" name="openingId" value={opening.id} />
-                  <input type="hidden" name="status" value={opening.status === 'open' ? 'closed' : 'open'} />
-                  <button type="submit" className="text-slate-600 underline hover:text-slate-900">
-                    {opening.status === 'open' ? 'Close' : 'Reopen'}
-                  </button>
-                </form>
-              </li>
-            ))}
-          </ul>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Title</TableHead>
+                <TableHead>Department</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {openings.map((opening) => (
+                <TableRow key={opening.id}>
+                  <TableCell>
+                    <Link
+                      href={`/hrm/recruitment/${opening.id}`}
+                      className="font-medium text-slate-800 hover:underline"
+                    >
+                      {opening.title}
+                    </Link>
+                  </TableCell>
+                  <TableCell className="text-slate-600">{opening.department || '—'}</TableCell>
+                  <TableCell>
+                    <Badge variant={opening.status === 'open' ? 'default' : 'secondary'}>{opening.status}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <form action={toggleOpeningStatus}>
+                      <input type="hidden" name="openingId" value={opening.id} />
+                      <input type="hidden" name="status" value={opening.status === 'open' ? 'closed' : 'open'} />
+                      <button type="submit" className="text-slate-600 underline hover:text-slate-900">
+                        {opening.status === 'open' ? 'Close' : 'Reopen'}
+                      </button>
+                    </form>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         ) : (
-          <p className="p-4 text-sm text-slate-500">No job openings yet.</p>
+          <CardContent className="pb-4">
+            <p className="text-sm text-slate-500">No job openings yet.</p>
+          </CardContent>
         )}
-      </div>
+      </Card>
     </div>
   )
 }

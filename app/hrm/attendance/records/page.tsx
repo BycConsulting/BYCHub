@@ -4,6 +4,11 @@ import { requireModule } from '@/lib/access'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { utcIsoToIstWallClock } from '@/lib/attendance'
 import { correctAttendanceRecord } from './actions'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 export default async function AttendanceRecordsPage({
   searchParams,
@@ -49,53 +54,68 @@ export default async function AttendanceRecordsPage({
       {error && (
         <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
       )}
-      {recordsError ? (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">
-          Could not load attendance records
-        </p>
-      ) : sortedRecords.length === 0 ? (
-        <p className="text-sm text-slate-500">No attendance records in the last 30 days.</p>
-      ) : (
-        <ul className="space-y-3">
-          {sortedRecords.map((record) => (
-            <li key={record.id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
-              <p className="text-sm font-medium text-slate-800">
-                {nameById.get(record.user_id) ?? 'Unknown'} — {record.date}
-                {record.checked_in_at && !record.checked_out_at && (
-                  <span className="ml-2 text-xs font-normal text-amber-600">missing checkout</span>
-                )}
-              </p>
-              <form action={correctAttendanceRecord} className="mt-2 flex flex-wrap items-end gap-3">
-                <input type="hidden" name="recordId" value={record.id} />
-                <label className="text-sm text-slate-700">
-                  Checked in
-                  <input
-                    type="datetime-local"
-                    name="checkedInAt"
-                    defaultValue={record.checked_in_at ? utcIsoToIstWallClock(record.checked_in_at) : ''}
-                    className="mt-1 block rounded-lg border border-slate-200 px-2 py-1 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-                  />
-                </label>
-                <label className="text-sm text-slate-700">
-                  Checked out
-                  <input
-                    type="datetime-local"
-                    name="checkedOutAt"
-                    defaultValue={record.checked_out_at ? utcIsoToIstWallClock(record.checked_out_at) : ''}
-                    className="mt-1 block rounded-lg border border-slate-200 px-2 py-1 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-                  />
-                </label>
-                <button
-                  type="submit"
-                  className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700 active:scale-[0.98] transition-transform"
-                >
-                  Save
-                </button>
-              </form>
-            </li>
-          ))}
-        </ul>
-      )}
+
+      <Card className="py-0">
+        {recordsError ? (
+          <CardContent className="py-4">
+            <p className="text-sm text-red-700">Could not load attendance records</p>
+          </CardContent>
+        ) : sortedRecords.length === 0 ? (
+          <CardContent className="py-4">
+            <p className="text-sm text-slate-500">No attendance records in the last 30 days.</p>
+          </CardContent>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Employee</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Correction</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {sortedRecords.map((record) => (
+                <TableRow key={record.id}>
+                  <TableCell className="align-top font-medium text-slate-800">
+                    {nameById.get(record.user_id) ?? 'Unknown'}
+                  </TableCell>
+                  <TableCell className="align-top text-slate-600">{record.date}</TableCell>
+                  <TableCell className="align-top">
+                    {record.checked_in_at && !record.checked_out_at && (
+                      <Badge variant="secondary">missing checkout</Badge>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <form action={correctAttendanceRecord} className="flex flex-wrap items-end gap-3">
+                      <input type="hidden" name="recordId" value={record.id} />
+                      <label className="text-sm text-slate-700">
+                        Checked in
+                        <Input
+                          type="datetime-local"
+                          name="checkedInAt"
+                          defaultValue={record.checked_in_at ? utcIsoToIstWallClock(record.checked_in_at) : ''}
+                          className="mt-1"
+                        />
+                      </label>
+                      <label className="text-sm text-slate-700">
+                        Checked out
+                        <Input
+                          type="datetime-local"
+                          name="checkedOutAt"
+                          defaultValue={record.checked_out_at ? utcIsoToIstWallClock(record.checked_out_at) : ''}
+                          className="mt-1"
+                        />
+                      </label>
+                      <Button type="submit">Save</Button>
+                    </form>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </Card>
     </div>
   )
 }

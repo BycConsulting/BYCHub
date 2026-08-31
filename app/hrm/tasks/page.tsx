@@ -2,6 +2,10 @@ import { requireModule } from '@/lib/access'
 import { createClient } from '@/lib/supabase/server'
 import { createTask, updateTaskStatus } from './actions'
 import { TaskBoard } from './task-board'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { FormSelect } from '@/components/ui/form-select'
 
 export default async function TasksBoardPage({
   searchParams,
@@ -31,78 +35,53 @@ export default async function TasksBoardPage({
   const allEmployees = employees ?? []
   const employeeNames = Object.fromEntries(allEmployees.map((employee) => [employee.id, employee.name]))
 
+  const assigneeFilterOptions = [
+    { value: '', label: 'All tasks' },
+    { value: 'me', label: 'My tasks' },
+    ...allEmployees.map((employee) => ({ value: employee.id, label: employee.name })),
+  ]
+
+  const assigneeOptions = [
+    { value: '', label: 'Unassigned' },
+    ...allEmployees.map((employee) => ({ value: employee.id, label: employee.name })),
+  ]
+
+  const priorityOptions = [
+    { value: 'low', label: 'Low' },
+    { value: 'medium', label: 'Medium' },
+    { value: 'high', label: 'High' },
+    { value: 'urgent', label: 'Urgent' },
+  ]
+
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
-        <h1 className="text-lg font-semibold text-slate-800">Tasks</h1>
-        {error && (
-          <p className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
-        )}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Tasks</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {error && (
+            <p className="mb-3 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+          )}
 
-        <form className="mt-3 flex items-center gap-2">
-          <select
-            name="assignee"
-            defaultValue={assignee ?? ''}
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-          >
-            <option value="">All tasks</option>
-            <option value="me">My tasks</option>
-            {allEmployees.map((employee) => (
-              <option key={employee.id} value={employee.id}>
-                {employee.name}
-              </option>
-            ))}
-          </select>
-          <button
-            type="submit"
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50"
-          >
-            Filter
-          </button>
-        </form>
+          <form className="flex items-center gap-2">
+            <FormSelect name="assignee" options={assigneeFilterOptions} defaultValue={assignee ?? ''} />
+            <Button type="submit" variant="outline">
+              Filter
+            </Button>
+          </form>
 
-        <form action={createTask} className="mt-4 grid grid-cols-5 gap-2">
-          <input
-            name="title"
-            placeholder="Task title"
-            required
-            className="col-span-2 rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-          />
-          <select
-            name="assigneeId"
-            defaultValue=""
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-          >
-            <option value="">Unassigned</option>
-            {allEmployees.map((employee) => (
-              <option key={employee.id} value={employee.id}>
-                {employee.name}
-              </option>
-            ))}
-          </select>
-          <select
-            name="priority"
-            defaultValue="medium"
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-          >
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-            <option value="urgent">Urgent</option>
-          </select>
-          <input
-            name="dueDate"
-            type="date"
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-          />
-          <button
-            type="submit"
-            className="col-span-5 rounded-lg bg-slate-800 py-2 text-sm font-medium text-white hover:bg-slate-700 active:scale-[0.98] transition-transform"
-          >
-            New task
-          </button>
-        </form>
-      </div>
+          <form action={createTask} className="mt-4 grid grid-cols-5 gap-2">
+            <Input name="title" placeholder="Task title" required className="col-span-2" />
+            <FormSelect name="assigneeId" options={assigneeOptions} defaultValue="" />
+            <FormSelect name="priority" options={priorityOptions} defaultValue="medium" />
+            <Input name="dueDate" type="date" />
+            <Button type="submit" className="col-span-5">
+              New task
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
 
       <TaskBoard tasks={allTasks} employeeNames={employeeNames} updateTaskStatus={updateTaskStatus} />
     </div>

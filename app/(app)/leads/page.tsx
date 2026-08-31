@@ -2,6 +2,12 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { createLead } from './actions'
 import { requireModule } from '@/lib/access'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Badge } from '@/components/ui/badge'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 export default async function LeadsPage({
   searchParams,
@@ -18,74 +24,60 @@ export default async function LeadsPage({
 
   return (
     <div className="space-y-8">
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
-        <h1 className="text-lg font-semibold text-slate-800">New lead</h1>
-        {error && (
-          <p className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
-        )}
-        <form action={createLead} className="mt-3 grid grid-cols-2 gap-3">
-          <input
-            name="contact_name"
-            placeholder="Contact name"
-            required
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-          />
-          <input
-            name="contact_email"
-            placeholder="Email"
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-          />
-          <input
-            name="contact_company"
-            placeholder="Company"
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-          />
-          <input
-            name="source"
-            placeholder="Source"
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-          />
-          <textarea
-            name="notes"
-            placeholder="Notes"
-            className="col-span-2 rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-          />
-          <button
-            type="submit"
-            className="col-span-2 rounded-lg bg-slate-800 py-2 text-sm font-medium text-white hover:bg-slate-700 active:scale-[0.98] transition-transform"
-          >
-            Add lead
-          </button>
-        </form>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">New lead</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {error && (
+            <p className="mb-3 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+          )}
+          <form action={createLead} className="grid grid-cols-2 gap-3">
+            <Input name="contact_name" placeholder="Contact name" required />
+            <Input name="contact_email" placeholder="Email" />
+            <Input name="contact_company" placeholder="Company" />
+            <Input name="source" placeholder="Source" />
+            <Textarea name="notes" placeholder="Notes" className="col-span-2" />
+            <Button type="submit" className="col-span-2">
+              Add lead
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
 
-      <div className="rounded-xl border border-slate-200 bg-white shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
-        <h1 className="px-4 pt-4 text-lg font-semibold text-slate-800">Leads</h1>
-        <table className="mt-3 w-full text-left text-sm">
-          <thead>
-            <tr className="border-b border-slate-200 text-slate-500">
-              <th className="px-4 py-2">Contact</th>
-              <th>Company</th>
-              <th>Stage</th>
-              <th>Source</th>
-            </tr>
-          </thead>
-          <tbody>
+      <Card className="py-0">
+        <CardHeader className="pt-4">
+          <CardTitle className="text-lg">Leads</CardTitle>
+        </CardHeader>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Contact</TableHead>
+              <TableHead>Company</TableHead>
+              <TableHead>Stage</TableHead>
+              <TableHead>Source</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {(leads ?? []).map((lead) => (
-              <tr key={lead.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
-                <td className="px-4 py-2">
+              <TableRow key={lead.id}>
+                <TableCell>
                   <Link href={`/leads/${lead.id}`} className="font-medium text-slate-800 hover:underline">
                     {lead.contact_name}
                   </Link>
-                </td>
-                <td className="text-slate-600">{lead.contact_company ?? '—'}</td>
-                <td className="text-slate-600">{lead.stage}</td>
-                <td className="text-slate-600">{lead.source ?? '—'}</td>
-              </tr>
+                </TableCell>
+                <TableCell className="text-slate-600">{lead.contact_company ?? '—'}</TableCell>
+                <TableCell>
+                  <Badge variant="outline" className="capitalize">
+                    {lead.stage}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-slate-600">{lead.source ?? '—'}</TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
-      </div>
+          </TableBody>
+        </Table>
+      </Card>
     </div>
   )
 }

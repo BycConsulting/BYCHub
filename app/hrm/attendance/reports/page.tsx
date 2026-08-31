@@ -3,6 +3,10 @@ import { redirect } from 'next/navigation'
 import { requireModule } from '@/lib/access'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { hoursWorked, todayDate } from '@/lib/attendance'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 function firstOfMonth(): string {
   return `${todayDate().slice(0, 7)}-01`
@@ -57,65 +61,58 @@ export default async function AttendanceReportsPage({
       </Link>
       <h1 className="text-xl font-semibold text-slate-800">Attendance reports</h1>
 
-      <form className="flex items-end gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
-        <label className="text-sm text-slate-700">
-          From
-          <input
-            type="date"
-            name="from"
-            defaultValue={from}
-            className="mt-1 block rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-          />
-        </label>
-        <label className="text-sm text-slate-700">
-          To
-          <input
-            type="date"
-            name="to"
-            defaultValue={to}
-            className="mt-1 block rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-          />
-        </label>
-        <button
-          type="submit"
-          className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700 active:scale-[0.98] transition-transform"
-        >
-          Filter
-        </button>
-        <a
-          href={`/hrm/attendance/reports/export?from=${from}&to=${to}`}
-          className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
-        >
-          Download CSV
-        </a>
-      </form>
+      <Card>
+        <CardContent>
+          <form className="flex items-end gap-3">
+            <label className="text-sm text-slate-700">
+              From
+              <Input type="date" name="from" defaultValue={from} className="mt-1" />
+            </label>
+            <label className="text-sm text-slate-700">
+              To
+              <Input type="date" name="to" defaultValue={to} className="mt-1" />
+            </label>
+            <Button type="submit">Filter</Button>
+            <a
+              href={`/hrm/attendance/reports/export?from=${from}&to=${to}`}
+              className={buttonVariants({ variant: 'outline' })}
+            >
+              Download CSV
+            </a>
+          </form>
+        </CardContent>
+      </Card>
 
-      <div className="rounded-xl border border-slate-200 bg-white shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
+      <Card className="py-0">
         {recordsError ? (
-          <p className="p-4 text-sm text-red-700">Could not load attendance records</p>
+          <CardContent className="py-4">
+            <p className="text-sm text-red-700">Could not load attendance records</p>
+          </CardContent>
         ) : summaryRows.length === 0 ? (
-          <p className="p-4 text-sm text-slate-500">No attendance records in this range.</p>
+          <CardContent className="py-4">
+            <p className="text-sm text-slate-500">No attendance records in this range.</p>
+          </CardContent>
         ) : (
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-slate-200 text-slate-500">
-                <th className="px-4 py-2">Name</th>
-                <th>Days present</th>
-                <th>Total hours</th>
-              </tr>
-            </thead>
-            <tbody>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Days present</TableHead>
+                <TableHead>Total hours</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {summaryRows.map((row) => (
-                <tr key={row.userId} className="border-b border-slate-100 last:border-0">
-                  <td className="px-4 py-2 text-slate-700">{row.name}</td>
-                  <td className="text-slate-600">{row.daysPresent}</td>
-                  <td className="text-slate-600">{row.totalHours.toFixed(2)}</td>
-                </tr>
+                <TableRow key={row.userId}>
+                  <TableCell className="text-slate-700">{row.name}</TableCell>
+                  <TableCell className="text-slate-600">{row.daysPresent}</TableCell>
+                  <TableCell className="text-slate-600">{row.totalHours.toFixed(2)}</TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         )}
-      </div>
+      </Card>
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { requireModule } from '@/lib/access'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
+import { Card } from '@/components/ui/card'
 
 function initialsFor(name: string): string {
   return name
@@ -58,22 +59,21 @@ export default async function DirectoryPage() {
         <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {rows.map((row) => (
             <li key={row.userId}>
-              <Link
-                href={`/hrm/directory/${row.userId}`}
-                className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)] transition hover:border-slate-300 hover:shadow"
-              >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-800 text-sm font-semibold text-white">
-                  {initialsFor(row.name)}
-                </div>
-                <div className="min-w-0">
-                  <div className="truncate text-sm font-medium text-slate-800">{row.name}</div>
-                  <div className="truncate text-xs text-slate-500">
-                    {row.designation ?? '—'} · {row.department ?? '—'}
+              <Link href={`/hrm/directory/${row.userId}`} className="block">
+                <Card className="flex-row items-center gap-3 p-4 transition hover:shadow-md">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-800 text-sm font-semibold text-white">
+                    {initialsFor(row.name)}
                   </div>
-                  {row.managerName && (
-                    <div className="truncate text-xs text-slate-400">Reports to {row.managerName}</div>
-                  )}
-                </div>
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-medium text-slate-800">{row.name}</div>
+                    <div className="truncate text-xs text-slate-500">
+                      {row.designation ?? '—'} · {row.department ?? '—'}
+                    </div>
+                    {row.managerName && (
+                      <div className="truncate text-xs text-slate-400">Reports to {row.managerName}</div>
+                    )}
+                  </div>
+                </Card>
               </Link>
             </li>
           ))}

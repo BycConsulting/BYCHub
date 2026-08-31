@@ -2,6 +2,10 @@ import Link from 'next/link'
 import { requireModule } from '@/lib/access'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { startOnboarding } from './actions'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { FormSelect } from '@/components/ui/form-select'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 export default async function OnboardingPage({
   searchParams,
@@ -37,6 +41,8 @@ export default async function OnboardingPage({
   const inProgress = (checklists ?? []).filter((c) => !c.completed_at)
   const completed = (checklists ?? []).filter((c) => c.completed_at)
 
+  const userOptions = availableUsers.map((u) => ({ value: u.id, label: u.name }))
+
   return (
     <div className="max-w-2xl space-y-6">
       <h1 className="text-xl font-semibold text-slate-800">Onboarding</h1>
@@ -44,70 +50,85 @@ export default async function OnboardingPage({
         <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
       )}
 
-      <form
-        action={startOnboarding}
-        className="flex items-end gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]"
-      >
-        <label className="flex-1 text-sm text-slate-700">
-          Start onboarding for
-          <select
-            name="userId"
-            required
-            defaultValue=""
-            className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-          >
-            <option value="" disabled>
-              Select an employee
-            </option>
-            {availableUsers.map((u) => (
-              <option key={u.id} value={u.id}>
-                {u.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <button
-          type="submit"
-          className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700 active:scale-[0.98] transition-transform"
-        >
-          Start
-        </button>
-      </form>
+      <Card>
+        <CardContent>
+          <form action={startOnboarding} className="flex items-end gap-3">
+            <label className="flex-1 text-sm text-slate-700">
+              Start onboarding for
+              <FormSelect
+                name="userId"
+                options={userOptions}
+                placeholder="Select an employee"
+                className="mt-1 w-full"
+              />
+            </label>
+            <Button type="submit">Start</Button>
+          </form>
+        </CardContent>
+      </Card>
 
-      <div className="rounded-xl border border-slate-200 bg-white shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
-        <h2 className="px-4 pt-4 text-lg font-semibold text-slate-800">In progress</h2>
+      <Card className="py-0">
+        <CardHeader className="pt-4">
+          <CardTitle className="text-lg">In progress</CardTitle>
+        </CardHeader>
         {checklistsError || usersError ? (
-          <p className="p-4 text-sm text-red-700">Could not load onboarding checklists</p>
+          <CardContent className="pb-4">
+            <p className="text-sm text-red-700">Could not load onboarding checklists</p>
+          </CardContent>
         ) : inProgress.length === 0 ? (
-          <p className="p-4 text-sm text-slate-500">No onboarding in progress.</p>
+          <CardContent className="pb-4">
+            <p className="text-sm text-slate-500">No onboarding in progress.</p>
+          </CardContent>
         ) : (
-          <ul className="mt-2 divide-y divide-slate-100">
-            {inProgress.map((c) => (
-              <li key={c.id} className="px-4 py-3 text-sm">
-                <Link href={`/hrm/onboarding/${c.id}`} className="font-medium text-slate-800 hover:underline">
-                  {nameById.get(c.user_id) ?? 'Unknown'}
-                </Link>
-                <span className="ml-2 text-slate-400">started {c.started_at.slice(0, 10)}</span>
-              </li>
-            ))}
-          </ul>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Employee</TableHead>
+                <TableHead>Started</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {inProgress.map((c) => (
+                <TableRow key={c.id}>
+                  <TableCell>
+                    <Link href={`/hrm/onboarding/${c.id}`} className="font-medium text-slate-800 hover:underline">
+                      {nameById.get(c.user_id) ?? 'Unknown'}
+                    </Link>
+                  </TableCell>
+                  <TableCell className="text-slate-400">{c.started_at.slice(0, 10)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         )}
-      </div>
+      </Card>
 
       {completed.length > 0 && (
-        <div className="rounded-xl border border-slate-200 bg-white shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
-          <h2 className="px-4 pt-4 text-lg font-semibold text-slate-800">Completed</h2>
-          <ul className="mt-2 divide-y divide-slate-100">
-            {completed.map((c) => (
-              <li key={c.id} className="px-4 py-3 text-sm">
-                <Link href={`/hrm/onboarding/${c.id}`} className="font-medium text-slate-800 hover:underline">
-                  {nameById.get(c.user_id) ?? 'Unknown'}
-                </Link>
-                <span className="ml-2 text-slate-400">completed {c.completed_at!.slice(0, 10)}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <Card className="py-0">
+          <CardHeader className="pt-4">
+            <CardTitle className="text-lg">Completed</CardTitle>
+          </CardHeader>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Employee</TableHead>
+                <TableHead>Completed</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {completed.map((c) => (
+                <TableRow key={c.id}>
+                  <TableCell>
+                    <Link href={`/hrm/onboarding/${c.id}`} className="font-medium text-slate-800 hover:underline">
+                      {nameById.get(c.user_id) ?? 'Unknown'}
+                    </Link>
+                  </TableCell>
+                  <TableCell className="text-slate-400">{c.completed_at!.slice(0, 10)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Card>
       )}
     </div>
   )

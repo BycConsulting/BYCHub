@@ -9,6 +9,7 @@ import {
   countActivitiesByUser,
 } from '@/lib/metrics'
 import { requireModule } from '@/lib/access'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 const clientStatusOrder = ['prospect', 'active', 'paused', 'lost'] as const
 
@@ -68,97 +69,117 @@ export default async function DashboardPage() {
       )}
 
       <div className="grid grid-cols-3 gap-4">
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
-          <div className="text-sm text-slate-500">Total leads</div>
-          <div className="text-2xl font-semibold text-slate-800">{leads.length}</div>
-        </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
-          <div className="text-sm text-slate-500">Win rate</div>
-          <div className="text-2xl font-semibold text-slate-800">
-            {winRate === null ? '—' : `${winRate.toFixed(0)}%`}
-          </div>
-        </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
-          <div className="text-sm text-slate-500">Avg time to won</div>
-          <div className="text-2xl font-semibold text-slate-800">
-            {avgDays === null ? '—' : `${avgDays.toFixed(1)}d`}
-          </div>
-        </div>
-      </div>
-
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
-        <h2 className="text-lg font-semibold text-slate-800">Leads by stage</h2>
-        <div className="mt-3 space-y-2">
-          {leadStageOrder.map((stage) => (
-            <div key={stage} className="flex items-center gap-2">
-              <div className="w-24 text-sm capitalize text-slate-600">{stage}</div>
-              <div className="h-4 flex-1 rounded bg-slate-100">
-                <div
-                  className="h-4 rounded bg-slate-800"
-                  style={{ width: `${(byStage[stage] / maxStageCount) * 100}%` }}
-                />
-              </div>
-              <div className="w-8 text-right text-sm text-slate-600">{byStage[stage]}</div>
+        <Card>
+          <CardContent>
+            <div className="text-sm text-slate-500">Total leads</div>
+            <div className="text-2xl font-semibold text-slate-800">{leads.length}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent>
+            <div className="text-sm text-slate-500">Win rate</div>
+            <div className="text-2xl font-semibold text-slate-800">
+              {winRate === null ? '—' : `${winRate.toFixed(0)}%`}
             </div>
-          ))}
-        </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent>
+            <div className="text-sm text-slate-500">Avg time to won</div>
+            <div className="text-2xl font-semibold text-slate-800">
+              {avgDays === null ? '—' : `${avgDays.toFixed(1)}d`}
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
-        <h2 className="text-lg font-semibold text-slate-800">Leads by source</h2>
-        {bySource.length === 0 ? (
-          <p className="mt-2 text-sm text-slate-500">No data yet.</p>
-        ) : (
-          <div className="mt-3 space-y-2">
-            {bySource.map(({ source, count }) => (
-              <div key={source} className="flex items-center gap-2">
-                <div className="w-24 truncate text-sm text-slate-600">{source}</div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Leads by stage</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            {leadStageOrder.map((stage) => (
+              <div key={stage} className="flex items-center gap-2">
+                <div className="w-24 text-sm capitalize text-slate-600">{stage}</div>
                 <div className="h-4 flex-1 rounded bg-slate-100">
                   <div
                     className="h-4 rounded bg-slate-800"
-                    style={{ width: `${(count / maxSourceCount) * 100}%` }}
+                    style={{ width: `${(byStage[stage] / maxStageCount) * 100}%` }}
                   />
                 </div>
-                <div className="w-8 text-right text-sm text-slate-600">{count}</div>
+                <div className="w-8 text-right text-sm text-slate-600">{byStage[stage]}</div>
               </div>
             ))}
           </div>
-        )}
-      </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Leads by source</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {bySource.length === 0 ? (
+            <p className="text-sm text-slate-500">No data yet.</p>
+          ) : (
+            <div className="space-y-2">
+              {bySource.map(({ source, count }) => (
+                <div key={source} className="flex items-center gap-2">
+                  <div className="w-24 truncate text-sm text-slate-600">{source}</div>
+                  <div className="h-4 flex-1 rounded bg-slate-100">
+                    <div
+                      className="h-4 rounded bg-slate-800"
+                      style={{ width: `${(count / maxSourceCount) * 100}%` }}
+                    />
+                  </div>
+                  <div className="w-8 text-right text-sm text-slate-600">{count}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       <div>
         <h2 className="text-lg font-semibold text-slate-800">Clients by status</h2>
         <div className="mt-3 grid grid-cols-4 gap-4">
           {clientStatusOrder.map((status) => (
-            <div key={status} className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
-              <div className="text-sm capitalize text-slate-500">{status}</div>
-              <div className="text-xl font-semibold text-slate-800">{byStatus[status]}</div>
-            </div>
+            <Card key={status}>
+              <CardContent>
+                <div className="text-sm capitalize text-slate-500">{status}</div>
+                <div className="text-xl font-semibold text-slate-800">{byStatus[status]}</div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
-        <h2 className="text-lg font-semibold text-slate-800">Activity by teammate</h2>
-        {byUser.length === 0 ? (
-          <p className="mt-2 text-sm text-slate-500">No activity yet.</p>
-        ) : (
-          <div className="mt-3 space-y-2">
-            {byUser.map(({ userId, name, count }) => (
-              <div key={userId} className="flex items-center gap-2">
-                <div className="w-24 truncate text-sm text-slate-600">{name}</div>
-                <div className="h-4 flex-1 rounded bg-slate-100">
-                  <div
-                    className="h-4 rounded bg-slate-800"
-                    style={{ width: `${(count / maxUserCount) * 100}%` }}
-                  />
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Activity by teammate</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {byUser.length === 0 ? (
+            <p className="text-sm text-slate-500">No activity yet.</p>
+          ) : (
+            <div className="space-y-2">
+              {byUser.map(({ userId, name, count }) => (
+                <div key={userId} className="flex items-center gap-2">
+                  <div className="w-24 truncate text-sm text-slate-600">{name}</div>
+                  <div className="h-4 flex-1 rounded bg-slate-100">
+                    <div
+                      className="h-4 rounded bg-slate-800"
+                      style={{ width: `${(count / maxUserCount) * 100}%` }}
+                    />
+                  </div>
+                  <div className="w-8 text-right text-sm text-slate-600">{count}</div>
                 </div>
-                <div className="w-8 text-right text-sm text-slate-600">{count}</div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

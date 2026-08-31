@@ -6,6 +6,18 @@ import { addClientMetric, deleteClientMetric } from './metrics-actions'
 import { MetricEntryForm } from './metric-entry-form'
 import { requireModule } from '@/lib/access'
 import { getMetricCatalog } from '@/lib/metric-catalog'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { FormSelect } from '@/components/ui/form-select'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+
+function statusBadgeVariant(status: string): 'default' | 'secondary' | 'destructive' {
+  if (status === 'active') return 'default'
+  if (status === 'lost') return 'destructive'
+  return 'secondary'
+}
 
 function currentMonthValue(): string {
   const now = new Date()
@@ -56,112 +68,111 @@ export default async function ClientDetailPage({
     throw new Error(metricsError.message)
   }
 
+  const activityTypeOptions = [
+    { value: 'note', label: 'Note' },
+    { value: 'call', label: 'Call' },
+    { value: 'email', label: 'Email' },
+  ]
+
   return (
     <div className="max-w-3xl space-y-6">
       {error && (
         <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
       )}
 
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
-        <h1 className="text-lg font-semibold text-slate-800">{client.name}</h1>
-        <p className="text-sm text-slate-500">Status: {client.status}</p>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">{client.name}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-slate-500">
+            Status:{' '}
+            <Badge variant={statusBadgeVariant(client.status)} className="capitalize">
+              {client.status}
+            </Badge>
+          </p>
+        </CardContent>
+      </Card>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-800">Metrics</h2>
-          <Link
-            href={`/clients/${id}/dashboard`}
-            className="text-sm text-slate-600 hover:text-slate-900 hover:underline"
-          >
-            View dashboard →
-          </Link>
-        </div>
-
-        <form className="mt-3 flex items-center gap-2">
-          <input
-            type="month"
-            name="period"
-            defaultValue={period}
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-          />
-          <button
-            type="submit"
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50"
-          >
-            Go
-          </button>
-        </form>
-
-        <ul className="mt-4 space-y-2">
-          {(metrics ?? []).map((metric) => (
-            <li
-              key={metric.id}
-              className="flex items-center justify-between rounded-lg border border-slate-100 p-2 text-sm"
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Metrics</CardTitle>
+          <CardAction>
+            <Link
+              href={`/clients/${id}/dashboard`}
+              className="text-sm text-slate-600 hover:text-slate-900 hover:underline"
             >
-              <span>
-                <span className="text-slate-400">{metric.channel} — </span>
-                <span className="font-medium text-slate-800">{metric.metric_label}</span>
-                <span className="text-slate-600">
-                  {' '}
-                  = {metric.value}
-                  {metric.unit ? ` ${metric.unit}` : ''}
+              View dashboard →
+            </Link>
+          </CardAction>
+        </CardHeader>
+        <CardContent>
+          <form className="flex items-center gap-2">
+            <Input type="month" name="period" defaultValue={period} className="w-auto" />
+            <Button type="submit" variant="outline">
+              Go
+            </Button>
+          </form>
+
+          <ul className="mt-4 space-y-2">
+            {(metrics ?? []).map((metric) => (
+              <li
+                key={metric.id}
+                className="flex items-center justify-between rounded-lg border border-slate-100 p-2 text-sm"
+              >
+                <span>
+                  <span className="text-slate-400">{metric.channel} — </span>
+                  <span className="font-medium text-slate-800">{metric.metric_label}</span>
+                  <span className="text-slate-600">
+                    {' '}
+                    = {metric.value}
+                    {metric.unit ? ` ${metric.unit}` : ''}
+                  </span>
+                  {metric.notes && <span className="text-slate-400"> ({metric.notes})</span>}
                 </span>
-                {metric.notes && <span className="text-slate-400"> ({metric.notes})</span>}
-              </span>
-              <form action={deleteClientMetric}>
-                <input type="hidden" name="metricId" value={metric.id} />
-                <input type="hidden" name="clientId" value={id} />
-                <button type="submit" className="text-red-600 underline">
-                  Delete
-                </button>
-              </form>
-            </li>
-          ))}
-          {(metrics ?? []).length === 0 && (
-            <li className="text-sm text-slate-400">No metrics logged for {period} yet.</li>
-          )}
-        </ul>
+                <form action={deleteClientMetric}>
+                  <input type="hidden" name="metricId" value={metric.id} />
+                  <input type="hidden" name="clientId" value={id} />
+                  <button type="submit" className="text-red-600 underline">
+                    Delete
+                  </button>
+                </form>
+              </li>
+            ))}
+            {(metrics ?? []).length === 0 && (
+              <li className="text-sm text-slate-400">No metrics logged for {period} yet.</li>
+            )}
+          </ul>
 
-        <MetricEntryForm action={addClientMetric} clientId={id} period={period} catalog={catalog} />
-      </div>
+          <MetricEntryForm action={addClientMetric} clientId={id} period={period} catalog={catalog} />
+        </CardContent>
+      </Card>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
-        <h2 className="text-lg font-semibold text-slate-800">Activity</h2>
-        <form action={addActivity} className="mt-3 space-y-2">
-          <input type="hidden" name="clientId" value={client.id} />
-          <select
-            name="type"
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-          >
-            <option value="note">Note</option>
-            <option value="call">Call</option>
-            <option value="email">Email</option>
-          </select>
-          <textarea
-            name="body"
-            placeholder="What happened?"
-            required
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-          />
-          <button
-            type="submit"
-            className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700 active:scale-[0.98] transition-transform"
-          >
-            Add activity
-          </button>
-        </form>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Activity</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form action={addActivity} className="space-y-2">
+            <input type="hidden" name="clientId" value={client.id} />
+            <FormSelect name="type" options={activityTypeOptions} defaultValue="note" />
+            <Textarea name="body" placeholder="What happened?" required className="w-full" />
+            <Button type="submit">Add activity</Button>
+          </form>
 
-        <ul className="mt-4 space-y-2">
-          {(activities ?? []).map((activity) => (
-            <li key={activity.id} className="rounded-lg border border-slate-100 p-2 text-sm">
-              <span className="font-medium text-slate-800">{activity.type}</span>{' '}
-              <span className="text-slate-600">— {activity.body}</span>
-              <div className="text-xs text-slate-400">{new Date(activity.created_at).toLocaleString()}</div>
-            </li>
-          ))}
-        </ul>
-      </div>
+          <ul className="mt-4 space-y-2">
+            {(activities ?? []).map((activity) => (
+              <li key={activity.id} className="rounded-lg border border-slate-100 p-2 text-sm">
+                <Badge variant="outline" className="capitalize">
+                  {activity.type}
+                </Badge>{' '}
+                <span className="text-slate-600">— {activity.body}</span>
+                <div className="text-xs text-slate-400">{new Date(activity.created_at).toLocaleString()}</div>
+              </li>
+            ))}
+          </ul>
+        </CardContent>
+      </Card>
     </div>
   )
 }

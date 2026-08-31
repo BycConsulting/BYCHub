@@ -5,6 +5,10 @@ import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { allocationForType, computeBalance, dayCount, LEAVE_TYPE_LABELS } from '@/lib/leave'
 import { approveLeaveRequest, rejectLeaveRequest } from './actions'
 import { ConfirmSubmitButton } from '@/app/(app)/confirm-submit-button'
+import { Badge } from '@/components/ui/badge'
+import { buttonVariants } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 export default async function LeaveRequestsPage({
   searchParams,
@@ -78,63 +82,88 @@ export default async function LeaveRequestsPage({
       {error && (
         <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
       )}
-      {pendingError || managerLookupError ? (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">
-          Could not load pending requests
-        </p>
-      ) : pending.length === 0 ? (
-        <p className="text-sm text-slate-500">No pending requests.</p>
-      ) : (
-        <ul className="space-y-3">
-          {pending.map((request) => {
-            const allocation = config ? allocationForType(config, request.type) : null
-            const balanceText =
-              configError && request.type !== 'wfh'
-                ? 'balance unavailable'
-                : allocation !== null
-                  ? `current balance: ${computeBalance(
-                      allocation,
-                      approvedByUserAndType.get(`${request.user_id}:${request.type}`) ?? [],
-                      currentYear
-                    )}`
-                  : null
 
-            return (
-              <li key={request.id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
-                <p className="text-sm font-medium text-slate-800">
-                  {nameById.get(request.user_id) ?? 'Unknown'} — {LEAVE_TYPE_LABELS[request.type]}
-                </p>
-                <p className="mt-1 text-sm text-slate-600">
-                  {request.start_date} to {request.end_date} ({dayCount(request.start_date, request.end_date)} day
-                  {dayCount(request.start_date, request.end_date) === 1 ? '' : 's'})
-                  {balanceText && <> — {balanceText}</>}
-                </p>
-                <p className="text-sm text-slate-600">{request.reason}</p>
-                <div className="mt-2 flex gap-3">
-                  <form action={approveLeaveRequest}>
-                    <input type="hidden" name="requestId" value={request.id} />
-                    <ConfirmSubmitButton
-                      confirmMessage="Approve this request? This cannot be undone."
-                      className="text-green-700 underline"
-                    >
-                      Approve
-                    </ConfirmSubmitButton>
-                  </form>
-                  <form action={rejectLeaveRequest}>
-                    <input type="hidden" name="requestId" value={request.id} />
-                    <ConfirmSubmitButton
-                      confirmMessage="Reject this request? This cannot be undone."
-                      className="text-red-600 underline"
-                    >
-                      Reject
-                    </ConfirmSubmitButton>
-                  </form>
-                </div>
-              </li>
-            )
-          })}
-        </ul>
-      )}
+      <Card className="py-0">
+        <CardHeader className="pt-4">
+          <CardTitle className="text-lg">Pending requests</CardTitle>
+        </CardHeader>
+        {pendingError || managerLookupError ? (
+          <CardContent className="pb-4">
+            <p className="text-sm text-red-700">Could not load pending requests</p>
+          </CardContent>
+        ) : pending.length === 0 ? (
+          <CardContent className="pb-4">
+            <p className="text-sm text-slate-500">No pending requests.</p>
+          </CardContent>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Employee</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Dates</TableHead>
+                <TableHead>Balance</TableHead>
+                <TableHead>Reason</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {pending.map((request) => {
+                const allocation = config ? allocationForType(config, request.type) : null
+                const balanceText =
+                  configError && request.type !== 'wfh'
+                    ? 'balance unavailable'
+                    : allocation !== null
+                      ? `current balance: ${computeBalance(
+                          allocation,
+                          approvedByUserAndType.get(`${request.user_id}:${request.type}`) ?? [],
+                          currentYear
+                        )}`
+                      : null
+
+                return (
+                  <TableRow key={request.id}>
+                    <TableCell className="font-medium text-slate-800">
+                      {nameById.get(request.user_id) ?? 'Unknown'}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{LEAVE_TYPE_LABELS[request.type]}</Badge>
+                    </TableCell>
+                    <TableCell className="text-slate-600">
+                      {request.start_date} to {request.end_date} ({dayCount(request.start_date, request.end_date)} day
+                      {dayCount(request.start_date, request.end_date) === 1 ? '' : 's'})
+                    </TableCell>
+                    <TableCell className="whitespace-normal text-slate-600">{balanceText ?? '—'}</TableCell>
+                    <TableCell className="whitespace-normal text-slate-600">{request.reason}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <form action={approveLeaveRequest}>
+                          <input type="hidden" name="requestId" value={request.id} />
+                          <ConfirmSubmitButton
+                            confirmMessage="Approve this request? This cannot be undone."
+                            className={buttonVariants({ variant: 'default' })}
+                          >
+                            Approve
+                          </ConfirmSubmitButton>
+                        </form>
+                        <form action={rejectLeaveRequest}>
+                          <input type="hidden" name="requestId" value={request.id} />
+                          <ConfirmSubmitButton
+                            confirmMessage="Reject this request? This cannot be undone."
+                            className={buttonVariants({ variant: 'destructive' })}
+                          >
+                            Reject
+                          </ConfirmSubmitButton>
+                        </form>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
+        )}
+      </Card>
     </div>
   )
 }
