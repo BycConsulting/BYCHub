@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { requireModule } from '@/lib/access'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { formatIstTime, todayDate } from '@/lib/attendance'
+import { Card } from '@/components/ui/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 export default async function AttendanceTeamPage() {
   const currentUser = await requireModule('leave_attendance')
@@ -60,27 +62,38 @@ export default async function AttendanceTeamPage() {
           Could not load your team&apos;s attendance
         </p>
       ) : (
-        <ul className="space-y-2">
-          {reportIds.map((reportId) => {
-            const record = teamToday.find((r) => r.user_id === reportId)
-            const status = !record?.checked_in_at
-              ? 'not checked in today'
-              : !record.checked_out_at
-                ? `checked in at ${formatIstTime(record.checked_in_at)}`
-                : `${formatIstTime(record.checked_in_at)} to ${formatIstTime(record.checked_out_at)}`
-            const shiftId = shiftIdByUser.get(reportId)
-            const shiftName = shiftId ? (shiftNameById.get(shiftId) ?? 'Unknown shift') : 'No shift assigned'
-            return (
-              <li
-                key={reportId}
-                className="rounded-lg border border-slate-100 bg-white p-3 text-sm text-slate-700 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]"
-              >
-                <span className="font-medium text-slate-800">{teamNameById.get(reportId) ?? 'Unknown'}</span> —{' '}
-                {status} <span className="text-slate-400">· {shiftName}</span>
-              </li>
-            )
-          })}
-        </ul>
+        <Card className="py-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Employee</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Shift</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {reportIds.map((reportId) => {
+                const record = teamToday.find((r) => r.user_id === reportId)
+                const status = !record?.checked_in_at
+                  ? 'not checked in today'
+                  : !record.checked_out_at
+                    ? `checked in at ${formatIstTime(record.checked_in_at)}`
+                    : `${formatIstTime(record.checked_in_at)} to ${formatIstTime(record.checked_out_at)}`
+                const shiftId = shiftIdByUser.get(reportId)
+                const shiftName = shiftId ? (shiftNameById.get(shiftId) ?? 'Unknown shift') : 'No shift assigned'
+                return (
+                  <TableRow key={reportId}>
+                    <TableCell className="font-medium text-slate-800">
+                      {teamNameById.get(reportId) ?? 'Unknown'}
+                    </TableCell>
+                    <TableCell className="text-slate-600">{status}</TableCell>
+                    <TableCell className="text-slate-500">{shiftName}</TableCell>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
+        </Card>
       )}
     </div>
   )
