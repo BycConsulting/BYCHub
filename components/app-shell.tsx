@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { LogOut } from 'lucide-react'
 import { logout } from '@/app/login/actions'
 import { NavLinks } from '@/components/nav-links'
@@ -25,11 +26,9 @@ export function AppShell({
   return (
     <div className="flex min-h-screen bg-slate-50">
       <aside className="flex w-56 shrink-0 flex-col border-r border-slate-200 bg-white px-3 py-4">
-        <div className="mb-6 flex items-center gap-2 px-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-800 text-sm font-bold text-white">
-            B
-          </div>
-          <span className="text-base font-semibold text-slate-800">BYC Hub</span>
+        <div className="mb-6 px-2">
+          <Image src="/byc-logo.png" alt="BYC Consulting" width={1600} height={664} priority className="h-7 w-auto" />
+          <span className="mt-1 block text-xs font-medium text-slate-400">BYC Hub</span>
         </div>
         <NavLinks enabledModules={enabledModules} />
       </aside>

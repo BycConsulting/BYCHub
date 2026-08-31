@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { login } from './actions'
 
 export default async function LoginPage({
@@ -14,9 +15,14 @@ export default async function LoginPage({
         className="w-full max-w-sm space-y-4 rounded-2xl border border-slate-200 bg-white p-8 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]"
       >
         <div className="text-center">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-slate-800 text-lg font-bold text-white">
-            B
-          </div>
+          <Image
+            src="/byc-logo.png"
+            alt="BYC Consulting"
+            width={1600}
+            height={664}
+            priority
+            className="mx-auto mb-4 h-10 w-auto"
+          />
           <h1 className="text-xl font-semibold text-slate-800">BYC Hub</h1>
           <p className="mt-1 text-sm text-slate-500">Please sign in to continue.</p>
         </div>
