@@ -1,6 +1,15 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { requireModule } from '@/lib/access'
+import { Badge } from '@/components/ui/badge'
+import { Card } from '@/components/ui/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+
+function statusBadgeVariant(status: string): 'default' | 'secondary' | 'destructive' {
+  if (status === 'active') return 'default'
+  if (status === 'lost') return 'destructive'
+  return 'secondary'
+}
 
 export default async function ClientsPage() {
   await requireModule('clients')
@@ -13,28 +22,32 @@ export default async function ClientsPage() {
   return (
     <div className="space-y-4">
       <h1 className="text-xl font-semibold text-slate-800">Clients</h1>
-      <div className="rounded-xl border border-slate-200 bg-white shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
-        <table className="w-full text-left text-sm">
-          <thead>
-            <tr className="border-b border-slate-200 text-slate-500">
-              <th className="px-4 py-2">Name</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
+      <Card className="py-0">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Status</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {(clients ?? []).map((client) => (
-              <tr key={client.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
-                <td className="px-4 py-2">
+              <TableRow key={client.id}>
+                <TableCell>
                   <Link href={`/clients/${client.id}`} className="font-medium text-slate-800 hover:underline">
                     {client.name}
                   </Link>
-                </td>
-                <td className="text-slate-600">{client.status}</td>
-              </tr>
+                </TableCell>
+                <TableCell>
+                  <Badge variant={statusBadgeVariant(client.status)} className="capitalize">
+                    {client.status}
+                  </Badge>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
-      </div>
+          </TableBody>
+        </Table>
+      </Card>
     </div>
   )
 }

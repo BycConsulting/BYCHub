@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { requireModule } from '@/lib/access'
 import { createClient } from '@/lib/supabase/server'
 import { MetricChart } from './metric-chart'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface MetricPoint {
   period: string
@@ -48,41 +49,49 @@ export default async function ClientMetricsDashboardPage({ params }: { params: P
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
-        <Link href={`/clients/${id}`} className="text-sm text-slate-600 hover:text-slate-900 hover:underline">
-          ← Back to {client.name}
-        </Link>
-        <h1 className="mt-2 text-lg font-semibold text-slate-800">{client.name} — Metrics dashboard</h1>
-      </div>
+      <Card>
+        <CardHeader>
+          <Link href={`/clients/${id}`} className="text-sm text-slate-600 hover:text-slate-900 hover:underline">
+            ← Back to {client.name}
+          </Link>
+          <CardTitle className="mt-2 text-lg">{client.name} — Metrics dashboard</CardTitle>
+        </CardHeader>
+      </Card>
 
       {byChannel.size === 0 && (
-        <p className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
-          No metrics logged for this client yet.
-        </p>
+        <Card>
+          <CardContent>
+            <p className="text-sm text-slate-500">No metrics logged for this client yet.</p>
+          </CardContent>
+        </Card>
       )}
 
       {Array.from(byChannel.entries()).map(([channel, metricMap]) => (
-        <div key={channel} className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
-          <h2 className="text-lg font-semibold text-slate-800">{channel}</h2>
-          <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {Array.from(metricMap.entries()).map(([label, metric]) => (
-              <div key={label} className="rounded-lg border border-slate-100 p-3">
-                <h3 className="text-sm font-medium text-slate-600">
-                  {label}
-                  {metric.unit ? ` (${metric.unit})` : ''}
-                </h3>
-                {metric.points.length >= 2 ? (
-                  <MetricChart points={metric.points} />
-                ) : (
-                  <p className="mt-2 text-2xl font-semibold text-slate-800">
-                    {metric.points[0]?.value}
-                    <span className="ml-2 text-xs font-normal text-slate-400">{metric.points[0]?.period}</span>
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
+        <Card key={channel}>
+          <CardHeader>
+            <CardTitle className="text-lg">{channel}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {Array.from(metricMap.entries()).map(([label, metric]) => (
+                <div key={label} className="rounded-lg border border-slate-100 p-3">
+                  <h3 className="text-sm font-medium text-slate-600">
+                    {label}
+                    {metric.unit ? ` (${metric.unit})` : ''}
+                  </h3>
+                  {metric.points.length >= 2 ? (
+                    <MetricChart points={metric.points} />
+                  ) : (
+                    <p className="mt-2 text-2xl font-semibold text-slate-800">
+                      {metric.points[0]?.value}
+                      <span className="ml-2 text-xs font-normal text-slate-400">{metric.points[0]?.period}</span>
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       ))}
     </div>
   )

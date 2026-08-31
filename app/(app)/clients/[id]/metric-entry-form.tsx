@@ -2,6 +2,9 @@
 
 import { useState } from 'react'
 import type { CatalogMetric } from '@/lib/metric-catalog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 export function MetricEntryForm({
   action,
@@ -38,76 +41,55 @@ export function MetricEntryForm({
       <input type="hidden" name="metricLabel" value={metricLabel} />
       <input type="hidden" name="unit" value={unit} />
 
-      <select
-        value={selected}
-        onChange={(event) => setSelected(event.target.value)}
-        required
-        className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-      >
-        <option value="" disabled>
-          Select a metric…
-        </option>
-        {channelsInOrder.map((channelName) => (
-          <optgroup key={channelName} label={channelName}>
-            {catalog
-              .filter((option) => option.channel === channelName)
-              .map((option) => (
-                <option key={`${option.channel}|${option.metricKey}`} value={`${option.channel}|${option.metricKey}`}>
-                  {option.label}
-                </option>
-              ))}
-          </optgroup>
-        ))}
-        <option value="__custom__">Custom…</option>
-      </select>
+      <Select value={selected} onValueChange={setSelected}>
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder="Select a metric…" />
+        </SelectTrigger>
+        <SelectContent>
+          {channelsInOrder.map((channelName) => (
+            <SelectGroup key={channelName}>
+              <SelectLabel>{channelName}</SelectLabel>
+              {catalog
+                .filter((option) => option.channel === channelName)
+                .map((option) => (
+                  <SelectItem key={`${option.channel}|${option.metricKey}`} value={`${option.channel}|${option.metricKey}`}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+            </SelectGroup>
+          ))}
+          <SelectItem value="__custom__">Custom…</SelectItem>
+        </SelectContent>
+      </Select>
 
       {isCustom && (
         <div className="grid grid-cols-3 gap-2">
-          <input
+          <Input
             value={customChannel}
             onChange={(event) => setCustomChannel(event.target.value)}
             placeholder="Channel (e.g. TikTok Ads)"
             required
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
           />
-          <input
+          <Input
             value={customLabel}
             onChange={(event) => setCustomLabel(event.target.value)}
             placeholder="Metric name"
             required
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
           />
-          <input
+          <Input
             value={customUnit}
             onChange={(event) => setCustomUnit(event.target.value)}
             placeholder="Unit (optional)"
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
           />
         </div>
       )}
 
       <div className="grid grid-cols-2 gap-2">
-        <input
-          name="value"
-          type="number"
-          step="any"
-          placeholder="Value"
-          required
-          className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-        />
-        <input
-          name="notes"
-          placeholder="Notes (optional)"
-          className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-        />
+        <Input name="value" type="number" step="any" placeholder="Value" required />
+        <Input name="notes" placeholder="Notes (optional)" />
       </div>
 
-      <button
-        type="submit"
-        className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700 active:scale-[0.98] transition-transform"
-      >
-        Add metric
-      </button>
+      <Button type="submit">Add metric</Button>
     </form>
   )
 }
