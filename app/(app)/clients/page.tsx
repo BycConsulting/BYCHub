@@ -13,7 +13,7 @@ export default async function ClientsPage() {
   return (
     <div className="space-y-4">
       <h1 className="text-xl font-semibold text-slate-800">Clients</h1>
-      <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="rounded-xl border border-slate-200 bg-white shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="border-b border-slate-200 text-slate-500">

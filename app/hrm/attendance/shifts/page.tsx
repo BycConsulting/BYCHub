@@ -51,26 +51,26 @@ export default async function ShiftsPage({
 
       <form
         action={createShift}
-        className="grid grid-cols-2 gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+        className="grid grid-cols-2 gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]"
       >
         <input
           name="name"
           placeholder="Shift name"
           required
-          className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+          className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
         />
         <div className="flex gap-3">
           <input
             type="time"
             name="startTime"
             required
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
           />
           <input
             type="time"
             name="endTime"
             required
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
           />
         </div>
         <div className="col-span-2 flex flex-wrap gap-4">
@@ -83,13 +83,13 @@ export default async function ShiftsPage({
         </div>
         <button
           type="submit"
-          className="col-span-2 rounded-lg bg-slate-800 py-2 text-sm font-medium text-white hover:bg-slate-700"
+          className="col-span-2 rounded-lg bg-slate-800 py-2 text-sm font-medium text-white hover:bg-slate-700 active:scale-[0.98] transition-transform"
         >
           Create shift
         </button>
       </form>
 
-      <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="rounded-xl border border-slate-200 bg-white shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
         <h2 className="px-4 pt-4 text-lg font-semibold text-slate-800">Existing shifts</h2>
         {shiftsError ? (
           <p className="p-4 text-sm text-red-700">Could not load shifts</p>
@@ -106,7 +106,7 @@ export default async function ShiftsPage({
         )}
       </div>
 
-      <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="rounded-xl border border-slate-200 bg-white shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
         <h2 className="px-4 pt-4 text-lg font-semibold text-slate-800">Assign employees</h2>
         {employeesError ? (
           <p className="p-4 text-sm text-red-700">Could not load employees</p>

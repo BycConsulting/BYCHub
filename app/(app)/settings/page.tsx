@@ -17,7 +17,7 @@ export default async function SettingsPage() {
           Edit role permissions
         </Link>
       )}
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
         <h2 className="text-sm font-medium text-slate-500">AI provider API keys</h2>
         <ul className="mt-2 space-y-2">
           {providers.map((provider) => (

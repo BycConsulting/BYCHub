@@ -70,7 +70,7 @@ export default async function AttendancePage({
         <p className="text-sm text-red-600">Could not check your team — try refreshing.</p>
       )}
 
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
         <h1 className="text-lg font-semibold text-slate-800">Attendance</h1>
         {error && (
           <p className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
@@ -81,7 +81,7 @@ export default async function AttendancePage({
             <form action={checkIn}>
               <button
                 type="submit"
-                className="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700"
+                className="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 active:scale-[0.98] transition-transform"
               >
                 Check In
               </button>
@@ -90,7 +90,7 @@ export default async function AttendancePage({
             <form action={checkOut}>
               <button
                 type="submit"
-                className="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700"
+                className="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 active:scale-[0.98] transition-transform"
               >
                 Check Out
               </button>
@@ -101,7 +101,7 @@ export default async function AttendancePage({
         </div>
       </div>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
         <h2 className="text-lg font-semibold text-slate-800">My history</h2>
         {recordsError ? (
           <p className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">

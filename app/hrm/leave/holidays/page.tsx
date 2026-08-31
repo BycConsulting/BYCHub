@@ -31,7 +31,7 @@ export default async function HolidaysPage({
       {canManage && (
         <form
           action={addHoliday}
-          className="flex items-end gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+          className="flex items-end gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]"
         >
           <label className="text-sm text-slate-700">
             Date
@@ -39,7 +39,7 @@ export default async function HolidaysPage({
               type="date"
               name="date"
               required
-              className="mt-1 block rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+              className="mt-1 block rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
             />
           </label>
           <label className="flex-1 text-sm text-slate-700">
@@ -48,19 +48,19 @@ export default async function HolidaysPage({
               name="name"
               placeholder="e.g. Independence Day"
               required
-              className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+              className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
             />
           </label>
           <button
             type="submit"
-            className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700"
+            className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700 active:scale-[0.98] transition-transform"
           >
             Add
           </button>
         </form>
       )}
 
-      <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="rounded-xl border border-slate-200 bg-white shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
         {holidaysError ? (
           <p className="p-4 text-sm text-red-700">Could not load holidays</p>
         ) : holidays && holidays.length > 0 ? (

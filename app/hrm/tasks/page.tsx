@@ -33,7 +33,7 @@ export default async function TasksBoardPage({
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
         <h1 className="text-lg font-semibold text-slate-800">Tasks</h1>
         {error && (
           <p className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
@@ -43,7 +43,7 @@ export default async function TasksBoardPage({
           <select
             name="assignee"
             defaultValue={assignee ?? ''}
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
           >
             <option value="">All tasks</option>
             <option value="me">My tasks</option>
@@ -66,12 +66,12 @@ export default async function TasksBoardPage({
             name="title"
             placeholder="Task title"
             required
-            className="col-span-2 rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+            className="col-span-2 rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
           />
           <select
             name="assigneeId"
             defaultValue=""
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
           >
             <option value="">Unassigned</option>
             {allEmployees.map((employee) => (
@@ -83,7 +83,7 @@ export default async function TasksBoardPage({
           <select
             name="priority"
             defaultValue="medium"
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
           >
             <option value="low">Low</option>
             <option value="medium">Medium</option>
@@ -93,11 +93,11 @@ export default async function TasksBoardPage({
           <input
             name="dueDate"
             type="date"
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
           />
           <button
             type="submit"
-            className="col-span-5 rounded-lg bg-slate-800 py-2 text-sm font-medium text-white hover:bg-slate-700"
+            className="col-span-5 rounded-lg bg-slate-800 py-2 text-sm font-medium text-white hover:bg-slate-700 active:scale-[0.98] transition-transform"
           >
             New task
           </button>

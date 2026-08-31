@@ -36,7 +36,7 @@ export default async function LeadDetailPage({
         <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
       )}
 
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
         <h1 className="text-lg font-semibold text-slate-800">{lead.contact_name}</h1>
         <p className="text-sm text-slate-500">
           {lead.contact_company} · {lead.contact_email}
@@ -51,7 +51,7 @@ export default async function LeadDetailPage({
             <select
               name="stage"
               defaultValue={lead.stage}
-              className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+              className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
             >
               {leadStages.map((stage) => (
                 <option key={stage} value={stage}>
@@ -61,7 +61,7 @@ export default async function LeadDetailPage({
             </select>
             <button
               type="submit"
-              className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700"
+              className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700 active:scale-[0.98] transition-transform"
             >
               Update stage
             </button>
@@ -69,13 +69,13 @@ export default async function LeadDetailPage({
         )}
       </div>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
         <h2 className="text-lg font-semibold text-slate-800">Activity</h2>
         <form action={addActivity} className="mt-3 space-y-2">
           <input type="hidden" name="leadId" value={lead.id} />
           <select
             name="type"
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
           >
             <option value="note">Note</option>
             <option value="call">Call</option>
@@ -85,11 +85,11 @@ export default async function LeadDetailPage({
             name="body"
             placeholder="What happened?"
             required
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
           />
           <button
             type="submit"
-            className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700"
+            className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700 active:scale-[0.98] transition-transform"
           >
             Add activity
           </button>

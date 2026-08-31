@@ -50,25 +50,25 @@ export default async function TaskDetailPage({
         <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
       )}
 
-      <form action={updateTask} className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <form action={updateTask} className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
         <input type="hidden" name="taskId" value={task.id} />
         <input
           name="title"
           defaultValue={task.title}
           required
-          className="w-full rounded-lg border border-slate-200 px-3 py-2 text-lg font-semibold focus:border-slate-800 focus:outline-none"
+          className="w-full rounded-lg border border-slate-200 px-3 py-2 text-lg font-semibold focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
         />
         <textarea
           name="description"
           defaultValue={task.description}
           placeholder="Description"
-          className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+          className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
         />
         <div className="grid grid-cols-2 gap-3">
           <select
             name="status"
             defaultValue={task.status}
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
           >
             <option value="todo">To Do</option>
             <option value="in_progress">In Progress</option>
@@ -77,7 +77,7 @@ export default async function TaskDetailPage({
           <select
             name="priority"
             defaultValue={task.priority}
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
           >
             <option value="low">Low</option>
             <option value="medium">Medium</option>
@@ -87,7 +87,7 @@ export default async function TaskDetailPage({
           <select
             name="assigneeId"
             defaultValue={task.assignee_id ?? ''}
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
           >
             <option value="">Unassigned</option>
             {allEmployees.map((employee) => (
@@ -100,18 +100,18 @@ export default async function TaskDetailPage({
             name="dueDate"
             type="date"
             defaultValue={task.due_date ?? ''}
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
           />
         </div>
         <button
           type="submit"
-          className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700"
+          className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700 active:scale-[0.98] transition-transform"
         >
           Save
         </button>
       </form>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
         <h2 className="text-lg font-semibold text-slate-800">Activity</h2>
         <ul className="mt-3 space-y-2">
           {(events ?? []).map((event) => (

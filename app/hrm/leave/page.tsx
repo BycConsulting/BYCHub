@@ -107,7 +107,7 @@ export default async function LeavePage({
         )}
       </div>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
         <h1 className="text-lg font-semibold text-slate-800">Leave & WFH</h1>
         {error && (
           <p className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
@@ -140,7 +140,7 @@ export default async function LeavePage({
         <form action={submitLeaveRequest} className="mt-4 grid grid-cols-2 gap-3">
           <select
             name="type"
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
           >
             {Object.entries(LEAVE_TYPE_LABELS).map(([value, label]) => (
               <option key={value} value={value}>
@@ -153,30 +153,30 @@ export default async function LeavePage({
             type="date"
             name="startDate"
             required
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
           />
           <input
             type="date"
             name="endDate"
             required
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
           />
           <textarea
             name="reason"
             placeholder="Reason"
             required
-            className="col-span-2 rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+            className="col-span-2 rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
           />
           <button
             type="submit"
-            className="col-span-2 rounded-lg bg-slate-800 py-2 text-sm font-medium text-white hover:bg-slate-700"
+            className="col-span-2 rounded-lg bg-slate-800 py-2 text-sm font-medium text-white hover:bg-slate-700 active:scale-[0.98] transition-transform"
           >
             Submit request
           </button>
         </form>
       </div>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
         <h2 className="text-lg font-semibold text-slate-800">My requests</h2>
         {requestsError ? (
           <p className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">
@@ -210,7 +210,7 @@ export default async function LeavePage({
       </div>
 
       {(reportsError || reportIds.length > 0) && (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
           <h2 className="text-lg font-semibold text-slate-800">My team&apos;s requests</h2>
           {reportsError ? (
             <p className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">

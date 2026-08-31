@@ -127,7 +127,7 @@ export default async function LeaveCalendarPage({
         </p>
       )}
 
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
         <div className="grid grid-cols-7 border-b border-slate-200 text-center text-xs font-medium text-slate-500">
           {WEEKDAY_LABELS.map((label) => (
             <div key={label} className="py-2">

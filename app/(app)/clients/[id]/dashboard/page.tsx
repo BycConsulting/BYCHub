@@ -48,7 +48,7 @@ export default async function ClientMetricsDashboardPage({ params }: { params: P
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
         <Link href={`/clients/${id}`} className="text-sm text-slate-600 hover:text-slate-900 hover:underline">
           ← Back to {client.name}
         </Link>
@@ -56,13 +56,13 @@ export default async function ClientMetricsDashboardPage({ params }: { params: P
       </div>
 
       {byChannel.size === 0 && (
-        <p className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500 shadow-sm">
+        <p className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
           No metrics logged for this client yet.
         </p>
       )}
 
       {Array.from(byChannel.entries()).map(([channel, metricMap]) => (
-        <div key={channel} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div key={channel} className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
           <h2 className="text-lg font-semibold text-slate-800">{channel}</h2>
           <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
             {Array.from(metricMap.entries()).map(([label, metric]) => (
