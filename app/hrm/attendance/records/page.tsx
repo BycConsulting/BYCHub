@@ -58,7 +58,7 @@ export default async function AttendanceRecordsPage({
       ) : (
         <ul className="space-y-3">
           {sortedRecords.map((record) => (
-            <li key={record.id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <li key={record.id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
               <p className="text-sm font-medium text-slate-800">
                 {nameById.get(record.user_id) ?? 'Unknown'} — {record.date}
                 {record.checked_in_at && !record.checked_out_at && (
@@ -73,7 +73,7 @@ export default async function AttendanceRecordsPage({
                     type="datetime-local"
                     name="checkedInAt"
                     defaultValue={record.checked_in_at ? utcIsoToIstWallClock(record.checked_in_at) : ''}
-                    className="mt-1 block rounded-lg border border-slate-200 px-2 py-1 text-sm focus:border-slate-800 focus:outline-none"
+                    className="mt-1 block rounded-lg border border-slate-200 px-2 py-1 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
                   />
                 </label>
                 <label className="text-sm text-slate-700">
@@ -82,12 +82,12 @@ export default async function AttendanceRecordsPage({
                     type="datetime-local"
                     name="checkedOutAt"
                     defaultValue={record.checked_out_at ? utcIsoToIstWallClock(record.checked_out_at) : ''}
-                    className="mt-1 block rounded-lg border border-slate-200 px-2 py-1 text-sm focus:border-slate-800 focus:outline-none"
+                    className="mt-1 block rounded-lg border border-slate-200 px-2 py-1 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
                   />
                 </label>
                 <button
                   type="submit"
-                  className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700"
+                  className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700 active:scale-[0.98] transition-transform"
                 >
                   Save
                 </button>

@@ -100,7 +100,7 @@ export default async function LeaveRequestsPage({
                   : null
 
             return (
-              <li key={request.id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <li key={request.id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
                 <p className="text-sm font-medium text-slate-800">
                   {nameById.get(request.user_id) ?? 'Unknown'} — {LEAVE_TYPE_LABELS[request.type]}
                 </p>

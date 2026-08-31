@@ -70,13 +70,13 @@ export default async function DirectoryProfilePage({
 
   return (
     <div className="max-w-2xl space-y-6">
-      <div className="flex items-center gap-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="flex items-center gap-4 rounded-xl border border-slate-200 bg-white p-6 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
         <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-slate-800 text-lg font-semibold text-white">
           {initialsFor(user.name)}
         </div>
         <h1 className="text-xl font-semibold text-slate-800">{user.name}</h1>
       </div>
-      <div className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
         {fields.map((field) => (
           <div key={field.label} className="flex justify-between px-6 py-3 text-sm">
             <span className="text-slate-500">{field.label}</span>

@@ -61,7 +61,7 @@ export default async function OnboardingDetailPage({
 
       <form
         action={updateOnboardingChecklist}
-        className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+        className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]"
       >
         <input type="hidden" name="checklistId" value={checklist.id} />
         <div className="space-y-2">
@@ -78,12 +78,12 @@ export default async function OnboardingDetailPage({
             name="notes"
             defaultValue={checklist.notes}
             rows={3}
-            className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+            className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
           />
         </label>
         <button
           type="submit"
-          className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700"
+          className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700 active:scale-[0.98] transition-transform"
         >
           Save
         </button>

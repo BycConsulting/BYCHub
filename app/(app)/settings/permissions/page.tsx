@@ -23,7 +23,7 @@ export default async function PermissionsPage({
         <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
       )}
 
-      <form action={updateModuleAccess} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <form action={updateModuleAccess} className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="border-b border-slate-200 text-slate-500">
@@ -59,7 +59,7 @@ export default async function PermissionsPage({
         </table>
         <button
           type="submit"
-          className="mt-4 rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700"
+          className="mt-4 rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700 active:scale-[0.98] transition-transform"
         >
           Save
         </button>

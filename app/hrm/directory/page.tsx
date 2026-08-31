@@ -60,7 +60,7 @@ export default async function DirectoryPage() {
             <li key={row.userId}>
               <Link
                 href={`/hrm/directory/${row.userId}`}
-                className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-slate-300 hover:shadow"
+                className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)] transition hover:border-slate-300 hover:shadow"
               >
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-800 text-sm font-semibold text-white">
                   {initialsFor(row.name)}

@@ -49,7 +49,7 @@ function TaskCard({ task, assigneeName }: { task: BoardTask; assigneeName: strin
       style={style}
       {...listeners}
       {...attributes}
-      className="touch-none cursor-grab rounded-lg border border-slate-200 bg-white p-3 text-sm shadow-sm"
+      className="touch-none cursor-grab rounded-lg border border-slate-200 bg-white p-3 text-sm shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]"
     >
       <Link href={`/hrm/tasks/${task.id}`} className="font-medium text-slate-800 hover:underline">
         {task.title}

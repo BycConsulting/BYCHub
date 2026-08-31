@@ -39,7 +39,7 @@ export default async function HrConfigPage({
       )}
 
       {config && (
-        <form action={updateHrConfig} className="space-y-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <form action={updateHrConfig} className="space-y-6 rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
           <div>
             <h2 className="text-sm font-medium text-slate-500">Working days</h2>
             <div className="mt-2 flex flex-wrap gap-4">
@@ -64,7 +64,7 @@ export default async function HrConfigPage({
                   max={365}
                   required
                   defaultValue={config?.casual_leave_days ?? 12}
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
                 />
               </label>
               <label className="text-sm text-slate-700">
@@ -76,7 +76,7 @@ export default async function HrConfigPage({
                   max={365}
                   required
                   defaultValue={config?.sick_leave_days ?? 12}
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
                 />
               </label>
               <label className="text-sm text-slate-700">
@@ -88,7 +88,7 @@ export default async function HrConfigPage({
                   max={365}
                   required
                   defaultValue={config?.earned_leave_days ?? 15}
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
                 />
               </label>
               <label className="text-sm text-slate-700">
@@ -100,7 +100,7 @@ export default async function HrConfigPage({
                   max={365}
                   required
                   defaultValue={config?.maternity_leave_days ?? 182}
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
                 />
               </label>
               <label className="text-sm text-slate-700">
@@ -112,7 +112,7 @@ export default async function HrConfigPage({
                   max={365}
                   required
                   defaultValue={config?.paternity_leave_days ?? 15}
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
                 />
               </label>
             </div>
@@ -128,13 +128,13 @@ export default async function HrConfigPage({
               name="officeIpAllowlist"
               rows={2}
               defaultValue={config?.office_ip_allowlist ?? ''}
-              className="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+              className="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
             />
           </div>
 
           <button
             type="submit"
-            className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700"
+            className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700 active:scale-[0.98] transition-transform"
           >
             Save
           </button>

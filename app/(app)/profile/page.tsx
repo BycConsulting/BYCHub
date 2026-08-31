@@ -18,7 +18,7 @@ export default async function ProfilePage() {
     <div className="max-w-2xl space-y-6">
       <h1 className="text-xl font-semibold text-slate-800">My profile</h1>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
         <h2 className="text-sm font-medium text-slate-500">Job info</h2>
         <div className="mt-2 space-y-1 text-sm text-slate-700">
           <p>Designation: {profile?.designation ?? '—'}</p>
@@ -28,7 +28,7 @@ export default async function ProfilePage() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
         <h2 className="text-sm font-medium text-slate-500">Personal info</h2>
         <div className="mt-2 space-y-1 text-sm text-slate-700">
           <p>Phone: {profile?.phone ?? '—'}</p>

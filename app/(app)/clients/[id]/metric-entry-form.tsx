@@ -42,7 +42,7 @@ export function MetricEntryForm({
         value={selected}
         onChange={(event) => setSelected(event.target.value)}
         required
-        className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+        className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
       >
         <option value="" disabled>
           Select a metric…
@@ -68,20 +68,20 @@ export function MetricEntryForm({
             onChange={(event) => setCustomChannel(event.target.value)}
             placeholder="Channel (e.g. TikTok Ads)"
             required
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
           />
           <input
             value={customLabel}
             onChange={(event) => setCustomLabel(event.target.value)}
             placeholder="Metric name"
             required
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
           />
           <input
             value={customUnit}
             onChange={(event) => setCustomUnit(event.target.value)}
             placeholder="Unit (optional)"
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
           />
         </div>
       )}
@@ -93,18 +93,18 @@ export function MetricEntryForm({
           step="any"
           placeholder="Value"
           required
-          className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+          className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
         />
         <input
           name="notes"
           placeholder="Notes (optional)"
-          className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none"
+          className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
         />
       </div>
 
       <button
         type="submit"
-        className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700"
+        className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700 active:scale-[0.98] transition-transform"
       >
         Add metric
       </button>

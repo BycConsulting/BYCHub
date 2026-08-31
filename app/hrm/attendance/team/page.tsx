@@ -73,7 +73,7 @@ export default async function AttendanceTeamPage() {
             return (
               <li
                 key={reportId}
-                className="rounded-lg border border-slate-100 bg-white p-3 text-sm text-slate-700 shadow-sm"
+                className="rounded-lg border border-slate-100 bg-white p-3 text-sm text-slate-700 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]"
               >
                 <span className="font-medium text-slate-800">{teamNameById.get(reportId) ?? 'Unknown'}</span> —{' '}
                 {status} <span className="text-slate-400">· {shiftName}</span>
