@@ -5,6 +5,12 @@ import { createClient } from '@/lib/supabase/server'
 import { clearInviteResult, deactivateUser, deleteUser, inviteUser, reactivateUser, resetUserPassword } from './actions'
 import { DeleteUserButton } from './delete-user-button'
 import { INVITE_RESULT_COOKIE, parseInviteResult } from './invite-result'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
+import { FormSelect } from '@/components/ui/form-select'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 export default async function UsersPage({
   searchParams,
@@ -40,92 +46,90 @@ export default async function UsersPage({
     ownedCounts.set(u.id, (leadsCount ?? 0) + (clientsCount ?? 0))
   }
 
+  const roleOptions = [
+    { value: 'employee', label: 'Employee' },
+    { value: 'hr', label: 'HR' },
+    ...(currentUser.role === 'admin' ? [{ value: 'admin', label: 'Admin' }] : []),
+  ]
+
   return (
     <div className="space-y-8">
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
-        <div className="flex gap-4">
+      <Card>
+        <CardHeader>
           <Link href="/users/config" className="text-sm text-slate-600 hover:text-slate-900 hover:underline">
             HR configuration
           </Link>
-        </div>
-        <h1 className="mt-2 text-lg font-semibold text-slate-800">Invite user</h1>
-        {error && (
-          <p className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
-        )}
-        {inviteResult && (
-          <div className="mt-2 rounded-lg border border-green-200 bg-green-50 p-2 text-sm text-green-700">
-            <p>
-              {inviteResult.action === 'invited' ? 'Created' : 'Reset password for'} {inviteResult.email}. Temporary
-              password: <strong>{inviteResult.tempPassword}</strong> — share this with them directly, it will not be
-              shown again.
-            </p>
-            <form action={clearInviteResult}>
-              <button type="submit" className="mt-2 underline">
-                Dismiss
-              </button>
-            </form>
-          </div>
-        )}
-        <form action={inviteUser} className="mt-3 grid grid-cols-3 gap-3">
-          <input
-            name="name"
-            placeholder="Full name"
-            required
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-          />
-          <input
-            name="email"
-            type="email"
-            placeholder="Email"
-            required
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-          />
-          <select
-            name="role"
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-          >
-            <option value="employee">Employee</option>
-            <option value="hr">HR</option>
-            {currentUser.role === 'admin' && <option value="admin">Admin</option>}
-          </select>
-          <button
-            type="submit"
-            className="col-span-3 rounded-lg bg-slate-800 py-2 text-sm font-medium text-white hover:bg-slate-700 active:scale-[0.98] transition-transform"
-          >
-            Create user
-          </button>
-        </form>
-      </div>
+          <CardTitle className="mt-2 text-lg">Invite user</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {error && (
+            <p className="mb-3 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+          )}
+          {inviteResult && (
+            <div className="mb-3 rounded-lg border border-green-200 bg-green-50 p-2 text-sm text-green-700">
+              <p>
+                {inviteResult.action === 'invited' ? 'Created' : 'Reset password for'} {inviteResult.email}. Temporary
+                password: <strong>{inviteResult.tempPassword}</strong> — share this with them directly, it will not be
+                shown again.
+              </p>
+              <form action={clearInviteResult}>
+                <button type="submit" className="mt-2 underline">
+                  Dismiss
+                </button>
+              </form>
+            </div>
+          )}
+          <form action={inviteUser} className="grid grid-cols-3 gap-3">
+            <Input name="name" placeholder="Full name" required />
+            <Input name="email" type="email" placeholder="Email" required />
+            <FormSelect name="role" options={roleOptions} defaultValue="employee" />
+            <Button type="submit" className="col-span-3">
+              Create user
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
 
-      <div className="rounded-xl border border-slate-200 bg-white shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
-        <h1 className="px-4 pt-4 text-lg font-semibold text-slate-800">Users</h1>
-        <table className="mt-3 w-full text-left text-sm">
-          <thead>
-            <tr className="border-b border-slate-200 text-slate-500">
-              <th className="px-4 py-2">Name</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
+      <Card className="py-0">
+        <CardHeader className="pt-4">
+          <CardTitle className="text-lg">Users</CardTitle>
+        </CardHeader>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Role</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {allUsers.map((u) => {
               const isSelf = u.id === currentUser.id
               const owned = ownedCounts.get(u.id) ?? 0
               const reassignTargets = activeUsers.filter((other) => other.id !== u.id)
+              const reassignOptions = reassignTargets.map((target) => ({ value: target.id, label: target.name }))
 
               return (
-                <tr key={u.id} className="border-b border-slate-100 align-top last:border-0 hover:bg-slate-50">
-                  <td className="px-4 py-2">
+                <TableRow key={u.id} className="align-top">
+                  <TableCell>
                     <Link href={`/users/${u.id}`} className="font-medium text-slate-800 hover:underline">
                       {u.name}
                     </Link>
-                  </td>
-                  <td className="text-slate-600">{u.email}</td>
-                  <td className="text-slate-600">{u.role}</td>
-                  <td className="text-slate-600">{u.is_active ? 'Active' : 'Deactivated'}</td>
-                  <td className="space-y-2 py-2">
+                  </TableCell>
+                  <TableCell className="text-slate-600">{u.email}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="capitalize">
+                      {u.role}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={u.is_active ? 'default' : 'secondary'}>
+                      {u.is_active ? 'Active' : 'Deactivated'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="space-y-2 py-2">
                     {isSelf && <span className="text-slate-400">You</span>}
                     {!isSelf && u.is_active && (
                       <>
@@ -138,21 +142,12 @@ export default async function UsersPage({
                         <form action={deactivateUser} className="flex items-center gap-2">
                           <input type="hidden" name="userId" value={u.id} />
                           {owned > 0 && (
-                            <select
+                            <FormSelect
                               name="reassignToUserId"
-                              required
-                              defaultValue=""
-                              className="rounded-lg border border-slate-200 px-2 py-1 text-xs"
-                            >
-                              <option value="" disabled>
-                                Reassign {owned} record{owned === 1 ? '' : 's'} to…
-                              </option>
-                              {reassignTargets.map((target) => (
-                                <option key={target.id} value={target.id}>
-                                  {target.name}
-                                </option>
-                              ))}
-                            </select>
+                              options={reassignOptions}
+                              placeholder={`Reassign ${owned} record${owned === 1 ? '' : 's'} to…`}
+                              className="h-7 text-xs"
+                            />
                           )}
                           <button type="submit" className="text-red-600 underline">
                             Deactivate
@@ -173,13 +168,13 @@ export default async function UsersPage({
                         )}
                       </>
                     )}
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               )
             })}
-          </tbody>
-        </table>
-      </div>
+          </TableBody>
+        </Table>
+      </Card>
     </div>
   )
 }

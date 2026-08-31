@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Input } from '@/components/ui/input'
 
 export function DeleteUserButton({
   userId,
@@ -17,12 +18,12 @@ export function DeleteUserButton({
   return (
     <form action={action} className="flex items-center gap-2">
       <input type="hidden" name="userId" value={userId} />
-      <input
+      <Input
         type="text"
         value={confirmText}
         onChange={(event) => setConfirmText(event.target.value)}
         placeholder={`Type "${userEmail}" to delete`}
-        className="w-48 rounded-lg border border-slate-200 px-2 py-1 text-xs"
+        className="h-7 w-48 text-xs"
       />
       <button
         type="submit"
