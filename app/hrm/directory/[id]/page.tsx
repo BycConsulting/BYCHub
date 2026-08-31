@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation'
 import { requireModule } from '@/lib/access'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
+import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 
 function initialsFor(name: string): string {
   return name
@@ -61,29 +63,35 @@ export default async function DirectoryProfilePage({
   }
 
   const fields = [
-    { label: 'Designation', value: profile?.designation },
-    { label: 'Department', value: profile?.department },
-    { label: 'Employment type', value: profile?.employment_type },
-    { label: 'Start date', value: profile?.employment_start_date },
-    { label: 'Manager', value: managerName },
+    { label: 'Designation', value: profile?.designation, badge: false },
+    { label: 'Department', value: profile?.department, badge: true },
+    { label: 'Employment type', value: profile?.employment_type, badge: true },
+    { label: 'Start date', value: profile?.employment_start_date, badge: false },
+    { label: 'Manager', value: managerName, badge: false },
   ]
 
   return (
     <div className="max-w-2xl space-y-6">
-      <div className="flex items-center gap-4 rounded-xl border border-slate-200 bg-white p-6 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
+      <Card className="flex-row items-center gap-4 p-6">
         <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-slate-800 text-lg font-semibold text-white">
           {initialsFor(user.name)}
         </div>
         <h1 className="text-xl font-semibold text-slate-800">{user.name}</h1>
-      </div>
-      <div className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
+      </Card>
+      <Card className="gap-0 divide-y divide-slate-100 py-0">
         {fields.map((field) => (
-          <div key={field.label} className="flex justify-between px-6 py-3 text-sm">
+          <div key={field.label} className="flex items-center justify-between px-6 py-3 text-sm">
             <span className="text-slate-500">{field.label}</span>
-            <span className="font-medium text-slate-800">{field.value ?? '—'}</span>
+            {field.badge && field.value ? (
+              <Badge variant="outline" className="capitalize">
+                {field.value}
+              </Badge>
+            ) : (
+              <span className="font-medium text-slate-800">{field.value ?? '—'}</span>
+            )}
           </div>
         ))}
-      </div>
+      </Card>
     </div>
   )
 }
