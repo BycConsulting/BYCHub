@@ -301,3 +301,8 @@ export const updateTaskSchema = z.object({
   assigneeId: z.string().uuid().optional().or(z.literal('')),
   dueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date').optional().or(z.literal('')),
 })
+
+export const forceDeleteUserSchema = z.object({
+  userId: z.string().uuid(),
+  acknowledged: z.literal('on', { error: 'You must confirm you understand this permanently deletes their history' }),
+})
