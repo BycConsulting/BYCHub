@@ -2,8 +2,17 @@ import Link from 'next/link'
 import { cookies } from 'next/headers'
 import { requireModule } from '@/lib/access'
 import { createClient } from '@/lib/supabase/server'
-import { clearInviteResult, deactivateUser, deleteUser, inviteUser, reactivateUser, resetUserPassword } from './actions'
+import {
+  clearInviteResult,
+  deactivateUser,
+  deleteUser,
+  forceDeleteUser,
+  inviteUser,
+  reactivateUser,
+  resetUserPassword,
+} from './actions'
 import { DeleteUserButton } from './delete-user-button'
+import { ForceDeleteUserButton } from './force-delete-user-button'
 import { INVITE_RESULT_COOKIE, parseInviteResult } from './invite-result'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -15,10 +24,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 export default async function UsersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>
+  searchParams: Promise<{ error?: string; blockedUserId?: string }>
 }) {
   const currentUser = await requireModule('hr')
-  const { error } = await searchParams
+  const { error, blockedUserId } = await searchParams
 
   // The temp password arrives in a short-lived httpOnly cookie, never the URL.
   const cookieStore = await cookies()
@@ -165,6 +174,9 @@ export default async function UsersPage({
                         </form>
                         {currentUser.role === 'admin' && (
                           <DeleteUserButton userId={u.id} userEmail={u.email} action={deleteUser} />
+                        )}
+                        {currentUser.role === 'admin' && blockedUserId === u.id && (
+                          <ForceDeleteUserButton userId={u.id} userEmail={u.email} action={forceDeleteUser} />
                         )}
                       </>
                     )}
