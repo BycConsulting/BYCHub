@@ -4,6 +4,9 @@ import { requireModule } from '@/lib/access'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { ConfirmSubmitButton } from '@/app/(app)/confirm-submit-button'
 import { updateOffboardingChecklist, completeOffboarding } from '../actions'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Textarea } from '@/components/ui/textarea'
 
 const STEPS = [
   { key: 'stepResignationRecorded', column: 'step_resignation_recorded', label: 'Resignation/termination recorded' },
@@ -58,42 +61,38 @@ export default async function OffboardingDetailPage({
         <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
       )}
 
-      <form
-        action={updateOffboardingChecklist}
-        className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]"
-      >
-        <input type="hidden" name="checklistId" value={checklist.id} />
-        <div className="space-y-2">
-          {STEPS.map((step) => (
-            <label key={step.key} className="flex items-center gap-2 text-sm text-slate-700">
-              <input type="checkbox" name={step.key} defaultChecked={checklist[step.column]} />
-              {step.label}
+      <Card>
+        <CardContent>
+          <form action={updateOffboardingChecklist} className="space-y-4">
+            <input type="hidden" name="checklistId" value={checklist.id} />
+            <div className="space-y-2">
+              {STEPS.map((step) => (
+                <label key={step.key} className="flex items-center gap-2 text-sm text-slate-700">
+                  <input
+                    type="checkbox"
+                    name={step.key}
+                    defaultChecked={checklist[step.column]}
+                    className="accent-slate-800"
+                  />
+                  {step.label}
+                </label>
+              ))}
+            </div>
+            <label className="block text-sm text-slate-700">
+              Notes
+              <Textarea name="notes" defaultValue={checklist.notes} rows={3} className="mt-1 w-full" />
             </label>
-          ))}
-        </div>
-        <label className="block text-sm text-slate-700">
-          Notes
-          <textarea
-            name="notes"
-            defaultValue={checklist.notes}
-            rows={3}
-            className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-          />
-        </label>
-        <button
-          type="submit"
-          className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700 active:scale-[0.98] transition-transform"
-        >
-          Save
-        </button>
-      </form>
+            <Button type="submit">Save</Button>
+          </form>
+        </CardContent>
+      </Card>
 
       {!checklist.completed_at && (
         <form action={completeOffboarding}>
           <input type="hidden" name="checklistId" value={checklist.id} />
           <ConfirmSubmitButton
             confirmMessage="Mark offboarding complete? This cannot be undone."
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+            className={buttonVariants({ variant: 'outline' })}
           >
             Mark complete
           </ConfirmSubmitButton>
