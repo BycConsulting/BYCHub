@@ -2,7 +2,16 @@
 
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
-import { DndContext, useDraggable, useDroppable, type DragEndEvent } from '@dnd-kit/core'
+import {
+  DndContext,
+  useDraggable,
+  useDroppable,
+  useSensor,
+  useSensors,
+  PointerSensor,
+  KeyboardSensor,
+  type DragEndEvent,
+} from '@dnd-kit/core'
 import type { TaskPriority, TaskStatus } from '@/types/database'
 
 interface BoardTask {
@@ -40,7 +49,7 @@ function TaskCard({ task, assigneeName }: { task: BoardTask; assigneeName: strin
       style={style}
       {...listeners}
       {...attributes}
-      className="cursor-grab rounded-lg border border-slate-200 bg-white p-3 text-sm shadow-sm"
+      className="touch-none cursor-grab rounded-lg border border-slate-200 bg-white p-3 text-sm shadow-sm"
     >
       <Link href={`/hrm/tasks/${task.id}`} className="font-medium text-slate-800 hover:underline">
         {task.title}
@@ -100,6 +109,11 @@ export function TaskBoard({
   updateTaskStatus: (taskId: string, status: TaskStatus) => Promise<{ error: string | null }>
 }) {
   const [localTasks, setLocalTasks] = useState(tasks)
+  const [syncedTasks, setSyncedTasks] = useState(tasks)
+  if (syncedTasks !== tasks) {
+    setSyncedTasks(tasks)
+    setLocalTasks(tasks)
+  }
   const [, startTransition] = useTransition()
 
   function handleDragEnd(event: DragEndEvent) {
@@ -124,8 +138,13 @@ export function TaskBoard({
     })
   }
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor)
+  )
+
   return (
-    <DndContext onDragEnd={handleDragEnd}>
+    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       <div className="flex gap-4">
         {COLUMNS.map((column) => (
           <Column
