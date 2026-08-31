@@ -2,6 +2,10 @@ import Link from 'next/link'
 import { requireModule } from '@/lib/access'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { addHoliday, deleteHoliday } from './actions'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 export default async function HolidaysPage({
   searchParams,
@@ -29,62 +33,62 @@ export default async function HolidaysPage({
       )}
 
       {canManage && (
-        <form
-          action={addHoliday}
-          className="flex items-end gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]"
-        >
-          <label className="text-sm text-slate-700">
-            Date
-            <input
-              type="date"
-              name="date"
-              required
-              className="mt-1 block rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-            />
-          </label>
-          <label className="flex-1 text-sm text-slate-700">
-            Name
-            <input
-              name="name"
-              placeholder="e.g. Independence Day"
-              required
-              className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-            />
-          </label>
-          <button
-            type="submit"
-            className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700 active:scale-[0.98] transition-transform"
-          >
-            Add
-          </button>
-        </form>
+        <Card>
+          <CardContent>
+            <form action={addHoliday} className="flex items-end gap-3">
+              <label className="text-sm text-slate-700">
+                Date
+                <Input type="date" name="date" required className="mt-1" />
+              </label>
+              <label className="flex-1 text-sm text-slate-700">
+                Name
+                <Input name="name" placeholder="e.g. Independence Day" required className="mt-1 w-full" />
+              </label>
+              <Button type="submit">Add</Button>
+            </form>
+          </CardContent>
+        </Card>
       )}
 
-      <div className="rounded-xl border border-slate-200 bg-white shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
+      <Card className="py-0">
         {holidaysError ? (
-          <p className="p-4 text-sm text-red-700">Could not load holidays</p>
+          <CardContent className="py-4">
+            <p className="text-sm text-red-700">Could not load holidays</p>
+          </CardContent>
         ) : holidays && holidays.length > 0 ? (
-          <ul className="divide-y divide-slate-100">
-            {holidays.map((holiday) => (
-              <li key={holiday.id} className="flex items-center justify-between px-4 py-3 text-sm">
-                <span className="text-slate-700">
-                  {holiday.date} — {holiday.name}
-                </span>
-                {canManage && (
-                  <form action={deleteHoliday}>
-                    <input type="hidden" name="holidayId" value={holiday.id} />
-                    <button type="submit" className="text-red-600 underline">
-                      Delete
-                    </button>
-                  </form>
-                )}
-              </li>
-            ))}
-          </ul>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Date</TableHead>
+                <TableHead>Name</TableHead>
+                {canManage && <TableHead>Actions</TableHead>}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {holidays.map((holiday) => (
+                <TableRow key={holiday.id}>
+                  <TableCell className="text-slate-600">{holiday.date}</TableCell>
+                  <TableCell className="text-slate-700">{holiday.name}</TableCell>
+                  {canManage && (
+                    <TableCell>
+                      <form action={deleteHoliday}>
+                        <input type="hidden" name="holidayId" value={holiday.id} />
+                        <button type="submit" className="text-red-600 underline">
+                          Delete
+                        </button>
+                      </form>
+                    </TableCell>
+                  )}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         ) : (
-          <p className="p-4 text-sm text-slate-500">No holidays added yet.</p>
+          <CardContent className="py-4">
+            <p className="text-sm text-slate-500">No holidays added yet.</p>
+          </CardContent>
         )}
-      </div>
+      </Card>
     </div>
   )
 }

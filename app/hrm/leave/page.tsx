@@ -8,8 +8,23 @@ import { submitLeaveRequest, cancelLeaveRequest } from './actions'
 import { approveTeamRequest, rejectTeamRequest } from './team-actions'
 import { ConfirmSubmitButton } from '@/app/(app)/confirm-submit-button'
 import type { LeaveRequestType } from '@/types/database'
+import { Badge } from '@/components/ui/badge'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { FormSelect } from '@/components/ui/form-select'
+import { Input } from '@/components/ui/input'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Textarea } from '@/components/ui/textarea'
 
 const BALANCE_TYPES: LeaveRequestType[] = ['casual', 'sick', 'earned', 'maternity', 'paternity']
+
+const LEAVE_TYPE_OPTIONS = Object.entries(LEAVE_TYPE_LABELS).map(([value, label]) => ({ value, label }))
+
+function statusBadgeVariant(status: string): 'default' | 'secondary' | 'destructive' {
+  if (status === 'approved') return 'default'
+  if (status === 'rejected') return 'destructive'
+  return 'secondary'
+}
 
 export default async function LeavePage({
   searchParams,
@@ -107,173 +122,194 @@ export default async function LeavePage({
         )}
       </div>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
-        <h1 className="text-lg font-semibold text-slate-800">Leave & WFH</h1>
-        {error && (
-          <p className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
-        )}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Leave & WFH</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {error && (
+            <p className="mb-3 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+          )}
 
-        {configError ? (
-          <p className="mt-3 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">
-            Could not load leave balances
-          </p>
-        ) : (
-          config && (
-            <div className="mt-3">
-              <h2 className="text-sm font-medium text-slate-500">My balance ({currentYear})</h2>
-              <div className="mt-2 grid grid-cols-5 gap-3">
-                {BALANCE_TYPES.map((type) => {
-                  const allocation = allocationForType(config, type)
-                  const balance = computeBalance(allocation ?? 0, approvedByType.get(type) ?? [], currentYear)
-                  return (
-                    <div key={type} className="rounded-lg border border-slate-200 p-3 text-sm">
-                      <div className="text-slate-500">{LEAVE_TYPE_LABELS[type]}</div>
-                      <div className="text-lg font-semibold text-slate-800">{balance}</div>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          )
-        )}
-
-        <form action={submitLeaveRequest} className="mt-4 grid grid-cols-2 gap-3">
-          <select
-            name="type"
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-          >
-            {Object.entries(LEAVE_TYPE_LABELS).map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
-          <div />
-          <input
-            type="date"
-            name="startDate"
-            required
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-          />
-          <input
-            type="date"
-            name="endDate"
-            required
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-          />
-          <textarea
-            name="reason"
-            placeholder="Reason"
-            required
-            className="col-span-2 rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-800/30"
-          />
-          <button
-            type="submit"
-            className="col-span-2 rounded-lg bg-slate-800 py-2 text-sm font-medium text-white hover:bg-slate-700 active:scale-[0.98] transition-transform"
-          >
-            Submit request
-          </button>
-        </form>
-      </div>
-
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
-        <h2 className="text-lg font-semibold text-slate-800">My requests</h2>
-        {requestsError ? (
-          <p className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">
-            Could not load your requests
-          </p>
-        ) : myRequests && myRequests.length > 0 ? (
-          <ul className="mt-3 space-y-2">
-            {myRequests.map((request) => (
-              <li key={request.id} className="rounded-lg border border-slate-100 p-3 text-sm">
-                <div className="text-slate-700">
-                  {LEAVE_TYPE_LABELS[request.type]}: {request.start_date} to {request.end_date} (
-                  {dayCount(request.start_date, request.end_date)} day
-                  {dayCount(request.start_date, request.end_date) === 1 ? '' : 's'}) —{' '}
-                  <strong className="text-slate-800">{request.status}</strong>
+          {configError ? (
+            <p className="mb-3 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">
+              Could not load leave balances
+            </p>
+          ) : (
+            config && (
+              <div className="mb-4">
+                <h2 className="text-sm font-medium text-slate-500">My balance ({currentYear})</h2>
+                <div className="mt-2 grid grid-cols-5 gap-3">
+                  {BALANCE_TYPES.map((type) => {
+                    const allocation = allocationForType(config, type)
+                    const balance = computeBalance(allocation ?? 0, approvedByType.get(type) ?? [], currentYear)
+                    return (
+                      <div key={type} className="rounded-lg border border-slate-200 p-3 text-sm">
+                        <div className="text-slate-500">{LEAVE_TYPE_LABELS[type]}</div>
+                        <div className="text-lg font-semibold text-slate-800">{balance}</div>
+                      </div>
+                    )
+                  })}
                 </div>
-                <div className="text-slate-500">{request.reason}</div>
-                {request.status === 'pending' && (
-                  <form action={cancelLeaveRequest} className="mt-1">
-                    <input type="hidden" name="requestId" value={request.id} />
-                    <button type="submit" className="text-red-600 underline">
-                      Cancel
-                    </button>
-                  </form>
-                )}
-              </li>
-            ))}
-          </ul>
+              </div>
+            )
+          )}
+
+          <form action={submitLeaveRequest} className="grid grid-cols-2 gap-3">
+            <FormSelect name="type" options={LEAVE_TYPE_OPTIONS} defaultValue={LEAVE_TYPE_OPTIONS[0]?.value} />
+            <div />
+            <Input type="date" name="startDate" required />
+            <Input type="date" name="endDate" required />
+            <Textarea name="reason" placeholder="Reason" required className="col-span-2" />
+            <Button type="submit" className="col-span-2">
+              Submit request
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+
+      <Card className="py-0">
+        <CardHeader className="pt-4">
+          <CardTitle className="text-lg">My requests</CardTitle>
+        </CardHeader>
+        {requestsError ? (
+          <CardContent className="pb-4">
+            <p className="text-sm text-red-700">Could not load your requests</p>
+          </CardContent>
+        ) : myRequests && myRequests.length > 0 ? (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Type</TableHead>
+                <TableHead>Dates</TableHead>
+                <TableHead>Reason</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {myRequests.map((request) => (
+                <TableRow key={request.id}>
+                  <TableCell>
+                    <Badge variant="outline">{LEAVE_TYPE_LABELS[request.type]}</Badge>
+                  </TableCell>
+                  <TableCell className="text-slate-600">
+                    {request.start_date} to {request.end_date} ({dayCount(request.start_date, request.end_date)} day
+                    {dayCount(request.start_date, request.end_date) === 1 ? '' : 's'})
+                  </TableCell>
+                  <TableCell className="whitespace-normal text-slate-500">{request.reason}</TableCell>
+                  <TableCell>
+                    <Badge variant={statusBadgeVariant(request.status)} className="capitalize">
+                      {request.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {request.status === 'pending' && (
+                      <form action={cancelLeaveRequest}>
+                        <input type="hidden" name="requestId" value={request.id} />
+                        <button type="submit" className="text-red-600 underline">
+                          Cancel
+                        </button>
+                      </form>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         ) : (
-          <p className="mt-2 text-sm text-slate-500">No requests yet.</p>
+          <CardContent className="pb-4">
+            <p className="text-sm text-slate-500">No requests yet.</p>
+          </CardContent>
         )}
-      </div>
+      </Card>
 
       {(reportsError || reportIds.length > 0) && (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_0_rgba(30,41,59,0.06),0_2px_6px_-1px_rgba(30,41,59,0.08)]">
-          <h2 className="text-lg font-semibold text-slate-800">My team&apos;s requests</h2>
+        <Card className="py-0">
+          <CardHeader className="pt-4">
+            <CardTitle className="text-lg">My team&apos;s requests</CardTitle>
+          </CardHeader>
           {reportsError ? (
-            <p className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">
-              Could not load your team
-            </p>
+            <CardContent className="pb-4">
+              <p className="text-sm text-red-700">Could not load your team</p>
+            </CardContent>
           ) : teamPendingError ? (
-            <p className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">
-              Could not load your team&apos;s requests
-            </p>
+            <CardContent className="pb-4">
+              <p className="text-sm text-red-700">Could not load your team&apos;s requests</p>
+            </CardContent>
           ) : teamPending.length === 0 ? (
-            <p className="mt-2 text-sm text-slate-500">No pending requests from your team.</p>
+            <CardContent className="pb-4">
+              <p className="text-sm text-slate-500">No pending requests from your team.</p>
+            </CardContent>
           ) : (
-            <ul className="mt-3 space-y-3">
-              {teamPending.map((request) => {
-                const allocation = config ? allocationForType(config, request.type) : null
-                const balanceText =
-                  (configError || teamApprovedError) && request.type !== 'wfh'
-                    ? 'balance unavailable'
-                    : allocation !== null
-                      ? `current balance: ${computeBalance(
-                          allocation,
-                          teamApprovedByUserAndType.get(`${request.user_id}:${request.type}`) ?? [],
-                          currentYear
-                        )}`
-                      : null
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Employee</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Dates</TableHead>
+                  <TableHead>Balance</TableHead>
+                  <TableHead>Reason</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {teamPending.map((request) => {
+                  const allocation = config ? allocationForType(config, request.type) : null
+                  const balanceText =
+                    (configError || teamApprovedError) && request.type !== 'wfh'
+                      ? 'balance unavailable'
+                      : allocation !== null
+                        ? `current balance: ${computeBalance(
+                            allocation,
+                            teamApprovedByUserAndType.get(`${request.user_id}:${request.type}`) ?? [],
+                            currentYear
+                          )}`
+                        : null
 
-                return (
-                  <li key={request.id} className="rounded-lg border border-slate-100 p-4">
-                    <p className="text-sm font-medium text-slate-800">
-                      {teamNameById.get(request.user_id) ?? 'Unknown'} — {LEAVE_TYPE_LABELS[request.type]}
-                    </p>
-                    <p className="mt-1 text-sm text-slate-600">
-                      {request.start_date} to {request.end_date} ({dayCount(request.start_date, request.end_date)}{' '}
-                      day{dayCount(request.start_date, request.end_date) === 1 ? '' : 's'})
-                      {balanceText && <> — {balanceText}</>}
-                    </p>
-                    <p className="text-sm text-slate-600">{request.reason}</p>
-                    <div className="mt-2 flex gap-3">
-                      <form action={approveTeamRequest}>
-                        <input type="hidden" name="requestId" value={request.id} />
-                        <ConfirmSubmitButton
-                          confirmMessage="Approve this request? This cannot be undone."
-                          className="text-green-700 underline"
-                        >
-                          Approve
-                        </ConfirmSubmitButton>
-                      </form>
-                      <form action={rejectTeamRequest}>
-                        <input type="hidden" name="requestId" value={request.id} />
-                        <ConfirmSubmitButton
-                          confirmMessage="Reject this request? This cannot be undone."
-                          className="text-red-600 underline"
-                        >
-                          Reject
-                        </ConfirmSubmitButton>
-                      </form>
-                    </div>
-                  </li>
-                )
-              })}
-            </ul>
+                  return (
+                    <TableRow key={request.id}>
+                      <TableCell className="font-medium text-slate-800">
+                        {teamNameById.get(request.user_id) ?? 'Unknown'}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{LEAVE_TYPE_LABELS[request.type]}</Badge>
+                      </TableCell>
+                      <TableCell className="text-slate-600">
+                        {request.start_date} to {request.end_date} ({dayCount(request.start_date, request.end_date)}{' '}
+                        day{dayCount(request.start_date, request.end_date) === 1 ? '' : 's'})
+                      </TableCell>
+                      <TableCell className="whitespace-normal text-slate-600">{balanceText ?? '—'}</TableCell>
+                      <TableCell className="whitespace-normal text-slate-600">{request.reason}</TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <form action={approveTeamRequest}>
+                            <input type="hidden" name="requestId" value={request.id} />
+                            <ConfirmSubmitButton
+                              confirmMessage="Approve this request? This cannot be undone."
+                              className={buttonVariants({ variant: 'default' })}
+                            >
+                              Approve
+                            </ConfirmSubmitButton>
+                          </form>
+                          <form action={rejectTeamRequest}>
+                            <input type="hidden" name="requestId" value={request.id} />
+                            <ConfirmSubmitButton
+                              confirmMessage="Reject this request? This cannot be undone."
+                              className={buttonVariants({ variant: 'destructive' })}
+                            >
+                              Reject
+                            </ConfirmSubmitButton>
+                          </form>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            </Table>
           )}
-        </div>
+        </Card>
       )}
     </div>
   )
