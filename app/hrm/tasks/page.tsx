@@ -72,10 +72,22 @@ export default async function TasksBoardPage({
           </form>
 
           <form action={createTask} className="mt-4 grid grid-cols-5 gap-2">
-            <Input name="title" placeholder="Task title" required className="col-span-2" />
-            <FormSelect name="assigneeId" options={assigneeOptions} defaultValue="" />
-            <FormSelect name="priority" options={priorityOptions} defaultValue="medium" />
-            <Input name="dueDate" type="date" />
+            <div className="col-span-2 space-y-1">
+              <label className="text-xs font-medium text-slate-500">Title</label>
+              <Input name="title" placeholder="Task title" required />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-slate-500">Assignee</label>
+              <FormSelect name="assigneeId" options={assigneeOptions} defaultValue="" />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-slate-500">Priority</label>
+              <FormSelect name="priority" options={priorityOptions} defaultValue="medium" />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-slate-500">Due date</label>
+              <Input name="dueDate" type="date" />
+            </div>
             <Button type="submit" className="col-span-5">
               New task
             </Button>
