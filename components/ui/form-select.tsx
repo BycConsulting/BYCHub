@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { cn } from '@/lib/utils'
 
 export interface FormSelectOption {
   value: string
@@ -33,7 +34,7 @@ export function FormSelect({
     <>
       <input type="hidden" name={name} value={value} />
       <Select value={value} onValueChange={setValue}>
-        <SelectTrigger className={className}>
+        <SelectTrigger className={cn('w-full', className)}>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>

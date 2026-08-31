@@ -13,7 +13,7 @@ export async function createTask(formData: FormData) {
 
   const parsed = createTaskSchema.safeParse({
     title: formData.get('title'),
-    description: formData.get('description'),
+    description: formData.get('description') ?? undefined,
     priority: formData.get('priority'),
     assigneeId: formData.get('assigneeId'),
     dueDate: formData.get('dueDate'),
