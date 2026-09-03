@@ -19,7 +19,12 @@ export async function POST(req: Request) {
 
   const { messages, provider, conversationId, system } = body
 
-  if (!messages || !provider || !conversationId || !chatProviders.includes(provider)) {
+  if (!messages || messages.length === 0 || !provider || !conversationId || !chatProviders.includes(provider)) {
+    return new Response('Malformed request', { status: 400 })
+  }
+
+  const lastUserMessage = messages[messages.length - 1]
+  if (!lastUserMessage.parts) {
     return new Response('Malformed request', { status: 400 })
   }
 
@@ -51,7 +56,6 @@ export async function POST(req: Request) {
 
   const model = provider === 'claude' ? anthropic('claude-sonnet-5') : openai('gpt-5.4')
 
-  const lastUserMessage = messages[messages.length - 1]
   const lastUserText = textFromParts(lastUserMessage.parts)
 
   const { error: userInsertError } = await supabase.from('chat_messages').insert({

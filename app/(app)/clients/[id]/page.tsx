@@ -133,6 +133,7 @@ export default async function ClientDetailPage({
                 <form action={deleteClientMetric}>
                   <input type="hidden" name="metricId" value={metric.id} />
                   <input type="hidden" name="clientId" value={id} />
+                  <input type="hidden" name="period" value={period} />
                   <button type="submit" className="text-red-600 underline">
                     Delete
                   </button>

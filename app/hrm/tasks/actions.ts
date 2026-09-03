@@ -92,6 +92,11 @@ export async function updateTaskStatus(taskId: string, status: TaskStatus): Prom
   }
 
   if (previousStatus !== parsed.data.status) {
+    // The status update above already committed and stands regardless of
+    // this audit-log write's outcome — a failure here must not tell the
+    // caller the move failed (task-board.tsx rolls the card back on any
+    // {error}), which would desync the UI from a DB write that actually
+    // succeeded. Log instead of returning it as a failure.
     const { error: eventError } = await logTaskEvent(
       supabase,
       parsed.data.taskId,
@@ -102,7 +107,7 @@ export async function updateTaskStatus(taskId: string, status: TaskStatus): Prom
     )
 
     if (eventError) {
-      return { error: eventError.message }
+      console.error('[tasks] failed to log status change event', eventError)
     }
   }
 

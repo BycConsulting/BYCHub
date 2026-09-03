@@ -34,6 +34,24 @@ async function reviewRequest(formData: FormData, status: 'approved' | 'rejected'
     redirect('/hrm/leave/requests?error=' + encodeURIComponent('You cannot review your own request'))
   }
 
+  // Requests from employees with an assigned manager route to that manager
+  // exclusively (see the queue page's own filter and its "never visible to
+  // both HR and manager at once" invariant) — re-check it here too, since a
+  // requestId can be submitted directly without going through the filtered
+  // queue UI.
+  const { data: profile } = await admin
+    .from('employee_profiles')
+    .select('manager_id')
+    .eq('user_id', request.user_id)
+    .maybeSingle()
+
+  if (profile?.manager_id) {
+    redirect(
+      '/hrm/leave/requests?error=' +
+        encodeURIComponent('This request is routed to the employee\'s manager, not HR')
+    )
+  }
+
   const { data: updated, error } = await admin
     .from('leave_requests')
     .update({ status, reviewed_by: currentUser.id, reviewed_at: new Date().toISOString() })

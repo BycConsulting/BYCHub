@@ -39,7 +39,12 @@ export default async function ConversationPage({
       <Link href="/chat" className="text-sm text-slate-500 hover:underline">
         ← Back to conversations
       </Link>
-      <ChatWindow conversationId={conversation.id} provider={conversation.provider} initialMessages={initialMessages} />
+      <ChatWindow
+        key={conversation.id}
+        conversationId={conversation.id}
+        provider={conversation.provider}
+        initialMessages={initialMessages}
+      />
     </div>
   )
 }

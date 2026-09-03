@@ -31,14 +31,14 @@ export function GlobalChatBubble({
     transport: new DefaultChatTransport({ api: '/api/chat' }),
   })
 
+  const isBusy = status === 'streaming' || status === 'submitted'
+
   function handleSubmit(event: FormEvent) {
     event.preventDefault()
-    if (!input.trim()) return
+    if (!input.trim() || isBusy) return
     sendMessage({ text: input }, { body: { provider: 'claude', conversationId, system: ASSISTANT_SYSTEM_PROMPT } })
     setInput('')
   }
-
-  const isBusy = status === 'streaming' || status === 'submitted'
 
   return (
     <>

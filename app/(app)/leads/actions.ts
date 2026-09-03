@@ -64,12 +64,18 @@ export async function updateLeadStage(formData: FormData) {
     redirect(`/leads/${leadId}?error=` + encodeURIComponent(updateError.message))
   }
 
-  await supabase.from('activities').insert({
+  // The stage change above already committed and stands regardless of this
+  // insert's outcome — log rather than fail the user-facing flow on it, same
+  // as the secondary-write pattern in app/api/chat/route.ts's onEnd handler.
+  const { error: activityError } = await supabase.from('activities').insert({
     lead_id: leadId,
     user_id: user.id,
     type: 'stage_change',
     body: stageChangeBody(stage),
   })
+  if (activityError) {
+    console.error('[leads] failed to log stage_change activity', activityError)
+  }
 
   if (stage === 'won') {
     // The stage change and its activity entry stand either way, but a failed

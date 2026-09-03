@@ -17,10 +17,14 @@ export default async function LeadsPage({
   await requireModule('leads')
   const { error } = await searchParams
   const supabase = await createClient()
-  const { data: leads } = await supabase
+  const { data: leads, error: leadsError } = await supabase
     .from('leads')
     .select('id, contact_name, contact_company, stage, source, created_at')
     .order('created_at', { ascending: false })
+
+  if (leadsError) {
+    console.error('[leads] failed to load leads list', leadsError)
+  }
 
   return (
     <div className="space-y-8">
@@ -49,6 +53,11 @@ export default async function LeadsPage({
         <CardHeader className="pt-4">
           <CardTitle className="text-lg">Leads</CardTitle>
         </CardHeader>
+        {leadsError && (
+          <p className="mx-4 mb-4 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">
+            Failed to load leads: {leadsError.message}
+          </p>
+        )}
         <Table>
           <TableHeader>
             <TableRow>

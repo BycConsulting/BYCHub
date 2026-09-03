@@ -37,7 +37,10 @@ export default async function FinancePage({
   if (from) query = query.gte('transaction_date', from)
   if (to) query = query.lte('transaction_date', to)
 
-  const { data: transactions } = await query
+  const { data: transactions, error: transactionsError } = await query
+  if (transactionsError) {
+    console.error('[finance] failed to load transactions', transactionsError)
+  }
 
   const allTransactions = transactions ?? []
   const allCategories = categories ?? []
@@ -186,6 +189,12 @@ export default async function FinancePage({
           </form>
         </CardContent>
       </Card>
+
+      {transactionsError && (
+        <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">
+          Failed to load transactions: {transactionsError.message}
+        </p>
+      )}
 
       <Card className="py-0">
         <Table>

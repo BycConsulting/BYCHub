@@ -36,7 +36,11 @@ export async function GET(request: NextRequest) {
   const rows = ['Name,Date,Checked In,Checked Out,Hours']
   for (const record of records ?? []) {
     const hours = record.checked_in_at ? hoursWorked(record.checked_in_at, record.checked_out_at) : null
-    const name = (nameById.get(record.user_id) ?? 'Unknown').replace(/"/g, '""')
+    // Prefix a leading =/+/-/@ with a tab so spreadsheet apps (Excel,
+    // Sheets) don't interpret the cell as a formula — CSV formula
+    // injection via a stored, user-editable name field.
+    let name = (nameById.get(record.user_id) ?? 'Unknown').replace(/"/g, '""')
+    if (/^[=+\-@]/.test(name)) name = `\t${name}`
     rows.push(
       `"${name}",${record.date},${record.checked_in_at ?? ''},${record.checked_out_at ?? ''},${hours ?? ''}`
     )

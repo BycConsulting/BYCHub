@@ -10,8 +10,11 @@ import { isIpAllowed, isIpv4Address, parseClientIp, todayDate } from '@/lib/atte
 
 async function resolveClientIp(): Promise<string | null> {
   const headerList = await headers()
-  const realIp = headerList.get('x-real-ip')
-  if (realIp && realIp.trim().length > 0) return realIp.trim()
+  // x-real-ip is NOT trusted here: nothing in this stack (no reverse proxy,
+  // no middleware) sets or strips it, so a client can send any value and
+  // have it accepted outright — trivially spoofing the office-network gate.
+  // x-forwarded-for is safe under the standard trusted-last-hop assumption
+  // documented on parseClientIp() below.
   return parseClientIp(headerList.get('x-forwarded-for'))
 }
 

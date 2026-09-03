@@ -23,6 +23,19 @@ export async function updateCandidateStage(formData: FormData) {
   }
 
   const admin = createAdminSupabaseClient()
+
+  // Terminal states must not be reachable again: without this, a "hired"
+  // candidate could be silently moved back to "applied" (or any stage) with
+  // no error and no trace, since the schema itself only restricts which
+  // values are legal, not which transitions are.
+  const { data: existing } = await admin.from('candidates').select('stage').eq('id', parsed.data.candidateId).single()
+  if (existing?.stage === 'hired' || existing?.stage === 'rejected') {
+    redirect(
+      `/hrm/recruitment/candidates/${parsed.data.candidateId}?error=` +
+        encodeURIComponent(`Candidate is already ${existing.stage} and cannot be moved`)
+    )
+  }
+
   const { data: updated, error } = await admin
     .from('candidates')
     .update({ stage: parsed.data.stage, updated_at: new Date().toISOString() })
@@ -49,6 +62,15 @@ export async function rejectCandidate(formData: FormData) {
   }
 
   const admin = createAdminSupabaseClient()
+
+  const { data: existing } = await admin.from('candidates').select('stage').eq('id', parsed.data.candidateId).single()
+  if (existing?.stage === 'hired') {
+    redirect(
+      `/hrm/recruitment/candidates/${parsed.data.candidateId}?error=` +
+        encodeURIComponent('Candidate is already hired and cannot be rejected')
+    )
+  }
+
   const { data: updated, error } = await admin
     .from('candidates')
     .update({ stage: 'rejected', updated_at: new Date().toISOString() })

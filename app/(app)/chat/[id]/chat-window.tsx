@@ -28,14 +28,14 @@ export function ChatWindow({
     transport: new DefaultChatTransport({ api: '/api/chat' }),
   })
 
+  const isBusy = status === 'streaming' || status === 'submitted'
+
   function handleSubmit(event: FormEvent) {
     event.preventDefault()
-    if (!input.trim()) return
+    if (!input.trim() || isBusy) return
     sendMessage({ text: input }, { body: { provider, conversationId } })
     setInput('')
   }
-
-  const isBusy = status === 'streaming' || status === 'submitted'
 
   return (
     <Card>
@@ -65,6 +65,7 @@ export function ChatWindow({
             onChange={(event) => setInput(event.target.value)}
             placeholder="Message..."
             className="flex-1"
+            disabled={isBusy}
           />
           <Button type="submit" disabled={isBusy}>
             Send
