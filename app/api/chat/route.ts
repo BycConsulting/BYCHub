@@ -19,12 +19,18 @@ export async function POST(req: Request) {
 
   const { messages, provider, conversationId, system } = body
 
-  if (!messages || messages.length === 0 || !provider || !conversationId || !chatProviders.includes(provider)) {
+  if (
+    !Array.isArray(messages) ||
+    messages.length === 0 ||
+    !provider ||
+    !conversationId ||
+    !chatProviders.includes(provider)
+  ) {
     return new Response('Malformed request', { status: 400 })
   }
 
   const lastUserMessage = messages[messages.length - 1]
-  if (!lastUserMessage.parts) {
+  if (!lastUserMessage?.parts || !Array.isArray(lastUserMessage.parts)) {
     return new Response('Malformed request', { status: 400 })
   }
 

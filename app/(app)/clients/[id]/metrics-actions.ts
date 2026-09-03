@@ -62,7 +62,7 @@ export async function deleteClientMetric(formData: FormData) {
   const parsed = deleteClientMetricSchema.safeParse({
     metricId: formData.get('metricId'),
     clientId: rawClientId,
-    period: formData.get('period'),
+    period: formData.get('period') ?? undefined,
   })
 
   if (!parsed.success) {
