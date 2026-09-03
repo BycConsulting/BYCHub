@@ -20,14 +20,26 @@ alter table public.chat_conversations enable row level security;
 alter table public.chat_messages enable row level security;
 
 -- Private per employee: unlike the CRM tables (any employee reads/writes any row),
--- chats are only visible to the employee who created them. Direct auth.uid() = user_id
--- checks on both tables, no EXISTS/subquery, avoiding the join-based-RLS pattern.
+-- chats are only visible to the employee who created them. Plus the is_active
+-- check 0005 requires on every per-employee policy: a deactivated employee's
+-- public.users row is deliberately kept (0004) and their password still
+-- authenticates at the Supabase Auth layer, so without this an offboarded
+-- employee could keep reading/writing their own chat history straight through
+-- the public anon key, bypassing the app entirely. (select auth.uid()) instead
+-- of a bare call, matching 0005/0006/0009/0011, so Postgres caches it once per
+-- query rather than re-evaluating per row.
 create policy "chat_conversations_own" on public.chat_conversations
   for all to authenticated
-  using (auth.uid() = user_id)
-  with check (auth.uid() = user_id);
+  using (
+    user_id = (select auth.uid())
+    and exists (select 1 from public.users u where u.id = user_id and u.is_active)
+  )
+  with check (user_id = (select auth.uid()));
 
 create policy "chat_messages_own" on public.chat_messages
   for all to authenticated
-  using (auth.uid() = user_id)
-  with check (auth.uid() = user_id);
+  using (
+    user_id = (select auth.uid())
+    and exists (select 1 from public.users u where u.id = user_id and u.is_active)
+  )
+  with check (user_id = (select auth.uid()));

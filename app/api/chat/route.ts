@@ -53,12 +53,15 @@ export async function POST(req: Request) {
   const lastUserMessage = messages[messages.length - 1]
   const lastUserText = textFromParts(lastUserMessage.parts)
 
-  await supabase.from('chat_messages').insert({
+  const { error: userInsertError } = await supabase.from('chat_messages').insert({
     conversation_id: conversationId,
     user_id: user.id,
     role: 'user',
     content: lastUserText,
   })
+  if (userInsertError) {
+    console.error('[chat] failed to persist user message', userInsertError)
+  }
 
   const result = streamText({
     model,
@@ -78,17 +81,23 @@ export async function POST(req: Request) {
         return
       }
 
-      await supabase.from('chat_messages').insert({
+      const { error: assistantInsertError } = await supabase.from('chat_messages').insert({
         conversation_id: conversationId,
         user_id: user.id,
         role: 'assistant',
         content: assistantText,
       })
+      if (assistantInsertError) {
+        console.error('[chat] failed to persist assistant message', assistantInsertError)
+      }
 
-      await supabase
+      const { error: updateError } = await supabase
         .from('chat_conversations')
         .update({ updated_at: new Date().toISOString() })
         .eq('id', conversationId)
+      if (updateError) {
+        console.error('[chat] failed to update conversation timestamp', updateError)
+      }
     },
   })
 }
