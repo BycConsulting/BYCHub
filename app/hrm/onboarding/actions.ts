@@ -85,6 +85,27 @@ export async function completeOnboarding(formData: FormData) {
   }
 
   const admin = createAdminSupabaseClient()
+
+  const { data: checklist } = await admin
+    .from('onboarding_checklists')
+    .select(
+      'step_offer_letter_signed, step_id_proof_collected, step_equipment_assigned, step_accounts_provisioned, step_orientation_completed, step_documents_filed'
+    )
+    .eq('id', parsed.data.checklistId)
+    .single()
+
+  if (!checklist) {
+    redirect(`/hrm/onboarding?error=` + encodeURIComponent('Checklist not found'))
+  }
+
+  const allStepsDone = Object.values(checklist).every(Boolean)
+  if (!allStepsDone) {
+    redirect(
+      `/hrm/onboarding/${parsed.data.checklistId}?error=` +
+        encodeURIComponent('All steps must be checked before marking onboarding complete')
+    )
+  }
+
   const { data: updated, error } = await admin
     .from('onboarding_checklists')
     .update({ completed_at: new Date().toISOString() })

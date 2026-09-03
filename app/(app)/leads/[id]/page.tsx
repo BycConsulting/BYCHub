@@ -21,11 +21,15 @@ export default async function LeadDetailPage({
   const { error } = await searchParams
   const supabase = await createClient()
 
-  const { data: lead } = await supabase
+  const { data: lead, error: leadError } = await supabase
     .from('leads')
     .select('id, contact_name, contact_company, contact_email, stage, source, notes, client_id')
     .eq('id', id)
     .single()
+
+  if (leadError && leadError.code !== 'PGRST116') {
+    throw new Error(leadError.message)
+  }
 
   if (!lead) notFound()
 
@@ -54,6 +58,7 @@ export default async function LeadDetailPage({
           <p className="text-sm text-slate-500">
             {lead.contact_company} · {lead.contact_email}
           </p>
+          {lead.source && <p className="text-xs text-slate-400">Source: {lead.source}</p>}
         </CardHeader>
         <CardContent>
           <p className="text-sm text-slate-700">{lead.notes}</p>

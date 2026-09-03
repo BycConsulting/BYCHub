@@ -87,6 +87,27 @@ export async function completeOffboarding(formData: FormData) {
   }
 
   const admin = createAdminSupabaseClient()
+
+  const { data: checklist } = await admin
+    .from('offboarding_checklists')
+    .select(
+      'step_resignation_recorded, step_exit_interview_done, step_assets_returned, step_accounts_deprovisioned, step_final_settlement_done'
+    )
+    .eq('id', parsed.data.checklistId)
+    .single()
+
+  if (!checklist) {
+    redirect(`/hrm/offboarding?error=` + encodeURIComponent('Checklist not found'))
+  }
+
+  const allStepsDone = Object.values(checklist).every(Boolean)
+  if (!allStepsDone) {
+    redirect(
+      `/hrm/offboarding/${parsed.data.checklistId}?error=` +
+        encodeURIComponent('All steps must be checked before marking offboarding complete')
+    )
+  }
+
   const { data: updated, error } = await admin
     .from('offboarding_checklists')
     .update({ completed_at: new Date().toISOString() })

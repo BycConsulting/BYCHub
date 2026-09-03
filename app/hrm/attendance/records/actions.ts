@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 import { requireModule } from '@/lib/access'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { correctAttendanceSchema } from '@/lib/validation'
-import { istWallClockToUtcIso } from '@/lib/attendance'
+import { istWallClockToUtcIso, todayDate } from '@/lib/attendance'
 
 export async function correctAttendanceRecord(formData: FormData) {
   const currentUser = await requireModule('leave_attendance')
@@ -31,12 +31,26 @@ export async function correctAttendanceRecord(formData: FormData) {
 
   const { data: record } = await admin
     .from('attendance_records')
-    .select('id, checked_in_at, checked_out_at')
+    .select('id, date, checked_in_at, checked_out_at')
     .eq('id', parsed.data.recordId)
     .single()
 
   if (!record) {
     redirect('/hrm/attendance/records?error=' + encodeURIComponent('Record not found'))
+  }
+
+  // Bound checks: a correction must land on the record's own day (the IST
+  // wall-clock date portion the form submitted, before UTC conversion below)
+  // and never in the future — nothing else in this action previously
+  // stopped either.
+  if (parsed.data.checkedInAt && !parsed.data.checkedInAt.startsWith(record.date)) {
+    redirect('/hrm/attendance/records?error=' + encodeURIComponent('Check-in time must fall on this record\'s date'))
+  }
+  if (parsed.data.checkedOutAt && !parsed.data.checkedOutAt.startsWith(record.date)) {
+    redirect('/hrm/attendance/records?error=' + encodeURIComponent('Checkout time must fall on this record\'s date'))
+  }
+  if (record.date > todayDate()) {
+    redirect('/hrm/attendance/records?error=' + encodeURIComponent('Cannot correct a future-dated record'))
   }
 
   const checkedInAt = parsed.data.checkedInAt ? istWallClockToUtcIso(parsed.data.checkedInAt) : record.checked_in_at
@@ -46,6 +60,11 @@ export async function correctAttendanceRecord(formData: FormData) {
 
   if (checkedInAt && checkedOutAt && new Date(checkedOutAt).getTime() < new Date(checkedInAt).getTime()) {
     redirect('/hrm/attendance/records?error=' + encodeURIComponent('Checkout must be after check-in'))
+  }
+
+  const now = Date.now()
+  if ((checkedInAt && new Date(checkedInAt).getTime() > now) || (checkedOutAt && new Date(checkedOutAt).getTime() > now)) {
+    redirect('/hrm/attendance/records?error=' + encodeURIComponent('Time cannot be in the future'))
   }
 
   const { data: updated, error } = await admin

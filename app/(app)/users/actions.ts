@@ -291,24 +291,31 @@ export async function resetUserPassword(formData: FormData) {
   redirect('/users')
 }
 
-// Nine "who did this" attribution columns — every one is nullable in the
+// "Who did this" attribution columns — every one is nullable in the
 // schema, so a force-delete can simply clear them. The record they're
 // attached to (a lead, a client, a leave request, ...) survives; it just
 // loses the note of who assigned/reviewed/started/created/updated it.
+//
+// employee_profile_requests was dropped in 0007_role_module_access.sql and
+// must never appear here — querying a dropped table errors on every call,
+// which is what broke deleteUser/forceDeleteUser entirely until this fix.
 const NULLABLE_ATTRIBUTION_CHECKS: { table: string; column: string; label: string }[] = [
   { table: 'leads', column: 'assigned_user_id', label: 'lead(s) assigned to them' },
   { table: 'clients', column: 'owner_user_id', label: 'client(s) owned by them' },
   { table: 'leave_requests', column: 'reviewed_by', label: 'leave request(s) reviewed by them' },
-  { table: 'employee_profile_requests', column: 'reviewed_by', label: 'profile-change request(s) reviewed by them' },
   { table: 'onboarding_checklists', column: 'started_by', label: 'onboarding checklist(s) started by them' },
   { table: 'offboarding_checklists', column: 'started_by', label: 'offboarding checklist(s) started by them' },
   { table: 'job_openings', column: 'created_by', label: 'job opening(s) created by them' },
   { table: 'hr_config', column: 'updated_by', label: 'HR configuration they last updated' },
   { table: 'employee_profiles', column: 'manager_id', label: 'report(s) who list them as manager' },
   { table: 'finance_transactions', column: 'created_by', label: 'finance transaction(s) recorded by them' },
+  { table: 'client_metrics', column: 'created_by', label: 'client metric(s) logged by them' },
+  { table: 'tasks', column: 'assignee_id', label: 'task(s) assigned to them' },
+  { table: 'tasks', column: 'created_by', label: 'task(s) created by them' },
+  { table: 'task_events', column: 'changed_by', label: 'task event(s) changed by them' },
 ]
 
-// Six "this is their own record" ownership columns — every one is NOT NULL
+// "This is their own record" ownership columns — every one is NOT NULL
 // in the schema, so it cannot be cleared. A force-delete has no choice but
 // to permanently delete these rows along with the account: there is no way
 // to keep someone's leave request, attendance record, or activity log entry
@@ -317,9 +324,10 @@ const OWNED_RECORD_CHECKS: { table: string; column: string; label: string }[] = 
   { table: 'activities', column: 'user_id', label: 'activity/activities logged by them' },
   { table: 'leave_requests', column: 'user_id', label: 'leave request(s) filed by them' },
   { table: 'attendance_records', column: 'user_id', label: 'attendance record(s)' },
-  { table: 'employee_profile_requests', column: 'user_id', label: 'profile-change request(s) filed by them' },
   { table: 'onboarding_checklists', column: 'user_id', label: 'onboarding checklist(s)' },
   { table: 'offboarding_checklists', column: 'user_id', label: 'offboarding checklist(s)' },
+  { table: 'chat_conversations', column: 'user_id', label: 'chat conversation(s)' },
+  { table: 'chat_messages', column: 'user_id', label: 'chat message(s)' },
 ]
 
 // Every table a user row could be entangled in. A hit on any of these blocks

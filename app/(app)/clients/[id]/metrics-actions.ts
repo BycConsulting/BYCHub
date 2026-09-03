@@ -62,13 +62,15 @@ export async function deleteClientMetric(formData: FormData) {
   const parsed = deleteClientMetricSchema.safeParse({
     metricId: formData.get('metricId'),
     clientId: rawClientId,
+    period: formData.get('period') ?? undefined,
   })
 
   if (!parsed.success) {
     redirect(`/clients/${rawClientId}?error=` + encodeURIComponent(parsed.error.issues[0].message))
   }
 
-  const { metricId, clientId } = parsed.data
+  const { metricId, clientId, period } = parsed.data
+  const periodSuffix = period ? `?period=${period}` : ''
 
   const supabase = await createClient()
   const { data: deleted, error } = await supabase
@@ -81,10 +83,10 @@ export async function deleteClientMetric(formData: FormData) {
 
   if (!deleted) {
     const message = !error || error.code === 'PGRST116' ? 'Metric not found' : error.message
-    redirect(`/clients/${clientId}?error=` + encodeURIComponent(message))
+    redirect(`/clients/${clientId}${periodSuffix}${periodSuffix ? '&' : '?'}error=` + encodeURIComponent(message))
   }
 
   revalidatePath(`/clients/${clientId}`)
   revalidatePath(`/clients/${clientId}/dashboard`)
-  redirect(`/clients/${clientId}`)
+  redirect(`/clients/${clientId}${periodSuffix}`)
 }

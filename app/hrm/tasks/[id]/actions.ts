@@ -66,10 +66,14 @@ export async function updateTask(formData: FormData) {
     redirect(`/hrm/tasks/${taskId}?error=` + encodeURIComponent(message))
   }
 
+  // The task update above already committed and stands regardless of these
+  // audit-log writes' outcome — a failure here must not redirect with an
+  // error (which would falsely tell the user the save failed) or abort
+  // logging the remaining field changes.
   if (current.status !== status) {
     const { error: eventError } = await logTaskEvent(supabase, taskId, 'status', current.status, status, user.id)
     if (eventError) {
-      redirect(`/hrm/tasks/${taskId}?error=` + encodeURIComponent(eventError.message))
+      console.error('[tasks] failed to log status change event', eventError)
     }
   }
 
@@ -83,7 +87,7 @@ export async function updateTask(formData: FormData) {
       user.id
     )
     if (eventError) {
-      redirect(`/hrm/tasks/${taskId}?error=` + encodeURIComponent(eventError.message))
+      console.error('[tasks] failed to log priority change event', eventError)
     }
   }
 
@@ -97,7 +101,7 @@ export async function updateTask(formData: FormData) {
       user.id
     )
     if (eventError) {
-      redirect(`/hrm/tasks/${taskId}?error=` + encodeURIComponent(eventError.message))
+      console.error('[tasks] failed to log assignee change event', eventError)
     }
   }
 

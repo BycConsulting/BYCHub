@@ -7,7 +7,7 @@ import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { updateEmployeeProfileSchema } from '@/lib/validation'
 
 export async function updateEmployeeProfile(formData: FormData) {
-  await requireModule('hr')
+  const currentUser = await requireModule('hr')
 
   const parsed = updateEmployeeProfileSchema.safeParse({
     userId: formData.get('userId'),
@@ -29,6 +29,12 @@ export async function updateEmployeeProfile(formData: FormData) {
 
   const { userId, ...fields } = parsed.data
   const admin = createAdminSupabaseClient()
+
+  const { data: target } = await admin.from('users').select('role').eq('id', userId).single()
+
+  if (target?.role === 'admin' && currentUser.role !== 'admin') {
+    redirect(`/users/${userId}?error=` + encodeURIComponent('Only an admin can edit an admin\'s profile'))
+  }
 
   // Defense-in-depth alongside the manager dropdown's UI handling: a stale
   // form submitted after someone else deactivates the candidate manager
