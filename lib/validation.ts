@@ -347,3 +347,9 @@ export const createFinanceTransactionSchema = z
 export const deleteFinanceTransactionSchema = z.object({
   transactionId: z.string().uuid(),
 })
+
+export const chatProviders = ['claude', 'chatgpt'] as const
+
+export const createConversationSchema = z.object({
+  provider: z.enum(chatProviders),
+})

@@ -17,6 +17,7 @@ import {
   ListTodo,
   Settings as SettingsIcon,
   Wallet,
+  MessageSquare,
 } from 'lucide-react'
 import type { Module } from '@/types/database'
 
@@ -28,6 +29,7 @@ const NAV_ITEMS: {
   adminOnly?: boolean
 }[] = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, module: 'dashboard' },
+  { href: '/chat', label: 'Chat', icon: MessageSquare, module: null },
   { href: '/leads', label: 'Leads', icon: Target, module: 'leads' },
   { href: '/clients', label: 'Clients', icon: Building2, module: 'clients' },
   { href: '/hrm/directory', label: 'Directory', icon: LayoutGrid, module: 'directory' },
