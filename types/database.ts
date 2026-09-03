@@ -12,6 +12,7 @@ export type LeaveRequestType = 'casual' | 'sick' | 'earned' | 'maternity' | 'pat
 export type LeaveRequestStatus = 'pending' | 'approved' | 'rejected' | 'cancelled'
 export type JobOpeningStatus = 'open' | 'closed'
 export type CandidateStage = 'applied' | 'screening' | 'interview' | 'offer' | 'hired' | 'rejected'
+export type FinanceTransactionType = 'income' | 'expense'
 
 export interface Database {
   public: {
@@ -477,6 +478,53 @@ export interface Database {
           from_value?: string | null
           to_value?: string | null
           changed_by?: string | null
+        }
+        Update: never
+        Relationships: []
+      }
+      finance_categories: {
+        Row: {
+          id: string
+          name: string
+          type: FinanceTransactionType
+          is_active: boolean
+          created_at: string
+        }
+        Insert: {
+          name: string
+          type: FinanceTransactionType
+          is_active?: boolean
+        }
+        Update: Partial<{
+          name: string
+          is_active: boolean
+        }>
+        Relationships: []
+      }
+      finance_transactions: {
+        Row: {
+          id: string
+          type: FinanceTransactionType
+          category_id: string
+          amount: number
+          currency: string
+          transaction_date: string
+          client_id: string | null
+          note: string | null
+          receipt_path: string | null
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          type: FinanceTransactionType
+          category_id: string
+          amount: number
+          currency?: string
+          transaction_date?: string
+          client_id?: string | null
+          note?: string | null
+          receipt_path?: string | null
+          created_by?: string | null
         }
         Update: never
         Relationships: []

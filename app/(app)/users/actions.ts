@@ -305,6 +305,7 @@ const NULLABLE_ATTRIBUTION_CHECKS: { table: string; column: string; label: strin
   { table: 'job_openings', column: 'created_by', label: 'job opening(s) created by them' },
   { table: 'hr_config', column: 'updated_by', label: 'HR configuration they last updated' },
   { table: 'employee_profiles', column: 'manager_id', label: 'report(s) who list them as manager' },
+  { table: 'finance_transactions', column: 'created_by', label: 'finance transaction(s) recorded by them' },
 ]
 
 // Six "this is their own record" ownership columns — every one is NOT NULL
