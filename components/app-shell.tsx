@@ -1,7 +1,9 @@
 import Image from 'next/image'
+import type { UIMessage } from 'ai'
 import { LogOut } from 'lucide-react'
 import { logout } from '@/app/login/actions'
 import { NavLinks } from '@/components/nav-links'
+import { GlobalChatBubble } from '@/components/global-chat-bubble'
 import type { CurrentUser } from '@/lib/access'
 import type { Module } from '@/types/database'
 
@@ -17,10 +19,12 @@ function initialsFor(name: string): string {
 export function AppShell({
   user,
   enabledModules,
+  assistant,
   children,
 }: {
   user: CurrentUser
   enabledModules: Module[]
+  assistant: { conversationId: string; initialMessages: UIMessage[] } | null
   children: React.ReactNode
 }) {
   return (
@@ -53,6 +57,9 @@ export function AppShell({
         </header>
         <main className="flex-1 px-6 py-8">{children}</main>
       </div>
+      {assistant && (
+        <GlobalChatBubble conversationId={assistant.conversationId} initialMessages={assistant.initialMessages} />
+      )}
     </div>
   )
 }
