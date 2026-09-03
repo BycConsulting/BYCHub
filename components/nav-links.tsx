@@ -16,6 +16,7 @@ import {
   Briefcase,
   ListTodo,
   Settings as SettingsIcon,
+  Wallet,
 } from 'lucide-react'
 import type { Module } from '@/types/database'
 
@@ -24,6 +25,7 @@ const NAV_ITEMS: {
   label: string
   icon: typeof LayoutDashboard
   module: Module | null
+  adminOnly?: boolean
 }[] = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, module: 'dashboard' },
   { href: '/leads', label: 'Leads', icon: Target, module: 'leads' },
@@ -38,14 +40,18 @@ const NAV_ITEMS: {
   { href: '/hrm/recruitment', label: 'Recruitment', icon: Briefcase, module: 'recruitment' },
   { href: '/hrm/tasks', label: 'Tasks', icon: ListTodo, module: 'tasks' },
   { href: '/settings', label: 'Settings', icon: SettingsIcon, module: 'settings' },
+  { href: '/finance', label: 'Finance', icon: Wallet, module: null, adminOnly: true },
 ]
 
-export function NavLinks({ enabledModules }: { enabledModules: Module[] }) {
+export function NavLinks({ enabledModules, isAdmin }: { enabledModules: Module[]; isAdmin: boolean }) {
   const pathname = usePathname()
 
   return (
     <nav className="flex flex-col gap-1">
-      {NAV_ITEMS.filter((item) => item.module === null || enabledModules.includes(item.module)).map((item) => {
+      {NAV_ITEMS.filter(
+        (item) =>
+          (item.module === null || enabledModules.includes(item.module)) && (!item.adminOnly || isAdmin)
+      ).map((item) => {
         const Icon = item.icon
         const active = pathname === item.href || pathname.startsWith(`${item.href}/`)
         return (

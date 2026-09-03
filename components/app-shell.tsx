@@ -30,7 +30,7 @@ export function AppShell({
           <Image src="/byc-logo.png" alt="BYC Consulting" width={1600} height={664} priority className="h-7 w-auto" />
           <span className="mt-1 block text-xs font-medium text-slate-400">BYC Hub</span>
         </div>
-        <NavLinks enabledModules={enabledModules} />
+        <NavLinks enabledModules={enabledModules} isAdmin={user.role === 'admin'} />
       </aside>
       <div className="flex flex-1 flex-col">
         <header className="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-3">
