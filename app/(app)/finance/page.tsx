@@ -22,7 +22,6 @@ export default async function FinancePage({
   const { data: categories } = await admin
     .from('finance_categories')
     .select('id, name, type, is_active')
-    .eq('is_active', true)
     .order('type')
     .order('name')
 
@@ -72,7 +71,9 @@ export default async function FinancePage({
     ...allCategories.map((c) => ({ value: c.id, label: `${c.name} (${c.type})` })),
   ]
   const typeOptions = financeTransactionTypes.map((t) => ({ value: t, label: t }))
-  const categoryOptions = allCategories.map((c) => ({ value: c.id, label: `${c.name} (${c.type})` }))
+  const categoryOptions = allCategories
+    .filter((c) => c.is_active)
+    .map((c) => ({ value: c.id, label: `${c.name} (${c.type})` }))
   const clientOptions = [{ value: '', label: 'No client' }, ...(clients ?? []).map((c) => ({ value: c.id, label: c.name }))]
 
   return (
