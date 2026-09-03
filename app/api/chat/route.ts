@@ -14,9 +14,10 @@ export async function POST(req: Request) {
     messages?: UIMessage[]
     provider?: ChatProvider
     conversationId?: string
+    system?: string
   }
 
-  const { messages, provider, conversationId } = body
+  const { messages, provider, conversationId, system } = body
 
   if (!messages || !provider || !conversationId || !chatProviders.includes(provider)) {
     return new Response('Malformed request', { status: 400 })
@@ -65,6 +66,7 @@ export async function POST(req: Request) {
 
   const result = streamText({
     model,
+    system,
     messages: await convertToModelMessages(messages),
   })
 
