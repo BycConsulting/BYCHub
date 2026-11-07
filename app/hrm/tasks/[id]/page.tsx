@@ -1,12 +1,12 @@
 import { notFound } from 'next/navigation'
 import { requireModule } from '@/lib/access'
 import { createClient } from '@/lib/supabase/server'
-import { updateTask } from './actions'
+import { loadTaskFormOptions } from '@/lib/task-form-data'
+import { addTaskComment, updateTask } from './actions'
+import { TaskFields, TASK_STATUS_LABELS } from '../task-fields'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { FormSelect } from '@/components/ui/form-select'
 
 export default async function TaskDetailPage({
   params,
@@ -20,11 +20,7 @@ export default async function TaskDetailPage({
   const { error } = await searchParams
   const supabase = await createClient()
 
-  const { data: task, error: taskError } = await supabase
-    .from('tasks')
-    .select('id, title, description, status, priority, assignee_id, due_date')
-    .eq('id', id)
-    .single()
+  const { data: task, error: taskError } = await supabase.from('tasks').select('*').eq('id', id).single()
 
   if (taskError && taskError.code !== 'PGRST116') {
     throw new Error(taskError.message)
@@ -32,65 +28,106 @@ export default async function TaskDetailPage({
 
   if (!task) notFound()
 
-  const { data: employees } = await supabase.from('users').select('id, name').eq('is_active', true).order('name')
+  const { clients, projects, employees, taskRefs } = await loadTaskFormOptions(supabase)
+  const employeeById = new Map(employees.map((employee) => [employee.id, employee.name]))
 
-  const allEmployees = employees ?? []
-  const employeeById = new Map(allEmployees.map((employee) => [employee.id, employee.name]))
+  const [{ data: events }, { data: comments }] = await Promise.all([
+    supabase
+      .from('task_events')
+      .select('id, field, from_value, to_value, changed_by, created_at')
+      .eq('task_id', id)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('task_comments')
+      .select('id, body, is_final, created_by, created_at')
+      .eq('task_id', id)
+      .order('created_at', { ascending: true }),
+  ])
 
-  const { data: events } = await supabase
-    .from('task_events')
-    .select('id, field, from_value, to_value, changed_by, created_at')
-    .eq('task_id', id)
-    .order('created_at', { ascending: false })
+  const hasFinalComment = (comments ?? []).some((c) => c.is_final)
 
   function describeValue(field: string, value: string | null): string {
     if (value === null) return field === 'assignee' ? 'Unassigned' : '—'
     if (field === 'assignee') return employeeById.get(value) ?? 'Unknown'
+    if (field === 'status') return TASK_STATUS_LABELS[value as keyof typeof TASK_STATUS_LABELS] ?? value
     return value
   }
 
-  const statusOptions = [
-    { value: 'todo', label: 'To Do' },
-    { value: 'in_progress', label: 'In Progress' },
-    { value: 'done', label: 'Done' },
-  ]
-
-  const priorityOptions = [
-    { value: 'low', label: 'Low' },
-    { value: 'medium', label: 'Medium' },
-    { value: 'high', label: 'High' },
-    { value: 'urgent', label: 'Urgent' },
-  ]
-
-  const assigneeOptions = [
-    { value: '', label: 'Unassigned' },
-    ...allEmployees.map((employee) => ({ value: employee.id, label: employee.name })),
-  ]
-
   return (
-    <div className="max-w-2xl space-y-6">
-      {error && (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
-      )}
+    <div className="max-w-4xl space-y-6">
+      {error && <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>}
 
       <Card>
         <CardContent>
           <form action={updateTask} className="space-y-3">
             <input type="hidden" name="taskId" value={task.id} />
-            <Input name="title" defaultValue={task.title} required className="text-lg font-semibold" />
-            <Textarea
-              name="description"
-              defaultValue={task.description}
-              placeholder="Description"
-              className="w-full"
+            <TaskFields
+              values={{
+                clientId: task.client_id ?? '',
+                projectId: task.project_id ?? '',
+                title: task.title,
+                description: task.description,
+                expectedOutput: task.expected_output,
+                assigneeId: task.assignee_id ?? '',
+                supportIds: task.support_ids,
+                noSupport: task.no_support_needed,
+                priority: task.priority,
+                estimatedHours: task.estimated_hours?.toString() ?? '',
+                dependencyTaskIds: task.dependency_task_ids,
+                dependencyNote: task.dependency_note,
+                noDependencies: task.dependency_task_ids.length === 0 && !task.dependency_note,
+                startDate: task.start_date ?? '',
+                endDate: task.due_date ?? '',
+                status: task.status,
+                blockerReason: task.blocker_reason,
+              }}
+              clients={clients}
+              projects={projects}
+              employees={employees}
+              taskRefs={taskRefs.filter((t) => t.id !== task.id)}
+              showStatus
             />
-            <div className="grid grid-cols-2 gap-3">
-              <FormSelect name="status" options={statusOptions} defaultValue={task.status} />
-              <FormSelect name="priority" options={priorityOptions} defaultValue={task.priority} />
-              <FormSelect name="assigneeId" options={assigneeOptions} defaultValue={task.assignee_id ?? ''} />
-              <Input name="dueDate" type="date" defaultValue={task.due_date ?? ''} />
-            </div>
+            {!hasFinalComment && (
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-slate-500">
+                  Final hand-off comment (required to set status to Completed)
+                </label>
+                <Textarea name="finalComment" placeholder="Summary and links to the final output" />
+              </div>
+            )}
             <Button type="submit">Save</Button>
+            {task.completed_at && (
+              <p className="text-xs text-slate-400">Completed {new Date(task.completed_at).toLocaleString()}</p>
+            )}
+          </form>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Comments / updates</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <ul className="space-y-2">
+            {(comments ?? []).map((comment) => (
+              <li key={comment.id} className="rounded-lg border border-slate-200 p-2 text-sm text-slate-700">
+                {comment.is_final && (
+                  <span className="mr-2 rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-700">Final hand-off</span>
+                )}
+                <span className="whitespace-pre-wrap">{comment.body}</span>
+                <div className="text-xs text-slate-400">
+                  {employeeById.get(comment.created_by ?? '') ?? 'Unknown'} — {new Date(comment.created_at).toLocaleString()}
+                </div>
+              </li>
+            ))}
+            {(comments ?? []).length === 0 && <li className="text-sm text-slate-400">No updates yet.</li>}
+          </ul>
+          <form action={addTaskComment} className="space-y-2">
+            <input type="hidden" name="taskId" value={task.id} />
+            <Textarea name="body" placeholder="Progress, draft links, review feedback, approvals" required />
+            <Button type="submit" variant="outline">
+              Add update
+            </Button>
           </form>
         </CardContent>
       </Card>

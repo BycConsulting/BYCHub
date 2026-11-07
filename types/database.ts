@@ -4,7 +4,7 @@ export type LeadStage = 'new' | 'contacted' | 'qualified' | 'proposal' | 'won' |
 export type ActivityType = 'note' | 'call' | 'email' | 'stage_change'
 export type EmploymentType = 'full_time' | 'part_time' | 'contract'
 export type Module = 'dashboard' | 'leads' | 'clients' | 'hr' | 'settings' | 'directory' | 'leave_attendance' | 'onboarding' | 'offboarding' | 'recruitment' | 'tasks'
-export type TaskStatus = 'todo' | 'in_progress' | 'done'
+export type TaskStatus = 'started' | 'in_progress' | 'blocked' | 'done'
 export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent'
 export type TaskEventField = 'created' | 'status' | 'assignee' | 'priority'
 export type ConfigurableRole = 'hr' | 'employee'
@@ -443,6 +443,17 @@ export interface Database {
           created_by: string | null
           created_at: string
           updated_at: string
+          client_id: string | null
+          project_id: string | null
+          expected_output: string
+          support_ids: string[]
+          no_support_needed: boolean
+          estimated_hours: number | null
+          dependency_task_ids: string[]
+          dependency_note: string
+          start_date: string | null
+          blocker_reason: string
+          completed_at: string | null
         }
         Insert: {
           title: string
@@ -452,6 +463,17 @@ export interface Database {
           assignee_id?: string | null
           due_date?: string | null
           created_by?: string | null
+          client_id?: string | null
+          project_id?: string | null
+          expected_output?: string
+          support_ids?: string[]
+          no_support_needed?: boolean
+          estimated_hours?: number | null
+          dependency_task_ids?: string[]
+          dependency_note?: string
+          start_date?: string | null
+          blocker_reason?: string
+          completed_at?: string | null
         }
         Update: Partial<{
           title: string
@@ -461,7 +483,55 @@ export interface Database {
           assignee_id: string | null
           due_date: string | null
           updated_at: string
+          client_id: string | null
+          project_id: string | null
+          expected_output: string
+          support_ids: string[]
+          no_support_needed: boolean
+          estimated_hours: number | null
+          dependency_task_ids: string[]
+          dependency_note: string
+          start_date: string | null
+          blocker_reason: string
+          completed_at: string | null
         }>
+        Relationships: []
+      }
+      projects: {
+        Row: {
+          id: string
+          name: string
+          client_id: string | null
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          name: string
+          client_id?: string | null
+          created_by?: string | null
+        }
+        Update: Partial<{
+          name: string
+          client_id: string | null
+        }>
+        Relationships: []
+      }
+      task_comments: {
+        Row: {
+          id: string
+          task_id: string
+          body: string
+          is_final: boolean
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          task_id: string
+          body: string
+          is_final?: boolean
+          created_by?: string | null
+        }
+        Update: never
         Relationships: []
       }
       task_events: {

@@ -21,12 +21,17 @@ interface BoardTask {
   status: TaskStatus
   assignee_id: string | null
   due_date: string | null
+  blocker_reason: string
+  clientName: string
+  projectName: string
+  openDependencies: number
 }
 
 const COLUMNS: { status: TaskStatus; label: string }[] = [
-  { status: 'todo', label: 'To Do' },
+  { status: 'started', label: 'Started' },
   { status: 'in_progress', label: 'In Progress' },
-  { status: 'done', label: 'Done' },
+  { status: 'blocked', label: 'Blocked / Waiting' },
+  { status: 'done', label: 'Completed' },
 ]
 
 const PRIORITY_COLORS: Record<TaskPriority, string> = {
@@ -36,7 +41,7 @@ const PRIORITY_COLORS: Record<TaskPriority, string> = {
   urgent: 'bg-red-100 text-red-700',
 }
 
-function TaskCard({ task, assigneeName }: { task: BoardTask; assigneeName: string }) {
+function TaskCard({ task, assigneeName, today }: { task: BoardTask; assigneeName: string; today: string }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id: task.id })
 
   const style = transform
@@ -58,7 +63,26 @@ function TaskCard({ task, assigneeName }: { task: BoardTask; assigneeName: strin
         <span className={`rounded-full px-2 py-0.5 ${PRIORITY_COLORS[task.priority]}`}>{task.priority}</span>
         <span>{assigneeName}</span>
       </div>
-      {task.due_date && <div className="mt-1 text-xs text-slate-400">Due {task.due_date}</div>}
+      <div className="mt-1 text-xs text-slate-400">
+        {task.clientName}
+        {task.projectName && ` · ${task.projectName}`}
+      </div>
+      {task.due_date && (
+        <div
+          className={`mt-1 text-xs ${
+            task.status !== 'done' && task.due_date < today ? 'font-medium text-red-600' : 'text-slate-400'
+          }`}
+        >
+          Due {task.due_date}
+          {task.status !== 'done' && task.due_date < today && ' · overdue'}
+        </div>
+      )}
+      {task.status === 'blocked' && task.blocker_reason && (
+        <div className="mt-1 text-xs text-amber-700">{task.blocker_reason}</div>
+      )}
+      {task.status !== 'done' && task.openDependencies > 0 && (
+        <div className="mt-1 text-xs text-amber-700">Waiting on {task.openDependencies} task(s)</div>
+      )}
     </div>
   )
 }
@@ -68,11 +92,13 @@ function Column({
   label,
   tasks,
   employeeNames,
+  today,
 }: {
   status: TaskStatus
   label: string
   tasks: BoardTask[]
   employeeNames: Record<string, string>
+  today: string
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: status })
 
@@ -92,6 +118,7 @@ function Column({
             key={task.id}
             task={task}
             assigneeName={task.assignee_id ? (employeeNames[task.assignee_id] ?? 'Unknown') : 'Unassigned'}
+            today={today}
           />
         ))}
       </div>
@@ -102,11 +129,13 @@ function Column({
 export function TaskBoard({
   tasks,
   employeeNames,
+  today,
   updateTaskStatus,
 }: {
   tasks: BoardTask[]
   employeeNames: Record<string, string>
-  updateTaskStatus: (taskId: string, status: TaskStatus) => Promise<{ error: string | null }>
+  today: string
+  updateTaskStatus: (taskId: string, status: TaskStatus, note?: string) => Promise<{ error: string | null }>
 }) {
   const [localTasks, setLocalTasks] = useState(tasks)
   const [syncedTasks, setSyncedTasks] = useState(tasks)
@@ -126,12 +155,23 @@ export function TaskBoard({
     const task = localTasks.find((t) => t.id === taskId)
     if (!task || task.status === newStatus) return
 
+    // Blocked needs a reason and Completed needs the final hand-off comment.
+    let note: string | undefined
+    if (newStatus === 'blocked') {
+      note = window.prompt('What is pending, and who needs to act?')?.trim()
+      if (!note) return
+    } else if (newStatus === 'done') {
+      note = window.prompt('Final hand-off: summary and output links')?.trim()
+      if (!note) return
+    }
+
     const previousStatus = task.status
     setLocalTasks((current) => current.map((t) => (t.id === taskId ? { ...t, status: newStatus } : t)))
 
     startTransition(() => {
-      updateTaskStatus(taskId, newStatus).then((result) => {
+      updateTaskStatus(taskId, newStatus, note).then((result) => {
         if (result.error) {
+          window.alert(result.error)
           setLocalTasks((current) => current.map((t) => (t.id === taskId ? { ...t, status: previousStatus } : t)))
         }
       })
@@ -145,7 +185,7 @@ export function TaskBoard({
 
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-      <div className="flex gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         {COLUMNS.map((column) => (
           <Column
             key={column.status}
@@ -153,6 +193,7 @@ export function TaskBoard({
             label={column.label}
             tasks={localTasks.filter((task) => task.status === column.status)}
             employeeNames={employeeNames}
+            today={today}
           />
         ))}
       </div>
