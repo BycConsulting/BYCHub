@@ -54,6 +54,13 @@ export default async function ClientsPage() {
                 </TableCell>
               </TableRow>
             ))}
+            {(clients ?? []).length === 0 && !clientsError && (
+              <TableRow>
+                <TableCell colSpan={2} className="py-10 text-center text-muted-foreground">
+                  No clients yet.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </Card>
