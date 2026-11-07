@@ -21,19 +21,27 @@ export function FormSelect({
   defaultValue = '',
   placeholder,
   className,
+  onValueChange,
 }: {
   name: string
   options: FormSelectOption[]
   defaultValue?: string
   placeholder?: string
   className?: string
+  onValueChange?: (value: string) => void
 }) {
   const [value, setValue] = useState(defaultValue)
 
   return (
     <>
       <input type="hidden" name={name} value={value} />
-      <Select value={value} onValueChange={setValue}>
+      <Select
+        value={value}
+        onValueChange={(next) => {
+          setValue(next)
+          onValueChange?.(next)
+        }}
+      >
         <SelectTrigger className={cn('w-full', className)}>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>

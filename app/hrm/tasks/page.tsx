@@ -1,7 +1,9 @@
 import { requireModule } from '@/lib/access'
 import { createClient } from '@/lib/supabase/server'
-import { createTask, updateTaskStatus } from './actions'
+import { loadTaskFormOptions, todayISO } from '@/lib/task-form-data'
+import { createProject, createTask, updateTaskStatus } from './actions'
 import { TaskBoard } from './task-board'
+import { TaskFields } from './task-fields'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -16,11 +18,11 @@ export default async function TasksBoardPage({
   const { error, assignee } = await searchParams
   const supabase = await createClient()
 
-  const { data: employees } = await supabase.from('users').select('id, name').eq('is_active', true).order('name')
+  const { clients, projects, employees, taskRefs } = await loadTaskFormOptions(supabase)
 
   let query = supabase
     .from('tasks')
-    .select('id, title, priority, status, assignee_id, due_date')
+    .select('id, title, priority, status, assignee_id, due_date, client_id, project_id, blocker_reason, dependency_task_ids')
     .order('created_at', { ascending: true })
 
   if (assignee === 'me') {
@@ -31,27 +33,32 @@ export default async function TasksBoardPage({
 
   const { data: tasks } = await query
 
-  const allTasks = tasks ?? []
-  const allEmployees = employees ?? []
-  const employeeNames = Object.fromEntries(allEmployees.map((employee) => [employee.id, employee.name]))
+  const employeeNames = Object.fromEntries(employees.map((employee) => [employee.id, employee.name]))
+  const clientNames = Object.fromEntries(clients.map((c) => [c.id, c.name]))
+  const projectNames = Object.fromEntries(projects.map((p) => [p.id, p.name]))
+  const doneIds = new Set(taskRefs.filter((t) => t.status === 'done').map((t) => t.id))
+  const today = todayISO()
+
+  const boardTasks = (tasks ?? []).map((t) => ({
+    id: t.id,
+    title: t.title,
+    priority: t.priority,
+    status: t.status,
+    assignee_id: t.assignee_id,
+    due_date: t.due_date,
+    blocker_reason: t.blocker_reason,
+    clientName: t.client_id ? (clientNames[t.client_id] ?? 'Unknown') : 'BYC',
+    projectName: t.project_id ? (projectNames[t.project_id] ?? '') : '',
+    openDependencies: t.dependency_task_ids.filter((id) => !doneIds.has(id)).length,
+  }))
 
   const assigneeFilterOptions = [
     { value: '', label: 'All tasks' },
     { value: 'me', label: 'My tasks' },
-    ...allEmployees.map((employee) => ({ value: employee.id, label: employee.name })),
+    ...employees.map((employee) => ({ value: employee.id, label: employee.name })),
   ]
 
-  const assigneeOptions = [
-    { value: '', label: 'Unassigned' },
-    ...allEmployees.map((employee) => ({ value: employee.id, label: employee.name })),
-  ]
-
-  const priorityOptions = [
-    { value: 'low', label: 'Low' },
-    { value: 'medium', label: 'Medium' },
-    { value: 'high', label: 'High' },
-    { value: 'urgent', label: 'Urgent' },
-  ]
+  const clientOptions = [{ value: '', label: 'BYC (internal)' }, ...clients.map((c) => ({ value: c.id, label: c.name }))]
 
   return (
     <div className="space-y-6">
@@ -59,10 +66,8 @@ export default async function TasksBoardPage({
         <CardHeader>
           <CardTitle className="text-lg">Tasks</CardTitle>
         </CardHeader>
-        <CardContent>
-          {error && (
-            <p className="mb-3 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
-          )}
+        <CardContent className="space-y-4">
+          {error && <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>}
 
           <form className="flex items-center gap-2">
             <FormSelect name="assignee" options={assigneeFilterOptions} defaultValue={assignee ?? ''} />
@@ -71,31 +76,57 @@ export default async function TasksBoardPage({
             </Button>
           </form>
 
-          <form action={createTask} className="mt-4 grid grid-cols-5 gap-2">
-            <div className="col-span-2 space-y-1">
-              <label className="text-xs font-medium text-slate-500">Title</label>
-              <Input name="title" placeholder="Task title" required />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-slate-500">Assignee</label>
-              <FormSelect name="assigneeId" options={assigneeOptions} defaultValue="" />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-slate-500">Priority</label>
-              <FormSelect name="priority" options={priorityOptions} defaultValue="medium" />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-slate-500">Due date</label>
-              <Input name="dueDate" type="date" />
-            </div>
-            <Button type="submit" className="col-span-5">
-              New task
-            </Button>
-          </form>
+          <details className="rounded-lg border border-slate-200 p-3" open={!!error}>
+            <summary className="cursor-pointer text-sm font-medium text-slate-700">New task</summary>
+            <form action={createTask} className="mt-3 space-y-3">
+              <TaskFields
+                values={{
+                  clientId: '',
+                  projectId: '',
+                  title: '',
+                  description: '',
+                  expectedOutput: '',
+                  assigneeId: user.id,
+                  supportIds: [],
+                  noSupport: false,
+                  priority: 'medium',
+                  estimatedHours: '',
+                  dependencyTaskIds: [],
+                  dependencyNote: '',
+                  noDependencies: false,
+                  startDate: today,
+                  endDate: '',
+                  status: 'started',
+                  blockerReason: '',
+                }}
+                clients={clients}
+                projects={projects}
+                employees={employees}
+                taskRefs={taskRefs}
+                showStatus={false}
+              />
+              <p className="text-xs text-slate-400">
+                Auto-filled: you as owner, today as start date, status Started. Created-by and created-at are recorded
+                automatically.
+              </p>
+              <Button type="submit">Create task</Button>
+            </form>
+          </details>
+
+          <details className="rounded-lg border border-slate-200 p-3">
+            <summary className="cursor-pointer text-sm font-medium text-slate-700">New project</summary>
+            <form action={createProject} className="mt-3 grid grid-cols-3 gap-2">
+              <Input name="name" placeholder="Project name, e.g. KLR Website" required className="col-span-1" />
+              <FormSelect name="clientId" options={clientOptions} defaultValue="" />
+              <Button type="submit" variant="outline">
+                Add project
+              </Button>
+            </form>
+          </details>
         </CardContent>
       </Card>
 
-      <TaskBoard tasks={allTasks} employeeNames={employeeNames} updateTaskStatus={updateTaskStatus} />
+      <TaskBoard tasks={boardTasks} employeeNames={employeeNames} today={today} updateTaskStatus={updateTaskStatus} />
     </div>
   )
 }
