@@ -30,8 +30,8 @@ export default async function FinanceCategoriesPage({
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-slate-800">Finance categories</h1>
-        <Link href="/finance" className="text-sm text-slate-500 hover:underline">
+        <h1 className="text-xl font-semibold text-foreground">Finance categories</h1>
+        <Link href="/finance" className="text-sm text-muted-foreground hover:underline">
           Back to ledger
         </Link>
       </div>
@@ -46,11 +46,11 @@ export default async function FinanceCategoriesPage({
           )}
           <form action={createCategory} className="flex items-end gap-2">
             <div className="flex-1 space-y-1">
-              <label className="text-xs font-medium text-slate-500">Name</label>
+              <label className="text-xs font-medium text-muted-foreground">Name</label>
               <Input name="name" placeholder="Category name" required />
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-medium text-slate-500">Type</label>
+              <label className="text-xs font-medium text-muted-foreground">Type</label>
               <FormSelect name="type" options={typeOptions} defaultValue="expense" />
             </div>
             <Button type="submit">Add</Button>
@@ -71,7 +71,7 @@ export default async function FinanceCategoriesPage({
           <TableBody>
             {(categories ?? []).map((category) => (
               <TableRow key={category.id}>
-                <TableCell className="font-medium text-slate-800">{category.name}</TableCell>
+                <TableCell className="font-medium text-foreground">{category.name}</TableCell>
                 <TableCell className="capitalize">{category.type}</TableCell>
                 <TableCell>
                   <Badge variant={category.is_active ? 'default' : 'secondary'}>

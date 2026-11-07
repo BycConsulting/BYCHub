@@ -28,7 +28,7 @@ export function DeleteUserButton({
       <button
         type="submit"
         disabled={!matches}
-        className="text-red-600 underline disabled:cursor-not-allowed disabled:text-slate-300 disabled:no-underline"
+        className="text-red-600 underline disabled:cursor-not-allowed disabled:text-muted-foreground disabled:no-underline"
       >
         Delete
       </button>

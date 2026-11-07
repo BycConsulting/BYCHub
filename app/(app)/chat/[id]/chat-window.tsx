@@ -46,8 +46,8 @@ export function ChatWindow({
               key={message.id}
               className={
                 message.role === 'user'
-                  ? 'ml-auto max-w-lg whitespace-pre-wrap rounded-lg bg-slate-800 p-3 text-sm text-white'
-                  : 'mr-auto max-w-lg whitespace-pre-wrap rounded-lg bg-slate-100 p-3 text-sm text-slate-700'
+                  ? 'ml-auto max-w-lg whitespace-pre-wrap rounded-lg bg-primary p-3 text-sm text-white'
+                  : 'mr-auto max-w-lg whitespace-pre-wrap rounded-lg bg-muted p-3 text-sm text-foreground/75'
               }
             >
               {textFromParts(message.parts)}

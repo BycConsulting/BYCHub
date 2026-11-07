@@ -85,7 +85,7 @@ export default async function ClientDetailPage({
           <CardTitle className="text-lg">{client.name}</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-muted-foreground">
             Status:{' '}
             <Badge variant={statusBadgeVariant(client.status)} className="capitalize">
               {client.status}
@@ -100,7 +100,7 @@ export default async function ClientDetailPage({
           <CardAction>
             <Link
               href={`/clients/${id}/dashboard`}
-              className="text-sm text-slate-600 hover:text-slate-900 hover:underline"
+              className="text-sm text-foreground/75 hover:text-foreground hover:underline"
             >
               View dashboard →
             </Link>
@@ -118,17 +118,17 @@ export default async function ClientDetailPage({
             {(metrics ?? []).map((metric) => (
               <li
                 key={metric.id}
-                className="flex items-center justify-between rounded-lg border border-slate-100 p-2 text-sm"
+                className="flex items-center justify-between rounded-lg border border-border p-2 text-sm"
               >
                 <span>
-                  <span className="text-slate-400">{metric.channel} — </span>
-                  <span className="font-medium text-slate-800">{metric.metric_label}</span>
-                  <span className="text-slate-600">
+                  <span className="text-muted-foreground">{metric.channel} — </span>
+                  <span className="font-medium text-foreground">{metric.metric_label}</span>
+                  <span className="text-foreground/75">
                     {' '}
                     = {metric.value}
                     {metric.unit ? ` ${metric.unit}` : ''}
                   </span>
-                  {metric.notes && <span className="text-slate-400"> ({metric.notes})</span>}
+                  {metric.notes && <span className="text-muted-foreground"> ({metric.notes})</span>}
                 </span>
                 <form action={deleteClientMetric}>
                   <input type="hidden" name="metricId" value={metric.id} />
@@ -141,7 +141,7 @@ export default async function ClientDetailPage({
               </li>
             ))}
             {(metrics ?? []).length === 0 && (
-              <li className="text-sm text-slate-400">No metrics logged for {period} yet.</li>
+              <li className="text-sm text-muted-foreground">No metrics logged for {period} yet.</li>
             )}
           </ul>
 
@@ -163,12 +163,12 @@ export default async function ClientDetailPage({
 
           <ul className="mt-4 space-y-2">
             {(activities ?? []).map((activity) => (
-              <li key={activity.id} className="rounded-lg border border-slate-100 p-2 text-sm">
+              <li key={activity.id} className="rounded-lg border border-border p-2 text-sm">
                 <Badge variant="outline" className="capitalize">
                   {activity.type}
                 </Badge>{' '}
-                <span className="text-slate-600">— {activity.body}</span>
-                <div className="text-xs text-slate-400">{new Date(activity.created_at).toLocaleString()}</div>
+                <span className="text-foreground/75">— {activity.body}</span>
+                <div className="text-xs text-muted-foreground">{new Date(activity.created_at).toLocaleString()}</div>
               </li>
             ))}
           </ul>

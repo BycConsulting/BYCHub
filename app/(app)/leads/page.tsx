@@ -71,17 +71,17 @@ export default async function LeadsPage({
             {(leads ?? []).map((lead) => (
               <TableRow key={lead.id}>
                 <TableCell>
-                  <Link href={`/leads/${lead.id}`} className="font-medium text-slate-800 hover:underline">
+                  <Link href={`/leads/${lead.id}`} className="font-medium text-foreground hover:underline">
                     {lead.contact_name}
                   </Link>
                 </TableCell>
-                <TableCell className="text-slate-600">{lead.contact_company ?? '—'}</TableCell>
+                <TableCell className="text-foreground/75">{lead.contact_company ?? '—'}</TableCell>
                 <TableCell>
                   <Badge variant="outline" className="capitalize">
                     {lead.stage}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-slate-600">{lead.source ?? '—'}</TableCell>
+                <TableCell className="text-foreground/75">{lead.source ?? '—'}</TableCell>
               </TableRow>
             ))}
           </TableBody>

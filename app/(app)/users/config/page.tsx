@@ -29,10 +29,10 @@ export default async function HrConfigPage({
 
   return (
     <div className="max-w-2xl space-y-4">
-      <Link href="/users" className="text-sm text-slate-600 hover:text-slate-900 hover:underline">
+      <Link href="/users" className="text-sm text-foreground/75 hover:text-foreground hover:underline">
         ← Back to HR
       </Link>
-      <h1 className="text-xl font-semibold text-slate-800">HR configuration</h1>
+      <h1 className="text-xl font-semibold text-foreground">HR configuration</h1>
       {error && (
         <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
       )}
@@ -47,15 +47,15 @@ export default async function HrConfigPage({
           <CardContent>
             <form action={updateHrConfig} className="space-y-6">
               <div>
-                <h2 className="text-sm font-medium text-slate-500">Working days</h2>
+                <h2 className="text-sm font-medium text-muted-foreground">Working days</h2>
                 <div className="mt-2 flex flex-wrap gap-4">
                   {WEEKDAYS.map((day) => (
-                    <label key={day.key} className="flex items-center gap-2 text-sm text-slate-700">
+                    <label key={day.key} className="flex items-center gap-2 text-sm text-foreground/75">
                       <input
                         type="checkbox"
                         name={day.key}
                         defaultChecked={config?.[day.column] ?? true}
-                        className="h-4 w-4 accent-slate-800"
+                        className="h-4 w-4 accent-primary"
                       />
                       {day.label}
                     </label>
@@ -64,9 +64,9 @@ export default async function HrConfigPage({
               </div>
 
               <div>
-                <h2 className="text-sm font-medium text-slate-500">Annual leave allocation (days)</h2>
+                <h2 className="text-sm font-medium text-muted-foreground">Annual leave allocation (days)</h2>
                 <div className="mt-2 grid grid-cols-2 gap-3">
-                  <label className="text-sm text-slate-700">
+                  <label className="text-sm text-foreground/75">
                     Casual Leave
                     <Input
                       type="number"
@@ -78,7 +78,7 @@ export default async function HrConfigPage({
                       className="mt-1"
                     />
                   </label>
-                  <label className="text-sm text-slate-700">
+                  <label className="text-sm text-foreground/75">
                     Sick Leave
                     <Input
                       type="number"
@@ -90,7 +90,7 @@ export default async function HrConfigPage({
                       className="mt-1"
                     />
                   </label>
-                  <label className="text-sm text-slate-700">
+                  <label className="text-sm text-foreground/75">
                     Earned/Privilege Leave
                     <Input
                       type="number"
@@ -102,7 +102,7 @@ export default async function HrConfigPage({
                       className="mt-1"
                     />
                   </label>
-                  <label className="text-sm text-slate-700">
+                  <label className="text-sm text-foreground/75">
                     Maternity Leave
                     <Input
                       type="number"
@@ -114,7 +114,7 @@ export default async function HrConfigPage({
                       className="mt-1"
                     />
                   </label>
-                  <label className="text-sm text-slate-700">
+                  <label className="text-sm text-foreground/75">
                     Paternity Leave
                     <Input
                       type="number"
@@ -130,8 +130,8 @@ export default async function HrConfigPage({
               </div>
 
               <div>
-                <h2 className="text-sm font-medium text-slate-500">Office network (attendance check-in)</h2>
-                <p className="mt-1 text-xs text-slate-400">
+                <h2 className="text-sm font-medium text-muted-foreground">Office network (attendance check-in)</h2>
+                <p className="mt-1 text-xs text-muted-foreground">
                   Comma-separated IPv4 addresses or CIDR ranges (e.g. 203.0.113.5, 198.51.100.0/24). Employees can
                   only check in/out from these networks unless they have an approved WFH request for today.
                 </p>

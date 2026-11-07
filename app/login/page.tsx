@@ -12,7 +12,7 @@ export default async function LoginPage({
   const { error } = await searchParams
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50">
+    <div className="flex min-h-screen items-center justify-center bg-muted">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <Image
@@ -23,20 +23,20 @@ export default async function LoginPage({
             priority
             className="mx-auto mb-4 h-10 w-auto"
           />
-          <h1 className="text-xl font-semibold text-slate-800">BYC Hub</h1>
-          <p className="mt-1 text-sm text-slate-500">Please sign in to continue.</p>
+          <h1 className="text-xl font-semibold text-foreground">BYC Hub</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Please sign in to continue.</p>
         </CardHeader>
         <CardContent>
           <form action={login} className="space-y-4">
             {error && <p className="rounded-lg bg-red-50 p-2 text-sm text-red-600">{error}</p>}
             <div>
-              <label className="block text-sm font-medium text-slate-700" htmlFor="email">
+              <label className="block text-sm font-medium text-foreground/75" htmlFor="email">
                 Email
               </label>
               <Input id="email" name="email" type="email" required className="mt-1" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700" htmlFor="password">
+              <label className="block text-sm font-medium text-foreground/75" htmlFor="password">
                 Password
               </label>
               <Input id="password" name="password" type="password" required className="mt-1" />

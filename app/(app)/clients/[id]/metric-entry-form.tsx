@@ -33,7 +33,7 @@ export function MetricEntryForm({
   const channelsInOrder = Array.from(new Set(catalog.map((option) => option.channel)))
 
   return (
-    <form action={action} className="mt-3 space-y-2 rounded-lg border border-slate-200 p-3">
+    <form action={action} className="mt-3 space-y-2 rounded-lg border border-border p-3">
       <input type="hidden" name="clientId" value={clientId} />
       <input type="hidden" name="period" value={period} />
       <input type="hidden" name="channel" value={channel} />

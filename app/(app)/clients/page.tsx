@@ -25,7 +25,7 @@ export default async function ClientsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold text-slate-800">Clients</h1>
+      <h1 className="text-xl font-semibold text-foreground">Clients</h1>
       {clientsError && (
         <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">
           Failed to load clients: {clientsError.message}
@@ -43,7 +43,7 @@ export default async function ClientsPage() {
             {(clients ?? []).map((client) => (
               <TableRow key={client.id}>
                 <TableCell>
-                  <Link href={`/clients/${client.id}`} className="font-medium text-slate-800 hover:underline">
+                  <Link href={`/clients/${client.id}`} className="font-medium text-foreground hover:underline">
                     {client.name}
                   </Link>
                 </TableCell>

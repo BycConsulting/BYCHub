@@ -65,7 +65,7 @@ export default async function UsersPage({
     <div className="space-y-8">
       <Card>
         <CardHeader>
-          <Link href="/users/config" className="text-sm text-slate-600 hover:text-slate-900 hover:underline">
+          <Link href="/users/config" className="text-sm text-foreground/75 hover:text-foreground hover:underline">
             HR configuration
           </Link>
           <CardTitle className="mt-2 text-lg">Invite user</CardTitle>
@@ -123,11 +123,11 @@ export default async function UsersPage({
               return (
                 <TableRow key={u.id} className="align-top">
                   <TableCell>
-                    <Link href={`/users/${u.id}`} className="font-medium text-slate-800 hover:underline">
+                    <Link href={`/users/${u.id}`} className="font-medium text-foreground hover:underline">
                       {u.name}
                     </Link>
                   </TableCell>
-                  <TableCell className="text-slate-600">{u.email}</TableCell>
+                  <TableCell className="text-foreground/75">{u.email}</TableCell>
                   <TableCell>
                     <Badge variant="outline" className="capitalize">
                       {u.role}
@@ -139,12 +139,12 @@ export default async function UsersPage({
                     </Badge>
                   </TableCell>
                   <TableCell className="space-y-2 py-2">
-                    {isSelf && <span className="text-slate-400">You</span>}
+                    {isSelf && <span className="text-muted-foreground">You</span>}
                     {!isSelf && u.is_active && (
                       <>
                         <form action={resetUserPassword}>
                           <input type="hidden" name="userId" value={u.id} />
-                          <button type="submit" className="text-slate-600 underline hover:text-slate-900">
+                          <button type="submit" className="text-foreground/75 underline hover:text-foreground">
                             Reset password
                           </button>
                         </form>
