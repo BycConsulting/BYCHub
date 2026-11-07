@@ -77,7 +77,7 @@ export default async function ClientDetailPage({
   return (
     <div className="max-w-3xl space-y-6">
       {error && (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+        <p className="rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">{error}</p>
       )}
 
       <Card>
@@ -134,7 +134,7 @@ export default async function ClientDetailPage({
                   <input type="hidden" name="metricId" value={metric.id} />
                   <input type="hidden" name="clientId" value={id} />
                   <input type="hidden" name="period" value={period} />
-                  <button type="submit" className="text-red-600 underline">
+                  <button type="submit" className="text-destructive underline">
                     Delete
                   </button>
                 </form>

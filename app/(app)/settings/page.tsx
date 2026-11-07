@@ -13,7 +13,7 @@ export default async function SettingsPage() {
 
   return (
     <div className="max-w-2xl space-y-4">
-      <h1 className="text-xl font-semibold text-foreground">Settings</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-foreground">Settings</h1>
       {currentUser.role === 'admin' && (
         <Link href="/settings/permissions" className="text-sm text-foreground/75 hover:text-foreground hover:underline">
           Edit role permissions

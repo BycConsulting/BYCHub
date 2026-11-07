@@ -76,7 +76,7 @@ export default async function DirectoryProfilePage({
         <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-semibold text-white">
           {initialsFor(user.name)}
         </div>
-        <h1 className="text-xl font-semibold text-foreground">{user.name}</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">{user.name}</h1>
       </Card>
       <Card className="gap-0 divide-y divide-border py-0">
         {fields.map((field) => (

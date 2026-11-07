@@ -128,11 +128,11 @@ export default async function LeavePage({
         </CardHeader>
         <CardContent>
           {error && (
-            <p className="mb-3 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+            <p className="mb-3 rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">{error}</p>
           )}
 
           {configError ? (
-            <p className="mb-3 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">
+            <p className="mb-3 rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">
               Could not load leave balances
             </p>
           ) : (
@@ -174,7 +174,7 @@ export default async function LeavePage({
         </CardHeader>
         {requestsError ? (
           <CardContent className="pb-4">
-            <p className="text-sm text-red-700">Could not load your requests</p>
+            <p className="text-sm text-destructive">Could not load your requests</p>
           </CardContent>
         ) : myRequests && myRequests.length > 0 ? (
           <Table>
@@ -207,7 +207,7 @@ export default async function LeavePage({
                     {request.status === 'pending' && (
                       <form action={cancelLeaveRequest}>
                         <input type="hidden" name="requestId" value={request.id} />
-                        <button type="submit" className="text-red-600 underline">
+                        <button type="submit" className="text-destructive underline">
                           Cancel
                         </button>
                       </form>
@@ -231,11 +231,11 @@ export default async function LeavePage({
           </CardHeader>
           {reportsError ? (
             <CardContent className="pb-4">
-              <p className="text-sm text-red-700">Could not load your team</p>
+              <p className="text-sm text-destructive">Could not load your team</p>
             </CardContent>
           ) : teamPendingError ? (
             <CardContent className="pb-4">
-              <p className="text-sm text-red-700">Could not load your team&apos;s requests</p>
+              <p className="text-sm text-destructive">Could not load your team&apos;s requests</p>
             </CardContent>
           ) : teamPending.length === 0 ? (
             <CardContent className="pb-4">

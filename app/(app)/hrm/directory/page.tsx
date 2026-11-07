@@ -48,11 +48,11 @@ export default async function DirectoryPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-foreground">Directory</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Directory</h1>
         <p className="text-sm text-muted-foreground">{rows.length} active employees</p>
       </div>
       {profilesError || usersError ? (
-        <p className="rounded-lg bg-red-50 p-3 text-sm text-red-600">Could not load the directory</p>
+        <p className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">Could not load the directory</p>
       ) : rows.length === 0 ? (
         <p className="text-sm text-muted-foreground">No employees found.</p>
       ) : (

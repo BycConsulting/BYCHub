@@ -54,9 +54,9 @@ export default async function ShiftsPage({
       <Link href="/hrm/attendance" className="text-sm text-foreground/75 hover:text-foreground hover:underline">
         ← Back to Attendance
       </Link>
-      <h1 className="text-xl font-semibold text-foreground">Shifts</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-foreground">Shifts</h1>
       {error && (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+        <p className="rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">{error}</p>
       )}
 
       <Card>
@@ -88,7 +88,7 @@ export default async function ShiftsPage({
         </CardHeader>
         {shiftsError ? (
           <CardContent className="pb-4">
-            <p className="text-sm text-red-700">Could not load shifts</p>
+            <p className="text-sm text-destructive">Could not load shifts</p>
           </CardContent>
         ) : shifts && shifts.length > 0 ? (
           <Table>
@@ -122,7 +122,7 @@ export default async function ShiftsPage({
         </CardHeader>
         {employeesError ? (
           <CardContent className="pb-4">
-            <p className="text-sm text-red-700">Could not load employees</p>
+            <p className="text-sm text-destructive">Could not load employees</p>
           </CardContent>
         ) : (
           <Table>

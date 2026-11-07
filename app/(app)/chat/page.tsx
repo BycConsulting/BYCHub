@@ -30,7 +30,7 @@ export default async function ChatPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold text-foreground">Chat</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-foreground">Chat</h1>
 
       <Card>
         <CardHeader>
@@ -38,7 +38,7 @@ export default async function ChatPage({
         </CardHeader>
         <CardContent>
           {error && (
-            <p className="mb-3 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+            <p className="mb-3 rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">{error}</p>
           )}
           <form action={createConversation} className="flex items-end gap-2">
             <div className="w-48 space-y-1">

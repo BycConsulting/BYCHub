@@ -59,7 +59,7 @@ export default async function AttendanceReportsPage({
       <Link href="/hrm/attendance" className="text-sm text-foreground/75 hover:text-foreground hover:underline">
         ← Back to Attendance
       </Link>
-      <h1 className="text-xl font-semibold text-foreground">Attendance reports</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-foreground">Attendance reports</h1>
 
       <Card>
         <CardContent>
@@ -86,7 +86,7 @@ export default async function AttendanceReportsPage({
       <Card className="py-0">
         {recordsError ? (
           <CardContent className="py-4">
-            <p className="text-sm text-red-700">Could not load attendance records</p>
+            <p className="text-sm text-destructive">Could not load attendance records</p>
           </CardContent>
         ) : summaryRows.length === 0 ? (
           <CardContent className="py-4">

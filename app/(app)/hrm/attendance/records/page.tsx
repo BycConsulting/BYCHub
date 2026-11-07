@@ -50,15 +50,15 @@ export default async function AttendanceRecordsPage({
       <Link href="/hrm/attendance" className="text-sm text-foreground/75 hover:text-foreground hover:underline">
         ← Back to Attendance
       </Link>
-      <h1 className="text-xl font-semibold text-foreground">Attendance records</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-foreground">Attendance records</h1>
       {error && (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+        <p className="rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">{error}</p>
       )}
 
       <Card className="py-0">
         {recordsError ? (
           <CardContent className="py-4">
-            <p className="text-sm text-red-700">Could not load attendance records</p>
+            <p className="text-sm text-destructive">Could not load attendance records</p>
           </CardContent>
         ) : sortedRecords.length === 0 ? (
           <CardContent className="py-4">

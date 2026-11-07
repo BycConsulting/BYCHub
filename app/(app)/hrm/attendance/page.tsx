@@ -70,7 +70,7 @@ export default async function AttendancePage({
       </div>
 
       {reportsError && (
-        <p className="text-sm text-red-600">Could not check your team — try refreshing.</p>
+        <p className="text-sm text-destructive">Could not check your team — try refreshing.</p>
       )}
 
       <Card>
@@ -79,7 +79,7 @@ export default async function AttendancePage({
         </CardHeader>
         <CardContent>
           {error && (
-            <p className="mb-3 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+            <p className="mb-3 rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">{error}</p>
           )}
 
           {!todayRecord?.checked_in_at ? (
@@ -102,7 +102,7 @@ export default async function AttendancePage({
         </CardHeader>
         {recordsError ? (
           <CardContent className="pb-4">
-            <p className="text-sm text-red-700">Could not load your attendance history</p>
+            <p className="text-sm text-destructive">Could not load your attendance history</p>
           </CardContent>
         ) : myRecords && myRecords.length > 0 ? (
           <Table>

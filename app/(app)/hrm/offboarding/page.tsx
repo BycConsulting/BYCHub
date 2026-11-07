@@ -45,9 +45,9 @@ export default async function OffboardingPage({
 
   return (
     <div className="max-w-2xl space-y-6">
-      <h1 className="text-xl font-semibold text-foreground">Offboarding</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-foreground">Offboarding</h1>
       {error && (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+        <p className="rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">{error}</p>
       )}
 
       <Card>
@@ -73,7 +73,7 @@ export default async function OffboardingPage({
         </CardHeader>
         {checklistsError || usersError ? (
           <CardContent className="pb-4">
-            <p className="text-sm text-red-700">Could not load offboarding checklists</p>
+            <p className="text-sm text-destructive">Could not load offboarding checklists</p>
           </CardContent>
         ) : inProgress.length === 0 ? (
           <CardContent className="pb-4">

@@ -88,7 +88,7 @@ export function GlobalChatBubble({
             </div>
           ))}
           {error && (
-            <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error.message}</p>
+            <p className="rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">{error.message}</p>
           )}
         </div>
 

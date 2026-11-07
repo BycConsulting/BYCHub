@@ -32,12 +32,12 @@ export default async function HrConfigPage({
       <Link href="/users" className="text-sm text-foreground/75 hover:text-foreground hover:underline">
         ← Back to HR
       </Link>
-      <h1 className="text-xl font-semibold text-foreground">HR configuration</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-foreground">HR configuration</h1>
       {error && (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+        <p className="rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">{error}</p>
       )}
       {readError && (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">
+        <p className="rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">
           Could not load HR configuration — has the 0008_hr_config migration been run?
         </p>
       )}

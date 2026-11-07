@@ -30,7 +30,7 @@ export default async function FinanceCategoriesPage({
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-foreground">Finance categories</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Finance categories</h1>
         <Link href="/finance" className="text-sm text-muted-foreground hover:underline">
           Back to ledger
         </Link>
@@ -42,7 +42,7 @@ export default async function FinanceCategoriesPage({
         </CardHeader>
         <CardContent>
           {error && (
-            <p className="mb-3 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+            <p className="mb-3 rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">{error}</p>
           )}
           <form action={createCategory} className="flex items-end gap-2">
             <div className="flex-1 space-y-1">

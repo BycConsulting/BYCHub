@@ -78,9 +78,9 @@ export default async function LeaveRequestsPage({
       <Link href="/hrm/leave" className="text-sm text-foreground/75 hover:text-foreground hover:underline">
         ← Back to Leave
       </Link>
-      <h1 className="text-xl font-semibold text-foreground">Pending leave & WFH requests</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-foreground">Pending leave & WFH requests</h1>
       {error && (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+        <p className="rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">{error}</p>
       )}
 
       <Card className="py-0">
@@ -89,7 +89,7 @@ export default async function LeaveRequestsPage({
         </CardHeader>
         {pendingError || managerLookupError ? (
           <CardContent className="pb-4">
-            <p className="text-sm text-red-700">Could not load pending requests</p>
+            <p className="text-sm text-destructive">Could not load pending requests</p>
           </CardContent>
         ) : pending.length === 0 ? (
           <CardContent className="pb-4">

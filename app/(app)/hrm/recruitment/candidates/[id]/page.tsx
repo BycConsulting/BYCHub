@@ -63,12 +63,12 @@ export default async function CandidateDetailPage({
       >
         ← Back to {opening?.title ?? 'opening'}
       </Link>
-      <h1 className="text-xl font-semibold text-foreground">{candidate.name}</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-foreground">{candidate.name}</h1>
       <p className="text-sm text-muted-foreground">
         {candidate.email || '—'} · {candidate.phone || '—'}
       </p>
       {error && (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+        <p className="rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">{error}</p>
       )}
 
       <Card>

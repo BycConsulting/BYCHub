@@ -51,14 +51,14 @@ export default async function AttendanceTeamPage() {
       <Link href="/hrm/attendance" className="text-sm text-foreground/75 hover:text-foreground hover:underline">
         ← Back to Attendance
       </Link>
-      <h1 className="text-xl font-semibold text-foreground">My team&apos;s attendance</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-foreground">My team&apos;s attendance</h1>
 
       {reportsError ? (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">
+        <p className="rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">
           Could not load your team
         </p>
       ) : teamRecordsError ? (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">
+        <p className="rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">
           Could not load your team&apos;s attendance
         </p>
       ) : (

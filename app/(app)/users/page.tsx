@@ -72,10 +72,10 @@ export default async function UsersPage({
         </CardHeader>
         <CardContent>
           {error && (
-            <p className="mb-3 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+            <p className="mb-3 rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">{error}</p>
           )}
           {inviteResult && (
-            <div className="mb-3 rounded-lg border border-green-200 bg-green-50 p-2 text-sm text-green-700">
+            <div className="mb-3 rounded-lg border border-success/30 bg-success/15 p-2 text-sm text-success">
               <p>
                 {inviteResult.action === 'invited' ? 'Created' : 'Reset password for'} {inviteResult.email}. Temporary
                 password: <strong>{inviteResult.tempPassword}</strong> — share this with them directly, it will not be
@@ -158,7 +158,7 @@ export default async function UsersPage({
                               className="h-7 text-xs"
                             />
                           )}
-                          <button type="submit" className="text-red-600 underline">
+                          <button type="submit" className="text-destructive underline">
                             Deactivate
                           </button>
                         </form>
@@ -168,7 +168,7 @@ export default async function UsersPage({
                       <>
                         <form action={reactivateUser}>
                           <input type="hidden" name="userId" value={u.id} />
-                          <button type="submit" className="text-green-700 underline">
+                          <button type="submit" className="text-success underline">
                             Reactivate
                           </button>
                         </form>

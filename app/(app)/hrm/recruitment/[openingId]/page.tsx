@@ -54,13 +54,13 @@ export default async function OpeningDetailPage({
         ← Back to Recruitment
       </Link>
       <div>
-        <h1 className="text-xl font-semibold text-foreground">{opening.title}</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">{opening.title}</h1>
         <p className="text-sm text-muted-foreground">
           {opening.department || '—'} · {opening.status}
         </p>
       </div>
       {error && (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+        <p className="rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">{error}</p>
       )}
 
       <Card>
@@ -84,7 +84,7 @@ export default async function OpeningDetailPage({
         </CardHeader>
         {candidatesError ? (
           <CardContent className="pb-4">
-            <p className="text-sm text-red-700">Could not load candidates</p>
+            <p className="text-sm text-destructive">Could not load candidates</p>
           </CardContent>
         ) : candidates && candidates.length > 0 ? (
           <Table>

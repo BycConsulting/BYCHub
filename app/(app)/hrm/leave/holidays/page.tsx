@@ -27,9 +27,9 @@ export default async function HolidaysPage({
       <Link href="/hrm/leave" className="text-sm text-foreground/75 hover:text-foreground hover:underline">
         ← Back to Leave
       </Link>
-      <h1 className="text-xl font-semibold text-foreground">Company holidays</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-foreground">Company holidays</h1>
       {error && (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+        <p className="rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">{error}</p>
       )}
 
       {canManage && (
@@ -53,7 +53,7 @@ export default async function HolidaysPage({
       <Card className="py-0">
         {holidaysError ? (
           <CardContent className="py-4">
-            <p className="text-sm text-red-700">Could not load holidays</p>
+            <p className="text-sm text-destructive">Could not load holidays</p>
           </CardContent>
         ) : holidays && holidays.length > 0 ? (
           <Table>
@@ -73,7 +73,7 @@ export default async function HolidaysPage({
                     <TableCell>
                       <form action={deleteHoliday}>
                         <input type="hidden" name="holidayId" value={holiday.id} />
-                        <button type="submit" className="text-red-600 underline">
+                        <button type="submit" className="text-destructive underline">
                           Delete
                         </button>
                       </form>

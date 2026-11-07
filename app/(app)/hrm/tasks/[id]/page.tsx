@@ -55,7 +55,7 @@ export default async function TaskDetailPage({
 
   return (
     <div className="max-w-4xl space-y-6">
-      {error && <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>}
+      {error && <p className="rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">{error}</p>}
 
       <Card>
         <CardContent>
@@ -112,7 +112,7 @@ export default async function TaskDetailPage({
             {(comments ?? []).map((comment) => (
               <li key={comment.id} className="rounded-lg border border-border p-2 text-sm text-foreground/75">
                 {comment.is_final && (
-                  <span className="mr-2 rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-700">Final hand-off</span>
+                  <span className="mr-2 rounded-full bg-success/15 px-2 py-0.5 text-xs text-success">Final hand-off</span>
                 )}
                 <span className="whitespace-pre-wrap">{comment.body}</span>
                 <div className="text-xs text-muted-foreground">

@@ -49,7 +49,7 @@ export default async function LeadDetailPage({
   return (
     <div className="max-w-3xl space-y-6">
       {error && (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+        <p className="rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">{error}</p>
       )}
 
       <Card>
@@ -64,7 +64,7 @@ export default async function LeadDetailPage({
           <p className="text-sm text-foreground/75">{lead.notes}</p>
 
           {lead.client_id ? (
-            <p className="mt-2 text-sm text-green-700">Converted to client.</p>
+            <p className="mt-2 text-sm text-success">Converted to client.</p>
           ) : (
             <form action={updateLeadStage} className="mt-3 flex items-center gap-2">
               <input type="hidden" name="leadId" value={lead.id} />

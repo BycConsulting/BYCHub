@@ -34,7 +34,7 @@ export default async function LeadsPage({
         </CardHeader>
         <CardContent>
           {error && (
-            <p className="mb-3 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+            <p className="mb-3 rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">{error}</p>
           )}
           <form action={createLead} className="grid grid-cols-2 gap-3">
             <Input name="contact_name" placeholder="Contact name" required />
@@ -54,7 +54,7 @@ export default async function LeadsPage({
           <CardTitle className="text-lg">Leads</CardTitle>
         </CardHeader>
         {leadsError && (
-          <p className="mx-4 mb-4 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">
+          <p className="mx-4 mb-4 rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">
             Failed to load leads: {leadsError.message}
           </p>
         )}

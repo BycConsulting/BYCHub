@@ -34,7 +34,7 @@ export default async function DashboardPage() {
   const queryError = leadsRes.error || clientsRes.error || activitiesRes.error || usersRes.error
   if (queryError) {
     return (
-      <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+      <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
         Failed to load dashboard data: {queryError.message}
       </div>
     )

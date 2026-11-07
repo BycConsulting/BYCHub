@@ -97,7 +97,7 @@ export default async function LeaveCalendarPage({
         ← Back to Leave
       </Link>
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-foreground">Leave calendar — {monthParam}</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Leave calendar — {monthParam}</h1>
         <div className="flex items-center gap-3 text-sm">
           <Link
             href={`/hrm/leave/calendar?month=${shiftMonth(monthParam, -1)}&scope=${scope}`}
@@ -123,7 +123,7 @@ export default async function LeaveCalendarPage({
       </div>
 
       {(leaveError || holidayError) && (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+        <p className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
           Could not load calendar data
         </p>
       )}
@@ -152,7 +152,7 @@ export default async function LeaveCalendarPage({
                     {Number(cell.date.slice(8, 10))}
                   </div>
                   {holidayName && (
-                    <div className="mt-1 truncate rounded bg-amber-100 px-1 py-0.5 text-amber-800">
+                    <div className="mt-1 truncate rounded bg-warning/15 px-1 py-0.5 text-foreground">
                       {holidayName}
                     </div>
                   )}
