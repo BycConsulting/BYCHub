@@ -35,7 +35,7 @@ export function AppShell({
 
   return (
     <div className="flex min-h-screen bg-background">
-      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar px-3 py-5 text-sidebar-foreground lg:flex">
+      <aside className="print:hidden sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar px-3 py-5 text-sidebar-foreground lg:flex">
         <div className="mb-7 px-1">
           <div className="rounded-xl bg-white px-3 py-2 shadow-sm">
             <Image src="/byc-logo.png" alt="BYC Consulting" width={1600} height={664} priority className="h-8 w-auto" />
@@ -49,7 +49,7 @@ export function AppShell({
         </div>
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border bg-background/80 px-4 py-3 backdrop-blur-md md:px-8">
+        <header className="print:hidden sticky top-0 z-30 flex items-center gap-3 border-b border-border bg-background/80 px-4 py-3 backdrop-blur-md md:px-8">
           <MobileNav enabledModules={enabledModules} isAdmin={isAdmin} />
           <CommandPalette enabledModules={enabledModules} isAdmin={isAdmin} />
           <div className="ml-auto flex items-center gap-2">
@@ -67,7 +67,7 @@ export function AppShell({
             </form>
           </div>
         </header>
-        <main className="flex-1 px-4 py-6 md:px-8 md:py-8">{children}</main>
+        <main className="flex-1 px-4 py-6 md:px-8 md:py-8 print:p-0">{children}</main>
       </div>
       {assistant && (
         <GlobalChatBubble conversationId={assistant.conversationId} initialMessages={assistant.initialMessages} />
