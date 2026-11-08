@@ -4,6 +4,8 @@ import { createClient } from '@/lib/supabase/server'
 import { addActivity } from '../../leads/actions'
 import { addClientMetric, deleteClientMetric } from './metrics-actions'
 import { MetricEntryForm } from './metric-entry-form'
+import { AdAccounts } from './ad-accounts'
+import { MetaReports } from './meta-reports'
 import { requireModule } from '@/lib/access'
 import { getMetricCatalog } from '@/lib/metric-catalog'
 import { Badge } from '@/components/ui/badge'
@@ -56,6 +58,18 @@ export default async function ClientDetailPage({
     .order('created_at', { ascending: false })
 
   const catalog = await getMetricCatalog()
+
+  const { data: adAccounts } = await supabase
+    .from('client_ad_accounts')
+    .select('id, ad_account_id, label')
+    .eq('client_id', id)
+    .order('created_at')
+
+  const { data: reports } = await supabase
+    .from('report_layouts')
+    .select('id, name, ad_account_id, updated_at')
+    .eq('client_id', id)
+    .order('updated_at', { ascending: false })
 
   const { data: metrics, error: metricsError } = await supabase
     .from('client_metrics')
@@ -148,6 +162,10 @@ export default async function ClientDetailPage({
           <MetricEntryForm action={addClientMetric} clientId={id} period={period} catalog={catalog} />
         </CardContent>
       </Card>
+
+      <AdAccounts clientId={id} accounts={adAccounts ?? []} />
+
+      <MetaReports clientId={id} accounts={adAccounts ?? []} reports={reports ?? []} />
 
       <Card>
         <CardHeader>

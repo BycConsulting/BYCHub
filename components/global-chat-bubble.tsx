@@ -47,14 +47,14 @@ export function GlobalChatBubble({
         onClick={() => setIsOpen((open) => !open)}
         aria-expanded={isOpen}
         aria-label={isOpen ? 'Close BYC Assistant' : 'Open BYC Assistant'}
-        className="fixed right-6 bottom-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white shadow-lg transition hover:bg-primary/90"
+        className="print:hidden fixed right-6 bottom-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white shadow-lg transition hover:bg-primary/90"
       >
         {isOpen ? <X className="h-5 w-5" /> : <MessageCircle className="h-5 w-5" />}
       </button>
 
       <div
         className={cn(
-          'fixed right-6 bottom-20 z-50 flex h-[32rem] w-96 max-w-[calc(100vw-3rem)] flex-col overflow-hidden rounded-xl bg-card text-card-foreground shadow-2xl ring-1 ring-foreground/10 transition',
+          'print:hidden fixed right-6 bottom-20 z-50 flex h-[32rem] w-96 max-w-[calc(100vw-3rem)] flex-col overflow-hidden rounded-xl bg-card text-card-foreground shadow-2xl ring-1 ring-foreground/10 transition',
           isOpen ? 'opacity-100' : 'pointer-events-none translate-y-2 opacity-0'
         )}
         role="dialog"
