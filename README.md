@@ -44,3 +44,19 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Meta Ads reports
+
+Per-client Meta Ads reports (client page → Meta Ads reports) read live from the
+Meta Marketing API and export to PDF.
+
+1. In the BYC Meta Business Manager create a **system user** with `ads_read`
+   on the clients' ad accounts and generate its access token.
+2. Set `META_ACCESS_TOKEN` in `.env.local` and in Vercel (Preview and
+   Production). The token is only read in server code.
+3. Apply `supabase/migrations/0019_meta_reports.sql` in the Supabase SQL editor.
+4. On a client page, add the client's ad account ID (`act_…`), then create a
+   report. Press **Refresh** to fetch data; reports only change when Refresh
+   is pressed. **Export PDF** opens the print dialog — choose "Save as PDF".
+
+Unit tests for the report logic: `npm test`.
