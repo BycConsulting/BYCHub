@@ -497,6 +497,72 @@ export interface Database {
         }>
         Relationships: []
       }
+      client_ad_accounts: {
+        Row: {
+          id: string
+          client_id: string
+          ad_account_id: string
+          label: string
+          created_at: string
+        }
+        Insert: {
+          client_id: string
+          ad_account_id: string
+          label?: string
+        }
+        Update: Partial<{
+          label: string
+        }>
+        Relationships: []
+      }
+      report_layouts: {
+        Row: {
+          id: string
+          client_id: string
+          name: string
+          ad_account_id: string
+          orientation: 'landscape' | 'portrait'
+          pages: unknown
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          name: string
+          ad_account_id: string
+          orientation?: 'landscape' | 'portrait'
+          pages?: unknown
+          created_by?: string | null
+        }
+        Update: Partial<{
+          name: string
+          orientation: 'landscape' | 'portrait'
+          pages: unknown
+          updated_at: string
+        }>
+        Relationships: []
+      }
+      report_data_cache: {
+        Row: {
+          id: string
+          layout_id: string
+          query_key: string
+          payload: unknown
+          fetched_at: string
+        }
+        Insert: {
+          layout_id: string
+          query_key: string
+          payload: unknown
+          fetched_at?: string
+        }
+        Update: Partial<{
+          payload: unknown
+          fetched_at: string
+        }>
+        Relationships: []
+      }
       projects: {
         Row: {
           id: string
