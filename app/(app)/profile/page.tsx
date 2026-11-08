@@ -17,14 +17,14 @@ export default async function ProfilePage() {
 
   return (
     <div className="max-w-2xl space-y-6">
-      <h1 className="text-xl font-semibold text-slate-800">My profile</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-foreground">My profile</h1>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm font-medium text-slate-500">Job info</CardTitle>
+          <CardTitle className="text-sm font-medium text-muted-foreground">Job info</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-1 text-sm text-slate-700">
+          <div className="space-y-1 text-sm text-foreground/75">
             <p>Designation: {profile?.designation ?? '—'}</p>
             <p>Department: {profile?.department ?? '—'}</p>
             <p>Start date: {profile?.employment_start_date ?? '—'}</p>
@@ -35,10 +35,10 @@ export default async function ProfilePage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm font-medium text-slate-500">Personal info</CardTitle>
+          <CardTitle className="text-sm font-medium text-muted-foreground">Personal info</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-1 text-sm text-slate-700">
+          <div className="space-y-1 text-sm text-foreground/75">
             <p>Phone: {profile?.phone ?? '—'}</p>
             <p>Address: {profile?.address ?? '—'}</p>
             <p>Emergency contact name: {profile?.emergency_contact_name ?? '—'}</p>
@@ -48,7 +48,7 @@ export default async function ProfilePage() {
         </CardContent>
       </Card>
 
-      <p className="text-xs text-slate-400">To update any of this information, contact HR or an admin.</p>
+      <p className="text-xs text-muted-foreground">To update any of this information, contact HR or an admin.</p>
     </div>
   )
 }

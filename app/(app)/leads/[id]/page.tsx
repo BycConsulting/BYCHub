@@ -49,22 +49,22 @@ export default async function LeadDetailPage({
   return (
     <div className="max-w-3xl space-y-6">
       {error && (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+        <p className="rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">{error}</p>
       )}
 
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">{lead.contact_name}</CardTitle>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-muted-foreground">
             {lead.contact_company} · {lead.contact_email}
           </p>
-          {lead.source && <p className="text-xs text-slate-400">Source: {lead.source}</p>}
+          {lead.source && <p className="text-xs text-muted-foreground">Source: {lead.source}</p>}
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-slate-700">{lead.notes}</p>
+          <p className="text-sm text-foreground/75">{lead.notes}</p>
 
           {lead.client_id ? (
-            <p className="mt-2 text-sm text-green-700">Converted to client.</p>
+            <p className="mt-2 text-sm text-success">Converted to client.</p>
           ) : (
             <form action={updateLeadStage} className="mt-3 flex items-center gap-2">
               <input type="hidden" name="leadId" value={lead.id} />
@@ -89,12 +89,12 @@ export default async function LeadDetailPage({
 
           <ul className="mt-4 space-y-2">
             {(activities ?? []).map((activity) => (
-              <li key={activity.id} className="rounded-lg border border-slate-100 p-2 text-sm">
+              <li key={activity.id} className="rounded-lg border border-border p-2 text-sm">
                 <Badge variant="outline" className="capitalize">
                   {activity.type}
                 </Badge>{' '}
-                <span className="text-slate-600">— {activity.body}</span>
-                <div className="text-xs text-slate-400">{new Date(activity.created_at).toLocaleString()}</div>
+                <span className="text-foreground/75">— {activity.body}</span>
+                <div className="text-xs text-muted-foreground">{new Date(activity.created_at).toLocaleString()}</div>
               </li>
             ))}
           </ul>

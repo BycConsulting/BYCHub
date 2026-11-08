@@ -2,73 +2,49 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import {
-  LayoutDashboard,
-  Target,
-  Building2,
-  LayoutGrid,
-  CircleUserRound,
-  CalendarDays,
-  Clock,
-  ShieldCheck,
-  UserPlus,
-  UserMinus,
-  Briefcase,
-  ListTodo,
-  Settings as SettingsIcon,
-  Wallet,
-  MessageSquare,
-} from 'lucide-react'
+import { visibleNavGroups } from '@/lib/nav'
 import type { Module } from '@/types/database'
 
-const NAV_ITEMS: {
-  href: string
-  label: string
-  icon: typeof LayoutDashboard
-  module: Module | null
-  adminOnly?: boolean
-}[] = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, module: 'dashboard' },
-  { href: '/chat', label: 'Chat', icon: MessageSquare, module: null },
-  { href: '/leads', label: 'Leads', icon: Target, module: 'leads' },
-  { href: '/clients', label: 'Clients', icon: Building2, module: 'clients' },
-  { href: '/hrm/directory', label: 'Directory', icon: LayoutGrid, module: 'directory' },
-  { href: '/profile', label: 'Profile', icon: CircleUserRound, module: null },
-  { href: '/hrm/leave', label: 'Leave', icon: CalendarDays, module: 'leave_attendance' },
-  { href: '/hrm/attendance', label: 'Attendance', icon: Clock, module: 'leave_attendance' },
-  { href: '/users', label: 'HR', icon: ShieldCheck, module: 'hr' },
-  { href: '/hrm/onboarding', label: 'Onboarding', icon: UserPlus, module: 'onboarding' },
-  { href: '/hrm/offboarding', label: 'Offboarding', icon: UserMinus, module: 'offboarding' },
-  { href: '/hrm/recruitment', label: 'Recruitment', icon: Briefcase, module: 'recruitment' },
-  { href: '/hrm/tasks', label: 'Tasks', icon: ListTodo, module: 'tasks' },
-  { href: '/settings', label: 'Settings', icon: SettingsIcon, module: 'settings' },
-  { href: '/finance', label: 'Finance', icon: Wallet, module: null, adminOnly: true },
-]
-
-export function NavLinks({ enabledModules, isAdmin }: { enabledModules: Module[]; isAdmin: boolean }) {
+export function NavLinks({
+  enabledModules,
+  isAdmin,
+  onNavigate,
+}: {
+  enabledModules: Module[]
+  isAdmin: boolean
+  onNavigate?: () => void
+}) {
   const pathname = usePathname()
 
   return (
-    <nav className="flex flex-col gap-1">
-      {NAV_ITEMS.filter(
-        (item) =>
-          (item.module === null || enabledModules.includes(item.module)) && (!item.adminOnly || isAdmin)
-      ).map((item) => {
-        const Icon = item.icon
-        const active = pathname === item.href || pathname.startsWith(`${item.href}/`)
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
-              active ? 'bg-slate-800 text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-800'
-            }`}
-          >
-            <Icon className="h-4 w-4" />
-            {item.label}
-          </Link>
-        )
-      })}
+    <nav className="flex flex-col gap-5">
+      {visibleNavGroups(enabledModules, isAdmin).map((group) => (
+        <div key={group.label} className="space-y-1">
+          <p className="px-3 text-[0.68rem] font-semibold tracking-wider text-sidebar-foreground/40 uppercase">
+            {group.label}
+          </p>
+          {group.items.map((item) => {
+            const Icon = item.icon
+            const active = pathname === item.href || pathname.startsWith(`${item.href}/`)
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={onNavigate}
+                className={`group relative flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors ${
+                  active
+                    ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                    : 'text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground'
+                }`}
+              >
+                {active && <span className="absolute top-2 bottom-2 left-0 w-0.5 rounded-full bg-sidebar-primary" />}
+                <Icon className={`h-4 w-4 ${active ? 'text-sidebar-primary' : ''}`} />
+                {item.label}
+              </Link>
+            )
+          })}
+        </div>
+      ))}
     </nav>
   )
 }

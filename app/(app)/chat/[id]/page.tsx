@@ -36,7 +36,7 @@ export default async function ConversationPage({
 
   return (
     <div className="space-y-4">
-      <Link href="/chat" className="text-sm text-slate-500 hover:underline">
+      <Link href="/chat" className="text-sm text-muted-foreground hover:underline">
         ← Back to conversations
       </Link>
       <ChatWindow

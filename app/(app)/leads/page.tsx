@@ -34,7 +34,7 @@ export default async function LeadsPage({
         </CardHeader>
         <CardContent>
           {error && (
-            <p className="mb-3 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+            <p className="mb-3 rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">{error}</p>
           )}
           <form action={createLead} className="grid grid-cols-2 gap-3">
             <Input name="contact_name" placeholder="Contact name" required />
@@ -54,7 +54,7 @@ export default async function LeadsPage({
           <CardTitle className="text-lg">Leads</CardTitle>
         </CardHeader>
         {leadsError && (
-          <p className="mx-4 mb-4 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">
+          <p className="mx-4 mb-4 rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">
             Failed to load leads: {leadsError.message}
           </p>
         )}
@@ -71,17 +71,17 @@ export default async function LeadsPage({
             {(leads ?? []).map((lead) => (
               <TableRow key={lead.id}>
                 <TableCell>
-                  <Link href={`/leads/${lead.id}`} className="font-medium text-slate-800 hover:underline">
+                  <Link href={`/leads/${lead.id}`} className="font-medium text-foreground hover:underline">
                     {lead.contact_name}
                   </Link>
                 </TableCell>
-                <TableCell className="text-slate-600">{lead.contact_company ?? '—'}</TableCell>
+                <TableCell className="text-foreground/75">{lead.contact_company ?? '—'}</TableCell>
                 <TableCell>
                   <Badge variant="outline" className="capitalize">
                     {lead.stage}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-slate-600">{lead.source ?? '—'}</TableCell>
+                <TableCell className="text-foreground/75">{lead.source ?? '—'}</TableCell>
               </TableRow>
             ))}
           </TableBody>

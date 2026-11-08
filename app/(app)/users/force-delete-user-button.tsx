@@ -24,9 +24,9 @@ export function ForceDeleteUserButton({
   const matches = confirmText === userEmail
 
   return (
-    <form action={action} className="mt-1 space-y-1.5 rounded-lg border border-red-200 bg-red-50 p-2">
+    <form action={action} className="mt-1 space-y-1.5 rounded-lg border border-destructive/30 bg-destructive/10 p-2">
       <input type="hidden" name="userId" value={userId} />
-      <p className="text-xs text-red-700">This permanently deletes their history too — see the error above.</p>
+      <p className="text-xs text-destructive">This permanently deletes their history too — see the error above.</p>
       <Input
         type="text"
         value={confirmText}
@@ -34,7 +34,7 @@ export function ForceDeleteUserButton({
         placeholder={`Type "${userEmail}" to confirm`}
         className="h-7 text-xs"
       />
-      <label className="flex items-center gap-2 text-xs text-red-700">
+      <label className="flex items-center gap-2 text-xs text-destructive">
         <input
           type="checkbox"
           name="acknowledged"

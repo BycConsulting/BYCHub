@@ -25,9 +25,9 @@ export default async function ClientsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold text-slate-800">Clients</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-foreground">Clients</h1>
       {clientsError && (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">
+        <p className="rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">
           Failed to load clients: {clientsError.message}
         </p>
       )}
@@ -43,7 +43,7 @@ export default async function ClientsPage() {
             {(clients ?? []).map((client) => (
               <TableRow key={client.id}>
                 <TableCell>
-                  <Link href={`/clients/${client.id}`} className="font-medium text-slate-800 hover:underline">
+                  <Link href={`/clients/${client.id}`} className="font-medium text-foreground hover:underline">
                     {client.name}
                   </Link>
                 </TableCell>
@@ -54,6 +54,13 @@ export default async function ClientsPage() {
                 </TableCell>
               </TableRow>
             ))}
+            {(clients ?? []).length === 0 && !clientsError && (
+              <TableRow>
+                <TableCell colSpan={2} className="py-10 text-center text-muted-foreground">
+                  No clients yet.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </Card>

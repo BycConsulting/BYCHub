@@ -51,7 +51,7 @@ export default async function ClientMetricsDashboardPage({ params }: { params: P
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <Link href={`/clients/${id}`} className="text-sm text-slate-600 hover:text-slate-900 hover:underline">
+          <Link href={`/clients/${id}`} className="text-sm text-foreground/75 hover:text-foreground hover:underline">
             ← Back to {client.name}
           </Link>
           <CardTitle className="mt-2 text-lg">{client.name} — Metrics dashboard</CardTitle>
@@ -61,7 +61,7 @@ export default async function ClientMetricsDashboardPage({ params }: { params: P
       {byChannel.size === 0 && (
         <Card>
           <CardContent>
-            <p className="text-sm text-slate-500">No metrics logged for this client yet.</p>
+            <p className="text-sm text-muted-foreground">No metrics logged for this client yet.</p>
           </CardContent>
         </Card>
       )}
@@ -74,17 +74,17 @@ export default async function ClientMetricsDashboardPage({ params }: { params: P
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {Array.from(metricMap.entries()).map(([label, metric]) => (
-                <div key={label} className="rounded-lg border border-slate-100 p-3">
-                  <h3 className="text-sm font-medium text-slate-600">
+                <div key={label} className="rounded-lg border border-border p-3">
+                  <h3 className="text-sm font-medium text-foreground/75">
                     {label}
                     {metric.unit ? ` (${metric.unit})` : ''}
                   </h3>
                   {metric.points.length >= 2 ? (
                     <MetricChart points={metric.points} />
                   ) : (
-                    <p className="mt-2 text-2xl font-semibold text-slate-800">
+                    <p className="mt-2 text-2xl font-semibold text-foreground">
                       {metric.points[0]?.value}
-                      <span className="ml-2 text-xs font-normal text-slate-400">{metric.points[0]?.period}</span>
+                      <span className="ml-2 text-xs font-normal text-muted-foreground">{metric.points[0]?.period}</span>
                     </p>
                   )}
                 </div>

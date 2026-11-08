@@ -76,13 +76,13 @@ export default async function EmployeeDetailPage({
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">{user.name}</CardTitle>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-muted-foreground">
             {user.email} · {user.role} · {user.is_active ? 'Active' : 'Deactivated'}
           </p>
         </CardHeader>
       </Card>
       {error && (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+        <p className="rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">{error}</p>
       )}
 
       <Card>
@@ -91,7 +91,7 @@ export default async function EmployeeDetailPage({
             <input type="hidden" name="userId" value={user.id} />
 
             <div className="space-y-2">
-              <h2 className="text-sm font-medium text-slate-500">Job info</h2>
+              <h2 className="text-sm font-medium text-muted-foreground">Job info</h2>
               <Input name="designation" placeholder="Designation" defaultValue={profile?.designation ?? ''} />
               <Input name="department" placeholder="Department" defaultValue={profile?.department ?? ''} />
               <Input
@@ -115,7 +115,7 @@ export default async function EmployeeDetailPage({
             </div>
 
             <div className="space-y-2">
-              <h2 className="text-sm font-medium text-slate-500">Personal info</h2>
+              <h2 className="text-sm font-medium text-muted-foreground">Personal info</h2>
               <Input name="phone" placeholder="Phone" defaultValue={profile?.phone ?? ''} />
               <Input name="address" placeholder="Address" defaultValue={profile?.address ?? ''} />
               <Input

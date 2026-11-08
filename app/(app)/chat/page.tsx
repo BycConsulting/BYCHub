@@ -30,7 +30,7 @@ export default async function ChatPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold text-slate-800">Chat</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-foreground">Chat</h1>
 
       <Card>
         <CardHeader>
@@ -38,11 +38,11 @@ export default async function ChatPage({
         </CardHeader>
         <CardContent>
           {error && (
-            <p className="mb-3 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+            <p className="mb-3 rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">{error}</p>
           )}
           <form action={createConversation} className="flex items-end gap-2">
             <div className="w-48 space-y-1">
-              <label className="text-xs font-medium text-slate-500">Provider</label>
+              <label className="text-xs font-medium text-muted-foreground">Provider</label>
               <FormSelect name="provider" options={providerOptions} defaultValue="claude" />
             </div>
             <Button type="submit">Start chat</Button>
@@ -61,10 +61,10 @@ export default async function ChatPage({
                 <Link
                   key={conversation.id}
                   href={`/chat/${conversation.id}`}
-                  className="flex items-center justify-between rounded-lg border border-slate-200 p-3 hover:bg-slate-50"
+                  className="flex items-center justify-between rounded-lg border border-border p-3 hover:bg-muted"
                 >
-                  <span className="text-sm font-medium text-slate-800">{conversation.title}</span>
-                  <span className="flex items-center gap-2 text-xs text-slate-500">
+                  <span className="text-sm font-medium text-foreground">{conversation.title}</span>
+                  <span className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Badge variant="secondary">{providerLabels[conversation.provider]}</Badge>
                     {new Date(conversation.created_at).toLocaleDateString()}
                   </span>
@@ -72,7 +72,7 @@ export default async function ChatPage({
               ))}
             </div>
           ) : (
-            <p className="text-sm text-slate-500">No conversations yet.</p>
+            <p className="text-sm text-muted-foreground">No conversations yet.</p>
           )}
         </CardContent>
       </Card>

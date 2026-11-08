@@ -47,7 +47,7 @@ export function GlobalChatBubble({
         onClick={() => setIsOpen((open) => !open)}
         aria-expanded={isOpen}
         aria-label={isOpen ? 'Close BYC Assistant' : 'Open BYC Assistant'}
-        className="fixed right-6 bottom-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-slate-800 text-white shadow-lg transition hover:bg-slate-700"
+        className="fixed right-6 bottom-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white shadow-lg transition hover:bg-primary/90"
       >
         {isOpen ? <X className="h-5 w-5" /> : <MessageCircle className="h-5 w-5" />}
       </button>
@@ -61,38 +61,38 @@ export function GlobalChatBubble({
         aria-label="BYC Assistant"
         aria-hidden={!isOpen}
       >
-        <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-          <span className="text-sm font-semibold text-slate-800">BYC Assistant</span>
+        <div className="flex items-center justify-between border-b border-border px-4 py-3">
+          <span className="text-sm font-semibold text-foreground">BYC Assistant</span>
           <button
             type="button"
             onClick={() => setIsOpen(false)}
             aria-label="Close"
-            className="text-slate-400 hover:text-slate-700"
+            className="text-muted-foreground hover:text-foreground/75"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
 
         <div className="flex-1 space-y-3 overflow-y-auto px-4 py-3">
-          {messages.length === 0 && <p className="text-sm text-slate-400">Ask BYC Assistant anything.</p>}
+          {messages.length === 0 && <p className="text-sm text-muted-foreground">Ask BYC Assistant anything.</p>}
           {messages.map((message) => (
             <div
               key={message.id}
               className={
                 message.role === 'user'
-                  ? 'ml-auto max-w-[85%] rounded-lg bg-slate-800 p-2.5 text-sm whitespace-pre-wrap text-white'
-                  : 'mr-auto max-w-[85%] rounded-lg bg-slate-100 p-2.5 text-sm whitespace-pre-wrap text-slate-700'
+                  ? 'ml-auto max-w-[85%] rounded-lg bg-primary p-2.5 text-sm whitespace-pre-wrap text-white'
+                  : 'mr-auto max-w-[85%] rounded-lg bg-muted p-2.5 text-sm whitespace-pre-wrap text-foreground/75'
               }
             >
               {textFromParts(message.parts)}
             </div>
           ))}
           {error && (
-            <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error.message}</p>
+            <p className="rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">{error.message}</p>
           )}
         </div>
 
-        <form onSubmit={handleSubmit} className="flex items-center gap-2 border-t border-slate-200 p-3">
+        <form onSubmit={handleSubmit} className="flex items-center gap-2 border-t border-border p-3">
           <Input
             value={input}
             onChange={(event) => setInput(event.target.value)}

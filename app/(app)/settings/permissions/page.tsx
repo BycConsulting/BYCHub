@@ -21,9 +21,9 @@ export default async function PermissionsPage({
 
   return (
     <div className="max-w-2xl space-y-4">
-      <h1 className="text-xl font-semibold text-slate-800">Role permissions</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-foreground">Role permissions</h1>
       {error && (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error}</p>
+        <p className="rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">{error}</p>
       )}
 
       <Card>
@@ -44,9 +44,9 @@ export default async function PermissionsPage({
               <TableBody>
                 {moduleKeys.map((moduleKey) => (
                   <TableRow key={moduleKey}>
-                    <TableCell className="capitalize text-slate-700">{moduleKey}</TableCell>
+                    <TableCell className="capitalize text-foreground/75">{moduleKey}</TableCell>
                     <TableCell>
-                      <input type="checkbox" checked disabled className="accent-slate-800" />
+                      <input type="checkbox" checked disabled className="accent-primary" />
                     </TableCell>
                     {configurableRoles.map((role) => (
                       <TableCell key={role}>
@@ -55,7 +55,7 @@ export default async function PermissionsPage({
                           name="enabled"
                           value={`${role}:${moduleKey}`}
                           defaultChecked={enabledSet.has(`${role}:${moduleKey}`)}
-                          className="accent-slate-800"
+                          className="accent-primary"
                         />
                       </TableCell>
                     ))}

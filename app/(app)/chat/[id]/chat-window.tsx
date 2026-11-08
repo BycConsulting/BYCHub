@@ -46,8 +46,8 @@ export function ChatWindow({
               key={message.id}
               className={
                 message.role === 'user'
-                  ? 'ml-auto max-w-lg whitespace-pre-wrap rounded-lg bg-slate-800 p-3 text-sm text-white'
-                  : 'mr-auto max-w-lg whitespace-pre-wrap rounded-lg bg-slate-100 p-3 text-sm text-slate-700'
+                  ? 'ml-auto max-w-lg whitespace-pre-wrap rounded-lg bg-primary p-3 text-sm text-white'
+                  : 'mr-auto max-w-lg whitespace-pre-wrap rounded-lg bg-muted p-3 text-sm text-foreground/75'
               }
             >
               {textFromParts(message.parts)}
@@ -56,7 +56,7 @@ export function ChatWindow({
         </div>
 
         {error && (
-          <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">{error.message}</p>
+          <p className="rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-sm text-destructive">{error.message}</p>
         )}
 
         <form onSubmit={handleSubmit} className="flex items-center gap-2">

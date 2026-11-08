@@ -9,7 +9,11 @@ import {
   countActivitiesByUser,
 } from '@/lib/metrics'
 import { requireModule } from '@/lib/access'
+import { Target, Timer, Trophy } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { PageHeader } from '@/components/page-header'
+import { StatTile } from '@/components/stat-tile'
+import { BarList } from '@/components/bar-list'
 
 const clientStatusOrder = ['prospect', 'active', 'paused', 'lost'] as const
 
@@ -30,7 +34,7 @@ export default async function DashboardPage() {
   const queryError = leadsRes.error || clientsRes.error || activitiesRes.error || usersRes.error
   if (queryError) {
     return (
-      <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+      <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
         Failed to load dashboard data: {queryError.message}
       </div>
     )
@@ -54,130 +58,83 @@ export default async function DashboardPage() {
   const avgDays = computeAvgTimeToWonDays(leads, activities)
   const byUser = countActivitiesByUser(activities, users)
 
-  const maxStageCount = Math.max(1, ...Object.values(byStage))
-  const maxSourceCount = Math.max(1, ...bySource.map((entry) => entry.count))
-  const maxUserCount = Math.max(1, ...byUser.map((entry) => entry.count))
+  const statusDot = {
+    prospect: 'bg-primary',
+    active: 'bg-success',
+    paused: 'bg-warning',
+    lost: 'bg-destructive',
+  } as const
 
   return (
-    <div className="space-y-8">
-      <h1 className="text-xl font-semibold text-slate-800">Dashboard</h1>
+    <div className="space-y-6">
+      <PageHeader title="Dashboard" description="Sales pipeline and team activity at a glance." />
 
       {isTruncated && (
-        <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-800">
+        <div className="rounded-xl border border-warning/40 bg-warning/10 p-3 text-sm text-foreground">
           Showing partial data — some rows were not loaded. Numbers below may be incomplete or inaccurate.
         </div>
       )}
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <StatTile label="Total leads" value={leads.length} icon={Target} />
+        <StatTile
+          label="Win rate"
+          value={winRate === null ? '—' : `${winRate.toFixed(0)}%`}
+          icon={Trophy}
+          tone="success"
+        />
+        <StatTile
+          label="Avg time to won"
+          value={avgDays === null ? '—' : `${avgDays.toFixed(1)}d`}
+          icon={Timer}
+          tone="gold"
+        />
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Leads by stage</CardTitle>
+          </CardHeader>
           <CardContent>
-            <div className="text-sm text-slate-500">Total leads</div>
-            <div className="text-2xl font-semibold text-slate-800">{leads.length}</div>
+            <BarList rows={leadStageOrder.map((stage) => ({ label: stage, value: byStage[stage] }))} />
           </CardContent>
         </Card>
+
         <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Leads by source</CardTitle>
+          </CardHeader>
           <CardContent>
-            <div className="text-sm text-slate-500">Win rate</div>
-            <div className="text-2xl font-semibold text-slate-800">
-              {winRate === null ? '—' : `${winRate.toFixed(0)}%`}
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent>
-            <div className="text-sm text-slate-500">Avg time to won</div>
-            <div className="text-2xl font-semibold text-slate-800">
-              {avgDays === null ? '—' : `${avgDays.toFixed(1)}d`}
-            </div>
+            <BarList rows={bySource.map(({ source, count }) => ({ label: source, value: count }))} />
           </CardContent>
         </Card>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Leads by stage</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {leadStageOrder.map((stage) => (
-              <div key={stage} className="flex items-center gap-2">
-                <div className="w-24 text-sm capitalize text-slate-600">{stage}</div>
-                <div className="h-4 flex-1 rounded bg-slate-100">
-                  <div
-                    className="h-4 rounded bg-slate-800"
-                    style={{ width: `${(byStage[stage] / maxStageCount) * 100}%` }}
-                  />
-                </div>
-                <div className="w-8 text-right text-sm text-slate-600">{byStage[stage]}</div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Leads by source</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {bySource.length === 0 ? (
-            <p className="text-sm text-slate-500">No data yet.</p>
-          ) : (
-            <div className="space-y-2">
-              {bySource.map(({ source, count }) => (
-                <div key={source} className="flex items-center gap-2">
-                  <div className="w-24 truncate text-sm text-slate-600">{source}</div>
-                  <div className="h-4 flex-1 rounded bg-slate-100">
-                    <div
-                      className="h-4 rounded bg-slate-800"
-                      style={{ width: `${(count / maxSourceCount) * 100}%` }}
-                    />
-                  </div>
-                  <div className="w-8 text-right text-sm text-slate-600">{count}</div>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
       <div>
-        <h2 className="text-lg font-semibold text-slate-800">Clients by status</h2>
-        <div className="mt-3 grid grid-cols-4 gap-4">
+        <h2 className="mb-3 text-base font-semibold text-foreground">Clients by status</h2>
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           {clientStatusOrder.map((status) => (
-            <Card key={status}>
-              <CardContent>
-                <div className="text-sm capitalize text-slate-500">{status}</div>
-                <div className="text-xl font-semibold text-slate-800">{byStatus[status]}</div>
-              </CardContent>
-            </Card>
+            <div key={status} className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+              <div className="flex items-center gap-2 text-sm capitalize text-muted-foreground">
+                <span className={`h-2 w-2 rounded-full ${statusDot[status]}`} />
+                {status}
+              </div>
+              <div className="mt-1 text-2xl font-semibold tracking-tight text-foreground">{byStatus[status]}</div>
+            </div>
           ))}
         </div>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Activity by teammate</CardTitle>
+          <CardTitle className="text-base">Activity by teammate</CardTitle>
         </CardHeader>
         <CardContent>
-          {byUser.length === 0 ? (
-            <p className="text-sm text-slate-500">No activity yet.</p>
-          ) : (
-            <div className="space-y-2">
-              {byUser.map(({ userId, name, count }) => (
-                <div key={userId} className="flex items-center gap-2">
-                  <div className="w-24 truncate text-sm text-slate-600">{name}</div>
-                  <div className="h-4 flex-1 rounded bg-slate-100">
-                    <div
-                      className="h-4 rounded bg-slate-800"
-                      style={{ width: `${(count / maxUserCount) * 100}%` }}
-                    />
-                  </div>
-                  <div className="w-8 text-right text-sm text-slate-600">{count}</div>
-                </div>
-              ))}
-            </div>
-          )}
+          <BarList
+            rows={byUser.map(({ name, count }) => ({ label: name, value: count }))}
+            empty="No activity yet."
+          />
         </CardContent>
       </Card>
     </div>
