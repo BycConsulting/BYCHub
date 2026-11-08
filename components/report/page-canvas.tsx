@@ -14,7 +14,6 @@ export function PageCanvas({
 }) {
   const { width, height } = PAGE_SIZE_PX[orientation]
   const colWidth = width / GRID_COLUMNS
-  const pad = 8
 
   return (
     <div className="relative bg-white text-slate-900" style={{ width, height }}>
@@ -23,10 +22,10 @@ export function PageCanvas({
           key={widget.id}
           className="absolute"
           style={{
-            left: widget.x * colWidth + pad / 2,
-            top: widget.y * ROW_HEIGHT_PX + pad / 2,
-            width: widget.w * colWidth - pad,
-            height: widget.h * ROW_HEIGHT_PX - pad,
+            left: widget.x * colWidth,
+            top: widget.y * ROW_HEIGHT_PX,
+            width: widget.w * colWidth,
+            height: widget.h * ROW_HEIGHT_PX,
           }}
         >
           <ReportWidget widget={widget} data={data[widget.id]} />

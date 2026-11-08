@@ -125,3 +125,33 @@ export async function refreshReport(formData: FormData) {
   revalidatePath(`/clients/${clientId}/reports/${layoutId}`)
   redirect(reportUrl(clientId, layoutId, from, to, compare))
 }
+
+export async function saveReport(
+  layoutId: string,
+  name: string,
+  orientation: 'landscape' | 'portrait',
+  pages: unknown
+): Promise<{ error: string | null }> {
+  await requireModule('clients')
+
+  const trimmed = name.trim()
+  if (!trimmed || trimmed.length > 120) return { error: 'Give the report a name (up to 120 characters)' }
+  if (orientation !== 'landscape' && orientation !== 'portrait') return { error: 'Invalid orientation' }
+
+  const parsed = pagesSchemaFor(orientation).safeParse(pages)
+  if (!parsed.success) return { error: parsed.error.issues[0].message }
+
+  const supabase = await createClient()
+  const { data: updated, error } = await supabase
+    .from('report_layouts')
+    .update({ name: trimmed, orientation, pages: parsed.data, updated_at: new Date().toISOString() })
+    .eq('id', layoutId)
+    .select('client_id')
+    .single()
+
+  if (error || !updated) return { error: error?.message ?? 'Report not found' }
+
+  revalidatePath(`/clients/${updated.client_id}/reports/${layoutId}`)
+  revalidatePath(`/clients/${updated.client_id}`)
+  return { error: null }
+}

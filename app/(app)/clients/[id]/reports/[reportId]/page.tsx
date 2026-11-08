@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { Download, RefreshCw } from 'lucide-react'
+import { Download, Pencil, RefreshCw } from 'lucide-react'
 import { requireModule } from '@/lib/access'
 import { createClient } from '@/lib/supabase/server'
 import { loadReportData } from '@/lib/meta/report-data'
@@ -85,6 +85,11 @@ export default async function ReportPage({
                 <RefreshCw /> Refresh
               </Button>
             </form>
+            <Button asChild variant="outline">
+              <Link href={`${base}/edit`}>
+                <Pencil /> Edit layout
+              </Link>
+            </Button>
             <Button asChild>
               <Link href={`${base}/print${query(range)}`} target="_blank">
                 <Download /> Export PDF

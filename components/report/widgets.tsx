@@ -88,10 +88,12 @@ export function ReportWidget({ widget, data }: { widget: Widget; data: WidgetDat
   const title = widget.config.title ?? metricTitle
 
   return (
-    <div className="flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card p-2.5">
-      {title && <div className="mb-1 truncate text-xs font-medium text-muted-foreground">{title}</div>}
-      <div className="min-h-0 flex-1">
-        <Body widget={widget} data={data} />
+    <div className="h-full p-1">
+      <div className="flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card p-2.5">
+        {title && <div className="mb-1 truncate text-xs font-medium text-muted-foreground">{title}</div>}
+        <div className="min-h-0 flex-1">
+          <Body widget={widget} data={data} />
+        </div>
       </div>
     </div>
   )
