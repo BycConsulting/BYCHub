@@ -25,20 +25,20 @@ export type MetricDef = {
 }
 
 export const METRIC_CATALOG: Record<string, MetricDef> = {
-  spend: { label: 'Spend', unit: '$', fields: ['spend'], derive: (r) => num(r.spend) },
+  spend: { label: 'Spend', unit: '₹', fields: ['spend'], derive: (r) => num(r.spend) },
   impressions: { label: 'Impressions', unit: '', fields: ['impressions'], derive: (r) => num(r.impressions) },
   reach: { label: 'Reach', unit: '', fields: ['reach'], derive: (r) => num(r.reach) },
   frequency: { label: 'Frequency', unit: 'x', fields: ['frequency'], derive: (r) => num(r.frequency) },
   clicks: { label: 'Clicks', unit: '', fields: ['clicks'], derive: (r) => num(r.clicks) },
   link_clicks: { label: 'Link clicks', unit: '', fields: ['inline_link_clicks'], derive: (r) => num(r.inline_link_clicks) },
   ctr: { label: 'CTR', unit: '%', fields: ['ctr'], derive: (r) => num(r.ctr) },
-  cpc: { label: 'CPC', unit: '$', fields: ['cpc'], derive: (r) => num(r.cpc) },
-  cpm: { label: 'CPM', unit: '$', fields: ['cpm'], derive: (r) => num(r.cpm) },
+  cpc: { label: 'CPC', unit: '₹', fields: ['cpc'], derive: (r) => num(r.cpc) },
+  cpm: { label: 'CPM', unit: '₹', fields: ['cpm'], derive: (r) => num(r.cpm) },
   results: { label: 'Leads', unit: '', fields: ['actions'], derive: results },
   purchases: { label: 'Purchases', unit: '', fields: ['actions'], derive: (r) => actionTotal(r, 'omni_purchase') },
   cost_per_result: {
     label: 'Cost per lead',
-    unit: '$',
+    unit: '₹',
     fields: ['spend', 'actions'],
     derive: (r) => (results(r) > 0 ? num(r.spend) / results(r) : 0),
   },

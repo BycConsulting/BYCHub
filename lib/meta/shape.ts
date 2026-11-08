@@ -26,10 +26,10 @@ export function breakdownPairs(rows: InsightRow[], metric: string, breakdown: st
 export function formatMetric(metric: string, value: number): string {
   const unit = METRIC_CATALOG[metric]?.unit ?? ''
   if (metric === 'cost_per_result' && value === 0) return '—'
-  if (unit === '$') return `$${value.toLocaleString('en-US', { maximumFractionDigits: value < 100 ? 2 : 0 })}`
+  if (unit === '₹') return `₹${value.toLocaleString('en-IN', { maximumFractionDigits: value < 100 ? 2 : 0 })}`
   if (unit === '%') return `${value.toFixed(1)}%`
   if (unit === 'x') return `${value.toFixed(2)}x`
-  return Math.round(value).toLocaleString('en-US')
+  return Math.round(value).toLocaleString('en-IN')
 }
 
 /** Cost ratios that Meta/derive report as 0 when undefined (no results, no clicks), not when truly zero. */

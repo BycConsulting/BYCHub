@@ -41,10 +41,15 @@ describe('breakdownPairs', () => {
 
 describe('formatMetric', () => {
   it('formats currency, percent, ratio and counts', () => {
-    expect(formatMetric('spend', 12400)).toBe('$12,400')
+    expect(formatMetric('spend', 12400)).toBe('₹12,400')
     expect(formatMetric('ctr', 1.234)).toBe('1.2%')
     expect(formatMetric('roas', 3.456)).toBe('3.46x')
-    expect(formatMetric('reach', 482000)).toBe('482,000')
+    expect(formatMetric('impressions', 950)).toBe('950')
+  })
+  it('uses rupees with Indian digit grouping', () => {
+    expect(formatMetric('spend', 124000)).toBe('₹1,24,000')
+    expect(formatMetric('cpc', 12.5)).toBe('₹12.5')
+    expect(formatMetric('reach', 482000)).toBe('4,82,000')
   })
   it('shows a dash for 0 cost-per-result', () => {
     expect(formatMetric('cost_per_result', 0)).toBe('—')
