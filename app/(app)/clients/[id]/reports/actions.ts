@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createReportSchema, refreshReportSchema } from '@/lib/validation'
 import { pagesSchemaFor, STANDARD_PAGES } from '@/lib/meta/layout'
 import { fetchInsights, MetaError } from '@/lib/meta/client'
-import { planFetches } from '@/lib/meta/plan'
+import { partitionResults, planFetches } from '@/lib/meta/plan'
 import { previousPeriod } from '@/lib/meta/ranges'
 
 export async function createReport(formData: FormData) {
@@ -115,12 +115,20 @@ export async function refreshReport(formData: FormData) {
     })
   )
 
-  const { error } = await supabase.from('report_data_cache').upsert(
-    results.map((r) => ({ layout_id: layoutId, query_key: r.key, payload: r.payload, fetched_at: new Date().toISOString() })),
-    { onConflict: 'layout_id,query_key' }
-  )
+  const { toSave, failures } = partitionResults(results)
 
-  if (error) redirect(reportUrl(clientId, layoutId, from, to, compare, error.message))
+  if (toSave.length > 0) {
+    const { error } = await supabase.from('report_data_cache').upsert(
+      toSave.map((r) => ({ layout_id: layoutId, query_key: r.key, payload: r.payload, fetched_at: new Date().toISOString() })),
+      { onConflict: 'layout_id,query_key' }
+    )
+    if (error) redirect(reportUrl(clientId, layoutId, from, to, compare, error.message))
+  }
+
+  if (failures.length > 0) {
+    revalidatePath(`/clients/${clientId}/reports/${layoutId}`)
+    redirect(reportUrl(clientId, layoutId, from, to, compare, `Some widgets could not refresh (previous data kept): ${failures.join(' ')}`))
+  }
 
   revalidatePath(`/clients/${clientId}/reports/${layoutId}`)
   redirect(reportUrl(clientId, layoutId, from, to, compare))

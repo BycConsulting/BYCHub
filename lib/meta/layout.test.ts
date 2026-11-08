@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { METRIC_CATALOG } from './metrics'
-import { pageRows, pagesSchema, pagesSchemaFor, STANDARD_PAGES } from './layout'
+import { PAGE_SIZE_MM, pageRows, pagesSchema, pagesSchemaFor, STANDARD_PAGES } from './layout'
 
 const base = { id: 'w', type: 'text' as const, x: 0, y: 0, w: 4, h: 2, config: { body: 'hi' } }
 
@@ -32,5 +32,12 @@ describe('pagesSchema', () => {
     const tall = [[{ ...base, y: 40, h: 4 }]]
     expect(pagesSchema.safeParse(tall).success).toBe(false)
     expect(pagesSchemaFor('portrait').safeParse(tall).success).toBe(true)
+  })
+})
+
+describe('PAGE_SIZE_MM', () => {
+  it('is exactly A4 so the printed box cannot spill onto an extra sheet', () => {
+    expect(PAGE_SIZE_MM.landscape).toEqual({ width: 297, height: 210 })
+    expect(PAGE_SIZE_MM.portrait).toEqual({ width: 210, height: 297 })
   })
 })

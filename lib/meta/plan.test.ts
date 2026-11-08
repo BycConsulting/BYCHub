@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { collectQueries, planFetches } from './plan'
+import { collectQueries, partitionResults, planFetches } from './plan'
 import { STANDARD_PAGES, type Page } from './layout'
 
 const range = { from: '2026-11-01', to: '2026-11-30' }
@@ -34,5 +34,23 @@ describe('planFetches', () => {
     const withCompare = planFetches([[kpi('a'), line]], 'act_1', range, true)
     expect(withCompare.find((f) => f.query.metrics[0] === 'spend')?.withPrevious).toBe(true)
     expect(withCompare.find((f) => f.query.metrics[0] === 'reach')?.withPrevious).toBe(false)
+  })
+})
+
+describe('partitionResults', () => {
+  it('keeps successful fetches for saving and reports failures without saving them', () => {
+    const { toSave, failures } = partitionResults([
+      { key: 'a', payload: { rows: [{ spend: '1' }] } },
+      { key: 'b', payload: { rows: [], error: 'Meta rate limit reached.' } },
+    ])
+    expect(toSave.map((r) => r.key)).toEqual(['a'])
+    expect(failures).toEqual(['Meta rate limit reached.'])
+  })
+  it('dedupes repeated failure messages', () => {
+    const { failures } = partitionResults([
+      { key: 'a', payload: { rows: [], error: 'x' } },
+      { key: 'b', payload: { rows: [], error: 'x' } },
+    ])
+    expect(failures).toEqual(['x'])
   })
 })

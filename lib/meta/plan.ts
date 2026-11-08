@@ -20,3 +20,12 @@ export function planFetches(pages: Page[], accountId: string, range: DateRange, 
   }
   return [...byKey.values()]
 }
+
+export type FetchResult = { key: string; payload: { rows: unknown[]; previous?: unknown[]; error?: string } }
+
+/** Failed fetches are not saved, so a rate-limited Refresh never wipes the last good data. */
+export function partitionResults(results: FetchResult[]): { toSave: FetchResult[]; failures: string[] } {
+  const toSave = results.filter((r) => !r.payload.error)
+  const failures = [...new Set(results.flatMap((r) => (r.payload.error ? [r.payload.error] : [])))]
+  return { toSave, failures }
+}

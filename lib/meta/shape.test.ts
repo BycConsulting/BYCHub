@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { breakdownPairs, formatMetric, kpiValue, seriesByDay } from './shape'
+import { breakdownPairs, formatMetric, kpiChange, kpiValue, seriesByDay } from './shape'
 
 describe('kpiValue', () => {
   it('is 0 when Meta returned no rows', () => {
@@ -48,5 +48,20 @@ describe('formatMetric', () => {
   })
   it('shows a dash for 0 cost-per-result', () => {
     expect(formatMetric('cost_per_result', 0)).toBe('—')
+  })
+})
+
+describe('kpiChange', () => {
+  it('is null when a cost ratio is undefined (no results) so it never shows a false improvement', () => {
+    expect(kpiChange('cost_per_result', 0, 50)).toBeNull()
+    expect(kpiChange('cost_per_result', 30, 0)).toBeNull()
+    expect(kpiChange('roas', 0, 2)).toBeNull()
+  })
+  it('still reports real zeros for additive metrics', () => {
+    expect(kpiChange('spend', 0, 50)).toBe(-100)
+    expect(kpiChange('spend', 110, 100)).toBe(10)
+  })
+  it('is null when the previous value is 0', () => {
+    expect(kpiChange('spend', 10, 0)).toBeNull()
   })
 })

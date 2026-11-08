@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 import { requireModule } from '@/lib/access'
 import { createClient } from '@/lib/supabase/server'
 import { loadReportData } from '@/lib/meta/report-data'
-import { PAGE_SIZE_PX, pagesSchemaFor } from '@/lib/meta/layout'
+import { PAGE_SIZE_MM, pagesSchemaFor } from '@/lib/meta/layout'
 import { presetRange } from '@/lib/meta/ranges'
 import { todayISO } from '@/lib/task-form-data'
 import { PageCanvas } from '@/components/report/page-canvas'
@@ -37,7 +37,7 @@ export default async function PrintReportPage({
   if (!pages.success) notFound()
 
   const data = await loadReportData(layout.id, layout.ad_account_id, pages.data, range, compareParam === '1')
-  const { width, height } = PAGE_SIZE_PX[layout.orientation]
+  const { width, height } = PAGE_SIZE_MM[layout.orientation]
 
   return (
     <div>
@@ -47,7 +47,7 @@ export default async function PrintReportPage({
         <div
           key={i}
           className="mb-6 overflow-hidden shadow-md ring-1 ring-border print:mb-0 print:shadow-none print:ring-0"
-          style={{ width, height, breakAfter: i < pages.data.length - 1 ? 'page' : 'auto' }}
+          style={{ width: `${width}mm`, height: `${height}mm`, breakAfter: i < pages.data.length - 1 ? 'page' : 'auto' }}
         >
           <PageCanvas orientation={layout.orientation} page={pages.data[i]} data={data} />
         </div>

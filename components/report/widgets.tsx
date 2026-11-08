@@ -1,6 +1,5 @@
 import { METRIC_CATALOG } from '@/lib/meta/metrics'
-import { changePercent } from '@/lib/meta/ranges'
-import { formatMetric, kpiValue } from '@/lib/meta/shape'
+import { formatMetric, kpiChange, kpiValue } from '@/lib/meta/shape'
 import type { Widget } from '@/lib/meta/layout'
 import type { WidgetData } from '@/lib/meta/report-data'
 import { BarWidget, DonutWidget, LineWidget } from './chart-widgets'
@@ -29,7 +28,7 @@ function Body({ widget, data }: { widget: Widget; data: WidgetData | undefined }
     case 'kpi': {
       const metric = metrics[0]
       const value = kpiValue(data.rows, metric)
-      const change = data.previous ? changePercent(value, kpiValue(data.previous, metric)) : null
+      const change = data.previous ? kpiChange(metric, value, kpiValue(data.previous, metric)) : null
       const good = change === null ? null : LOWER_IS_BETTER.has(metric) ? change <= 0 : change >= 0
       return (
         <div className="flex h-full flex-col justify-center">

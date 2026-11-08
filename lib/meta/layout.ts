@@ -10,6 +10,12 @@ export const PAGE_SIZE_PX = {
   portrait: { width: 794, height: 1123 },
 } as const
 
+/** Physical A4 size for the print box; px sizes above are 96 dpi and 0.3px larger than A4, which can spill onto an extra sheet. */
+export const PAGE_SIZE_MM = {
+  landscape: { width: 297, height: 210 },
+  portrait: { width: 210, height: 297 },
+} as const
+
 export type Orientation = keyof typeof PAGE_SIZE_PX
 
 export const widgetTypes = ['kpi', 'line', 'bar', 'donut', 'table', 'text'] as const
