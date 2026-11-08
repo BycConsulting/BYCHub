@@ -13,13 +13,14 @@ import { previousPeriod } from '@/lib/meta/ranges'
 export async function createReport(formData: FormData) {
   const user = await requireModule('clients')
 
-  const rawClientId = formData.get('clientId')
-  const back = `/clients/${rawClientId}`
+  const back = '/marketing/meta'
+  // The Marketing page picks "client|ad account" in one select.
+  const [rawClientId, rawAdAccountId] = String(formData.get('target') ?? '').split('|')
 
-  const parsed = createReportSchema.safeParse({ clientId: rawClientId, adAccountId: formData.get('adAccountId') })
+  const parsed = createReportSchema.safeParse({ clientId: rawClientId, adAccountId: rawAdAccountId })
 
   if (!parsed.success) {
-    redirect(`${back}?error=` + encodeURIComponent('Map an ad account first'))
+    redirect(`${back}?error=` + encodeURIComponent('Pick a client ad account first'))
   }
 
   const { clientId, adAccountId } = parsed.data
@@ -54,7 +55,7 @@ export async function createReport(formData: FormData) {
   }
 
   revalidatePath(back)
-  redirect(`${back}/reports/${created.id}`)
+  redirect(`/clients/${clientId}/reports/${created.id}`)
 }
 
 function reportUrl(clientId: string, layoutId: string, from: string, to: string, compare: boolean, error?: string) {
@@ -77,7 +78,7 @@ export async function refreshReport(formData: FormData) {
   })
 
   if (!parsed.success) {
-    redirect(`/clients/${formData.get('clientId')}?error=` + encodeURIComponent(parsed.error.issues[0].message))
+    redirect('/marketing/meta?error=' + encodeURIComponent(parsed.error.issues[0].message))
   }
 
   const { layoutId, clientId, from, to, compare } = parsed.data
@@ -91,7 +92,7 @@ export async function refreshReport(formData: FormData) {
     .eq('client_id', clientId)
     .single()
 
-  if (!layout) redirect(`/clients/${clientId}?error=` + encodeURIComponent('Report not found'))
+  if (!layout) redirect('/marketing/meta?error=' + encodeURIComponent('Report not found'))
 
   const pages = pagesSchemaFor(layout.orientation).safeParse(layout.pages)
   if (!pages.success) {
@@ -160,6 +161,6 @@ export async function saveReport(
   if (error || !updated) return { error: error?.message ?? 'Report not found' }
 
   revalidatePath(`/clients/${updated.client_id}/reports/${layoutId}`)
-  revalidatePath(`/clients/${updated.client_id}`)
+  revalidatePath('/marketing/meta')
   return { error: null }
 }

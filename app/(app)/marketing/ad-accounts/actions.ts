@@ -18,7 +18,7 @@ export async function addAdAccount(formData: FormData) {
   })
 
   if (!parsed.success) {
-    redirect(`/clients/${rawClientId}?error=` + encodeURIComponent(parsed.error.issues[0].message))
+    redirect('/marketing/ad-accounts?error=' + encodeURIComponent(parsed.error.issues[0].message))
   }
 
   const { clientId, adAccountId, label } = parsed.data
@@ -30,11 +30,12 @@ export async function addAdAccount(formData: FormData) {
 
   if (error) {
     const message = error.code === '23505' ? 'That ad account is already mapped to this client' : error.message
-    redirect(`/clients/${clientId}?error=` + encodeURIComponent(message))
+    redirect('/marketing/ad-accounts?error=' + encodeURIComponent(message))
   }
 
-  revalidatePath(`/clients/${clientId}`)
-  redirect(`/clients/${clientId}`)
+  revalidatePath('/marketing/ad-accounts')
+  revalidatePath('/marketing/meta')
+  redirect('/marketing/ad-accounts')
 }
 
 export async function removeAdAccount(formData: FormData) {
@@ -45,7 +46,7 @@ export async function removeAdAccount(formData: FormData) {
   const parsed = removeAdAccountSchema.safeParse({ id: formData.get('id'), clientId: rawClientId })
 
   if (!parsed.success) {
-    redirect(`/clients/${rawClientId}?error=` + encodeURIComponent(parsed.error.issues[0].message))
+    redirect('/marketing/ad-accounts?error=' + encodeURIComponent(parsed.error.issues[0].message))
   }
 
   const supabase = await createClient()
@@ -56,9 +57,10 @@ export async function removeAdAccount(formData: FormData) {
     .eq('client_id', parsed.data.clientId)
 
   if (error) {
-    redirect(`/clients/${parsed.data.clientId}?error=` + encodeURIComponent(error.message))
+    redirect('/marketing/ad-accounts?error=' + encodeURIComponent(error.message))
   }
 
-  revalidatePath(`/clients/${parsed.data.clientId}`)
-  redirect(`/clients/${parsed.data.clientId}`)
+  revalidatePath('/marketing/ad-accounts')
+  revalidatePath('/marketing/meta')
+  redirect('/marketing/ad-accounts')
 }

@@ -70,6 +70,9 @@ export default async function ReportPage({
 
   return (
     <div className="space-y-5">
+      <Link href="/marketing/meta" className="text-sm text-muted-foreground hover:text-foreground">
+        ← All Meta reports
+      </Link>
       <PageHeader
         title={layout.name}
         description={`${client?.name ?? 'Client'} · ${layout.ad_account_id} · ${range.from} → ${range.to}`}
