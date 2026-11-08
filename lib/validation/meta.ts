@@ -10,3 +10,8 @@ export const removeAdAccountSchema = z.object({
   id: z.string().uuid(),
   clientId: z.string().uuid(),
 })
+
+export const createReportSchema = z.object({
+  clientId: z.string().uuid(),
+  adAccountId: z.string().trim().regex(/^act_\d+$/, 'Pick an ad account'),
+})
