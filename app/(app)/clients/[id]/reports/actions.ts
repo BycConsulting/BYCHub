@@ -4,8 +4,11 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { requireModule } from '@/lib/access'
 import { createClient } from '@/lib/supabase/server'
-import { createReportSchema } from '@/lib/validation'
-import { STANDARD_PAGES } from '@/lib/meta/layout'
+import { createReportSchema, refreshReportSchema } from '@/lib/validation'
+import { pagesSchemaFor, STANDARD_PAGES } from '@/lib/meta/layout'
+import { fetchInsights, MetaError } from '@/lib/meta/client'
+import { planFetches } from '@/lib/meta/plan'
+import { previousPeriod } from '@/lib/meta/ranges'
 
 export async function createReport(formData: FormData) {
   const user = await requireModule('clients')
@@ -52,4 +55,73 @@ export async function createReport(formData: FormData) {
 
   revalidatePath(back)
   redirect(`${back}/reports/${created.id}`)
+}
+
+function reportUrl(clientId: string, layoutId: string, from: string, to: string, compare: boolean, error?: string) {
+  const params = new URLSearchParams({ from, to })
+  if (compare) params.set('compare', '1')
+  if (error) params.set('error', error)
+  return `/clients/${clientId}/reports/${layoutId}?${params}`
+}
+
+/** Fetches every widget query from Meta and overwrites the saved copy. Only runs when someone presses Refresh. */
+export async function refreshReport(formData: FormData) {
+  await requireModule('clients')
+
+  const parsed = refreshReportSchema.safeParse({
+    layoutId: formData.get('layoutId'),
+    clientId: formData.get('clientId'),
+    from: formData.get('from'),
+    to: formData.get('to'),
+    compare: formData.get('compare') === '1',
+  })
+
+  if (!parsed.success) {
+    redirect(`/clients/${formData.get('clientId')}?error=` + encodeURIComponent(parsed.error.issues[0].message))
+  }
+
+  const { layoutId, clientId, from, to, compare } = parsed.data
+  const range = { from, to }
+  const supabase = await createClient()
+
+  const { data: layout } = await supabase
+    .from('report_layouts')
+    .select('ad_account_id, pages, orientation')
+    .eq('id', layoutId)
+    .eq('client_id', clientId)
+    .single()
+
+  if (!layout) redirect(`/clients/${clientId}?error=` + encodeURIComponent('Report not found'))
+
+  const pages = pagesSchemaFor(layout.orientation).safeParse(layout.pages)
+  if (!pages.success) {
+    redirect(reportUrl(clientId, layoutId, from, to, compare, 'This report layout is invalid'))
+  }
+
+  const fetches = planFetches(pages.data, layout.ad_account_id, range, compare)
+
+  const results = await Promise.all(
+    fetches.map(async (f) => {
+      try {
+        const [rows, previous] = await Promise.all([
+          fetchInsights(layout.ad_account_id, f.query, range),
+          f.withPrevious ? fetchInsights(layout.ad_account_id, f.query, previousPeriod(range)) : Promise.resolve(undefined),
+        ])
+        return { key: f.key, payload: { rows, ...(previous ? { previous } : {}) } }
+      } catch (err) {
+        const message = err instanceof MetaError ? err.message : 'Could not reach Meta.'
+        return { key: f.key, payload: { rows: [], error: message } }
+      }
+    })
+  )
+
+  const { error } = await supabase.from('report_data_cache').upsert(
+    results.map((r) => ({ layout_id: layoutId, query_key: r.key, payload: r.payload, fetched_at: new Date().toISOString() })),
+    { onConflict: 'layout_id,query_key' }
+  )
+
+  if (error) redirect(reportUrl(clientId, layoutId, from, to, compare, error.message))
+
+  revalidatePath(`/clients/${clientId}/reports/${layoutId}`)
+  redirect(reportUrl(clientId, layoutId, from, to, compare))
 }

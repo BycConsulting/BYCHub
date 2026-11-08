@@ -15,3 +15,15 @@ export const createReportSchema = z.object({
   clientId: z.string().uuid(),
   adAccountId: z.string().trim().regex(/^act_\d+$/, 'Pick an ad account'),
 })
+
+const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date')
+
+export const refreshReportSchema = z
+  .object({
+    layoutId: z.string().uuid(),
+    clientId: z.string().uuid(),
+    from: isoDate,
+    to: isoDate,
+    compare: z.boolean(),
+  })
+  .refine((v) => v.from <= v.to, 'Start date must be before end date')
