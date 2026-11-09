@@ -563,6 +563,32 @@ export interface Database {
         }>
         Relationships: []
       }
+      notifications: {
+        Row: {
+          id: string
+          user_id: string
+          type: string
+          title: string
+          body: string
+          link: string
+          actor_id: string | null
+          created_at: string
+          read_at: string | null
+        }
+        Insert: {
+          user_id: string
+          type: string
+          title: string
+          body?: string
+          link: string
+          actor_id?: string | null
+          read_at?: string | null
+        }
+        Update: Partial<{
+          read_at: string | null
+        }>
+        Relationships: []
+      }
       projects: {
         Row: {
           id: string
