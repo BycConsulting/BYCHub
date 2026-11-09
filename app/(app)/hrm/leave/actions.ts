@@ -7,6 +7,9 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { submitLeaveRequestSchema, leaveRequestIdSchema } from '@/lib/validation'
 import { rangesOverlap } from '@/lib/leave'
+import { notify } from '@/lib/notifications'
+import { leaveSubmittedNotices } from '@/lib/notification-events'
+import { leaveApprovers } from '@/lib/leave-approvers'
 
 export async function submitLeaveRequest(formData: FormData) {
   const currentUser = await requireModule('leave_attendance')
@@ -42,17 +45,32 @@ export async function submitLeaveRequest(formData: FormData) {
     redirect('/hrm/leave?error=' + encodeURIComponent('This date range overlaps an existing request'))
   }
 
-  const { error } = await supabase.from('leave_requests').insert({
-    user_id: currentUser.id,
-    type: parsed.data.type,
-    start_date: parsed.data.startDate,
-    end_date: parsed.data.endDate,
-    reason: parsed.data.reason,
-  })
+  const { data: created, error } = await supabase
+    .from('leave_requests')
+    .insert({
+      user_id: currentUser.id,
+      type: parsed.data.type,
+      start_date: parsed.data.startDate,
+      end_date: parsed.data.endDate,
+      reason: parsed.data.reason,
+    })
+    .select('id')
+    .single()
 
-  if (error) {
-    redirect('/hrm/leave?error=' + encodeURIComponent(error.message))
+  if (error || !created) {
+    redirect('/hrm/leave?error=' + encodeURIComponent(error?.message ?? 'Failed to submit request'))
   }
+
+  const { managerId, hrIds } = await leaveApprovers(currentUser.id)
+  await notify(
+    leaveSubmittedNotices({
+      requestId: created.id,
+      employeeId: currentUser.id,
+      employeeName: currentUser.name,
+      managerId,
+      hrIds,
+    })
+  )
 
   revalidatePath('/hrm/leave')
   redirect('/hrm/leave')
