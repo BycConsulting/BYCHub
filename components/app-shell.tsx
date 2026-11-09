@@ -7,6 +7,7 @@ import { TopNav, SubNav } from '@/components/top-nav'
 import { MobileNav } from '@/components/mobile-nav'
 import { CommandPalette } from '@/components/command-palette'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { NotificationBell } from '@/components/notification-bell'
 import { Button } from '@/components/ui/button'
 import { GlobalChatBubble } from '@/components/global-chat-bubble'
 import type { CurrentUser } from '@/lib/access'
@@ -25,11 +26,13 @@ export function AppShell({
   user,
   enabledModules,
   assistant,
+  unreadCount,
   children,
 }: {
   user: CurrentUser
   enabledModules: Module[]
   assistant: { conversationId: string; initialMessages: UIMessage[] } | null
+  unreadCount: number
   children: React.ReactNode
 }) {
   const isAdmin = user.role === 'admin'
@@ -45,6 +48,7 @@ export function AppShell({
           <TopNav enabledModules={enabledModules} isAdmin={isAdmin} />
           <div className="ml-auto flex items-center gap-2">
             <CommandPalette enabledModules={enabledModules} isAdmin={isAdmin} />
+            <NotificationBell count={unreadCount} />
             <ThemeToggle />
             <Link
               href="/profile"
