@@ -6,6 +6,8 @@ import { requireModule } from '@/lib/access'
 import { createClient } from '@/lib/supabase/server'
 import { createProjectSchema, parseTaskForm, updateTaskStatusSchema } from '@/lib/validation'
 import { logTaskEvent } from '@/lib/task-events'
+import { notify } from '@/lib/notifications'
+import { taskAssignmentNotices, taskStatusNotices } from '@/lib/notification-events'
 import { checkProjectMatchesClient, taskColumns } from '@/lib/task-form-data'
 import type { TaskStatus } from '@/types/database'
 
@@ -40,6 +42,18 @@ export async function createTask(formData: FormData) {
   if (eventError) {
     redirect('/hrm/tasks?error=' + encodeURIComponent(eventError.message))
   }
+
+  await notify(
+    taskAssignmentNotices({
+      taskId: created.id,
+      title: parsed.data.title,
+      actorId: user.id,
+      previousOwnerId: null,
+      ownerId: parsed.data.assigneeId,
+      previousSupportIds: [],
+      supportIds: parsed.data.noSupport ? [] : parsed.data.supportIds,
+    })
+  )
 
   revalidatePath('/hrm/tasks')
   redirect('/hrm/tasks')
@@ -91,7 +105,7 @@ export async function updateTaskStatus(
 
   const { data: current, error: currentError } = await supabase
     .from('tasks')
-    .select('status')
+    .select('status, title, assignee_id, created_by')
     .eq('id', parsed.data.taskId)
     .single()
 
@@ -163,6 +177,18 @@ export async function updateTaskStatus(
       console.error('[tasks] failed to log status change event', eventError)
     }
   }
+
+  await notify(
+    taskStatusNotices({
+      taskId: parsed.data.taskId,
+      title: current.title,
+      actorId: user.id,
+      previousStatus,
+      status: newStatus,
+      ownerId: current.assignee_id,
+      creatorId: current.created_by,
+    })
+  )
 
   revalidatePath('/hrm/tasks')
   return { error: null }

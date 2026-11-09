@@ -6,6 +6,8 @@ import { requireModule } from '@/lib/access'
 import { createClient } from '@/lib/supabase/server'
 import { addTaskCommentSchema, parseTaskForm } from '@/lib/validation'
 import { logTaskEvent } from '@/lib/task-events'
+import { notify } from '@/lib/notifications'
+import { taskAssignmentNotices, taskCommentNotices, taskStatusNotices } from '@/lib/notification-events'
 import { checkProjectMatchesClient, taskColumns } from '@/lib/task-form-data'
 
 export async function updateTask(formData: FormData) {
@@ -28,7 +30,7 @@ export async function updateTask(formData: FormData) {
 
   const { data: current, error: currentError } = await supabase
     .from('tasks')
-    .select('status, priority, assignee_id')
+    .select('status, priority, assignee_id, title, support_ids, created_by')
     .eq('id', taskId)
     .single()
 
@@ -103,6 +105,27 @@ export async function updateTask(formData: FormData) {
     }
   }
 
+  await notify([
+    ...taskAssignmentNotices({
+      taskId,
+      title: fields.title,
+      actorId: user.id,
+      previousOwnerId: current.assignee_id,
+      ownerId: fields.assigneeId,
+      previousSupportIds: current.support_ids,
+      supportIds: fields.noSupport ? [] : fields.supportIds,
+    }),
+    ...taskStatusNotices({
+      taskId,
+      title: fields.title,
+      actorId: user.id,
+      previousStatus: current.status,
+      status: fields.status,
+      ownerId: fields.assigneeId,
+      creatorId: current.created_by,
+    }),
+  ])
+
   revalidatePath(back)
   revalidatePath('/hrm/tasks')
   redirect(back)
@@ -127,6 +150,25 @@ export async function addTaskComment(formData: FormData) {
 
   if (error) {
     redirect(back + '?error=' + encodeURIComponent(error.message))
+  }
+
+  const { data: task } = await supabase
+    .from('tasks')
+    .select('title, assignee_id, created_by, support_ids')
+    .eq('id', parsed.data.taskId)
+    .single()
+
+  if (task) {
+    await notify(
+      taskCommentNotices({
+        taskId: parsed.data.taskId,
+        title: task.title,
+        actorId: user.id,
+        ownerId: task.assignee_id,
+        creatorId: task.created_by,
+        supportIds: task.support_ids,
+      })
+    )
   }
 
   revalidatePath(back)

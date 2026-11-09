@@ -5,6 +5,8 @@ import { redirect } from 'next/navigation'
 import { requireModule } from '@/lib/access'
 import { createAdminSupabaseClient } from '@/lib/supabase/admin'
 import { leaveRequestIdSchema } from '@/lib/validation'
+import { notify } from '@/lib/notifications'
+import { leaveDecisionNotice } from '@/lib/notification-events'
 
 async function reviewRequest(formData: FormData, status: 'approved' | 'rejected') {
   const currentUser = await requireModule('leave_attendance')
@@ -64,6 +66,8 @@ async function reviewRequest(formData: FormData, status: 'approved' | 'rejected'
     const message = !error || error.code === 'PGRST116' ? 'Request not found or already resolved' : error.message
     redirect('/hrm/leave/requests?error=' + encodeURIComponent(message))
   }
+
+  await notify(leaveDecisionNotice({ employeeId: request.user_id, actorId: currentUser.id, status }))
 
   revalidatePath('/hrm/leave/requests')
   redirect('/hrm/leave/requests')
