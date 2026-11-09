@@ -60,3 +60,14 @@ Meta Marketing API and export to PDF.
    is pressed. **Export PDF** opens the print dialog — choose "Save as PDF".
 
 Unit tests for the report logic: `npm test`.
+
+## Notifications
+
+A bell in the top bar shows unread in-app notifications; `/notifications` lists them.
+
+1. Apply `supabase/migrations/0020_notifications.sql` in the Supabase SQL editor.
+2. Notifications are created by server actions for: task assigned, added as support,
+   blocked, completed and commented; leave submitted (to the manager, or HR if none),
+   approved and rejected. Nobody is notified about their own action.
+3. Rows can only be created by server code (service role); users can read and mark
+   only their own. Email through Zoho Mail is planned and can read the same rows.
