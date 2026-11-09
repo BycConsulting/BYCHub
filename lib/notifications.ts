@@ -55,12 +55,14 @@ export type NotificationClient = {
 /** Saves notifications. Never throws: a failure here must not break the action that caused it. */
 export async function notify(
   inputs: NotificationInput | NotificationInput[],
-  client: NotificationClient = createAdminSupabaseClient() as unknown as NotificationClient
+  client?: NotificationClient
 ): Promise<void> {
   try {
     const rows = (Array.isArray(inputs) ? inputs : [inputs]).flatMap(buildNotifications)
     if (rows.length === 0) return
-    const { error } = await client.from('notifications').insert(rows)
+    // Created inside the try: a missing service-role key must not fail a save that already committed.
+    const db = client ?? (createAdminSupabaseClient() as unknown as NotificationClient)
+    const { error } = await db.from('notifications').insert(rows)
     if (error) console.error('[notifications] failed to save', error.message)
   } catch (err) {
     console.error('[notifications] failed to save', err)

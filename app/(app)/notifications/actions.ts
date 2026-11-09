@@ -6,6 +6,7 @@ import { requireUser } from '@/lib/access'
 import { createClient } from '@/lib/supabase/server'
 import { notificationIdSchema } from '@/lib/validation'
 import { safeLink } from '@/lib/notifications'
+import { getUnreadCount } from '@/lib/notifications-read'
 
 /** Marks one of your notifications read and goes to the page it is about. */
 export async function openNotification(formData: FormData) {
@@ -48,4 +49,10 @@ export async function markAllRead() {
 
   revalidatePath('/', 'layout')
   redirect('/notifications')
+}
+
+/** Called by the bell on every route change so the count stays current without a full reload. */
+export async function fetchUnreadCount(): Promise<number> {
+  await requireUser()
+  return getUnreadCount()
 }

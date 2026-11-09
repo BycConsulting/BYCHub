@@ -1,7 +1,34 @@
-import Link from 'next/link'
-import { Bell } from 'lucide-react'
+'use client'
 
-export function NotificationBell({ count }: { count: number }) {
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { Bell } from 'lucide-react'
+import { fetchUnreadCount } from '@/app/(app)/notifications/actions'
+
+/** The shared layout does not re-render on client navigation, so the count is re-read whenever the route changes. */
+export function NotificationBell({ count: initialCount }: { count: number }) {
+  const pathname = usePathname()
+  const [count, setCount] = useState(initialCount)
+  const [seenInitial, setSeenInitial] = useState(initialCount)
+
+  if (seenInitial !== initialCount) {
+    setSeenInitial(initialCount)
+    setCount(initialCount)
+  }
+
+  useEffect(() => {
+    let active = true
+    fetchUnreadCount()
+      .then((latest) => {
+        if (active) setCount(latest)
+      })
+      .catch(() => {})
+    return () => {
+      active = false
+    }
+  }, [pathname])
+
   return (
     <Link
       href="/notifications"
